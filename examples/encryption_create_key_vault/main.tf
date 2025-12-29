@@ -9,11 +9,15 @@ module "atlas_azure" {
   encryption = {
     enabled = true
     create_key_vault = {
-      enabled             = true
-      name                = var.key_vault_name
-      azure_location      = data.azurerm_resource_group.main.location
-      resource_group_name = data.azurerm_resource_group.main.name
+      enabled                    = true
+      name                       = var.key_vault_name
+      azure_location             = data.azurerm_resource_group.main.location
+      resource_group_name        = data.azurerm_resource_group.main.name
+      purge_protection_enabled   = var.purge_protection_enabled
+      soft_delete_retention_days = var.soft_delete_retention_days
     }
+    require_private_networking = var.require_private_networking
+    private_endpoint_regions   = var.private_endpoint_regions
   }
 }
 
@@ -29,4 +33,9 @@ output "key_vault_id" {
 output "key_identifier" {
   description = "Module-created key identifier"
   value       = module.atlas_azure.encryption.key_identifier
+}
+
+output "private_endpoints" {
+  description = "Private endpoint status (empty if require_private_networking = false)"
+  value       = module.atlas_azure.encryption.private_endpoints
 }

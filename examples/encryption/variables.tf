@@ -17,3 +17,15 @@ variable "key_vault_name" {
   type        = string
   description = "Azure Key Vault name (must be globally unique)"
 }
+
+variable "purge_protection_enabled" {
+  type        = bool
+  default     = true
+  description = "Enable purge protection. Set to false for dev/test to allow immediate cleanup."
+}
+
+variable "soft_delete_retention_days" {
+  type        = number
+  default     = 90
+  description = "Soft delete retention days (7-90). Use 7 for dev/test."
+}
