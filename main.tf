@@ -32,3 +32,35 @@ resource "mongodbatlas_cloud_provider_access_authorization" "this" {
     tenant_id            = local.tenant_id
   }
 }
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Encryption at Rest with Azure Key Vault
+# ─────────────────────────────────────────────────────────────────────────────
+
+module "encryption" {
+  count  = var.encryption.enabled && !var.skip_cloud_provider_access ? 1 : 0
+  source = "./modules/encryption"
+
+  project_id           = var.project_id
+  service_principal_id = local.service_principal_id
+
+  key_vault_id     = var.encryption.key_vault_id
+  key_identifier   = var.encryption.key_identifier
+  create_key_vault = var.encryption.create_key_vault
+
+  client_secret              = var.encryption_client_secret
+  require_private_networking = var.encryption.require_private_networking
+
+  depends_on = [mongodbatlas_cloud_provider_access_authorization.this]
+}
+
+module "encryption_private_endpoint" {
+  source   = "./modules/encryption_private_endpoint"
+  for_each = var.encryption.enabled && var.encryption.require_private_networking ? var.encryption.private_endpoint_regions : toset([])
+
+  project_id   = var.project_id
+  region_name  = each.key
+  key_vault_id = local.encryption_key_vault_id
+
+  depends_on = [module.encryption]
+}

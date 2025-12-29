@@ -31,3 +31,87 @@ variable "skip_cloud_provider_access" {
   default     = false
   description = "Skip cloud_provider_access setup. Set true ONLY for privatelink-only usage where azuread provider is not available."
 }
+
+variable "encryption" {
+  type = object({
+    enabled        = optional(bool, false)
+    key_vault_id   = optional(string)
+    key_identifier = optional(string)
+    create_key_vault = optional(object({
+      enabled                    = bool
+      name                       = string
+      resource_group_name        = string
+      azure_location             = string
+      purge_protection_enabled   = optional(bool, true)
+      soft_delete_retention_days = optional(number, 90)
+    }))
+    require_private_networking = optional(bool, false)
+    private_endpoint_regions   = optional(set(string), [])
+  })
+  default     = {}
+  description = <<-EOT
+    Encryption at rest configuration with Azure Key Vault.
+    
+    Provide EITHER:
+    - key_vault_id + key_identifier (user-provided Key Vault)
+    - create_key_vault.enabled = true (module-managed Key Vault)
+  EOT
+
+  validation {
+    condition     = !(var.encryption.key_vault_id != null && try(var.encryption.create_key_vault.enabled, false))
+    error_message = "Cannot use both key_vault_id (user-provided) and create_key_vault.enabled=true (module-managed)."
+  }
+
+  validation {
+    condition     = !var.encryption.enabled || (var.encryption.key_vault_id != null || try(var.encryption.create_key_vault.enabled, false))
+    error_message = "encryption.enabled=true requires key_vault_id OR create_key_vault.enabled=true."
+  }
+
+  validation {
+    condition     = var.encryption.key_vault_id == null || var.encryption.key_identifier != null
+    error_message = "When using key_vault_id (user-provided), key_identifier is required."
+  }
+
+  validation {
+    condition     = var.encryption.key_vault_id == null || var.encryption.create_key_vault == null
+    error_message = "When using key_vault_id (user-provided), do not set create_key_vault."
+  }
+
+  validation {
+    condition = var.encryption.key_identifier == null || can(regex(
+      "^https://[a-zA-Z0-9-]+\\.vault\\.azure\\.net/keys/[a-zA-Z0-9-]+$",
+      var.encryption.key_identifier
+    ))
+    error_message = "key_identifier must be versionless: https://{vault}.vault.azure.net/keys/{key-name}"
+  }
+
+  validation {
+    condition = var.encryption.create_key_vault == null || can(regex(
+      "^[a-z][a-z0-9]+$",
+      var.encryption.create_key_vault.azure_location
+    ))
+    error_message = "create_key_vault.azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
+  }
+
+  validation {
+    condition     = !var.encryption.require_private_networking || var.encryption.enabled
+    error_message = "require_private_networking=true requires encryption.enabled=true."
+  }
+
+  validation {
+    condition     = !var.encryption.require_private_networking || length(var.encryption.private_endpoint_regions) > 0
+    error_message = "When require_private_networking=true, private_endpoint_regions must specify at least one region."
+  }
+}
+
+variable "encryption_client_secret" {
+  type        = string
+  default     = null
+  sensitive   = true
+  description = <<-EOT
+    Azure AD application client secret for encryption. If null, module creates one automatically.
+    
+    IMPORTANT: Azure limits Client Secret lifetime to 2 years. Atlas loses CMK access
+    when the secret expires, causing cluster unavailability. Rotate secrets before expiration.
+  EOT
+}
