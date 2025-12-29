@@ -71,7 +71,7 @@ resource "azurerm_key_vault_key" "atlas" {
 
 resource "azurerm_role_assignment" "key_vault_crypto" {
   scope                = local.key_vault_id
-  role_definition_name = "Key Vault Crypto Service Encryption User"
+  role_definition_name = "Key Vault Crypto User"
   principal_id         = var.service_principal_id
 }
 
