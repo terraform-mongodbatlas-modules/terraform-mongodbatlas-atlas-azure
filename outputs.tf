@@ -20,7 +20,7 @@ output "feature_usages" {
 
 output "encryption" {
   description = "Encryption at rest configuration status"
-  value = var.encryption.enabled && !var.skip_cloud_provider_access ? {
+  value = local.encryption_enabled ? {
     valid                       = module.encryption[0].valid
     encryption_at_rest_provider = module.encryption[0].encryption_at_rest_provider
     key_vault_id                = module.encryption[0].key_vault_id
@@ -38,5 +38,5 @@ output "encryption" {
 
 output "encryption_at_rest_provider" {
   description = "Value for cluster's encryption_at_rest_provider attribute"
-  value       = var.encryption.enabled && !var.skip_cloud_provider_access ? "AZURE" : "NONE"
+  value       = local.encryption_enabled ? "AZURE" : "NONE"
 }

@@ -184,7 +184,8 @@ run "encryption_user_provided_key_vault" {
   command = plan
 
   variables {
-    project_id = var.project_id
+    project_id               = var.project_id
+    encryption_client_secret = "test-secret-value"
     encryption = {
       enabled        = true
       key_vault_id   = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.KeyVault/vaults/kv"
@@ -201,13 +202,19 @@ run "encryption_user_provided_key_vault" {
     condition     = output.encryption_at_rest_provider == "AZURE"
     error_message = "Expected encryption_at_rest_provider to be AZURE"
   }
+
+  assert {
+    condition     = length(azuread_application_password.encryption) == 0
+    error_message = "Expected no client secret to be created when provided"
+  }
 }
 
 run "encryption_module_managed_key_vault" {
   command = plan
 
   variables {
-    project_id = var.project_id
+    project_id               = var.project_id
+    encryption_client_secret = "test-secret-value"
     encryption = {
       enabled = true
       create_key_vault = {
@@ -234,7 +241,8 @@ run "encryption_with_private_networking" {
   command = plan
 
   variables {
-    project_id = var.project_id
+    project_id               = var.project_id
+    encryption_client_secret = "test-secret-value"
     encryption = {
       enabled = true
       create_key_vault = {
@@ -279,5 +287,10 @@ run "encryption_skipped_when_skip_cloud_provider_access" {
   assert {
     condition     = length(module.encryption) == 0
     error_message = "Expected no encryption module when skip_cloud_provider_access=true"
+  }
+
+  assert {
+    condition     = length(azuread_application_password.encryption) == 0
+    error_message = "Expected no client secret when skip_cloud_provider_access=true"
   }
 }

@@ -35,9 +35,8 @@ variable "create_key_vault" {
 
 variable "client_secret" {
   type        = string
-  default     = null
   sensitive   = true
-  description = "Azure AD application client secret. If null, module creates one."
+  description = "Azure AD application client secret for Atlas encryption."
 }
 
 variable "require_private_networking" {

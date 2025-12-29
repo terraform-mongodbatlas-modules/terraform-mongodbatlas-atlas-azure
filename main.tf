@@ -37,8 +37,19 @@ resource "mongodbatlas_cloud_provider_access_authorization" "this" {
 # Encryption at Rest with Azure Key Vault
 # ─────────────────────────────────────────────────────────────────────────────
 
+data "azuread_application" "atlas" {
+  count     = local.create_encryption_client_secret ? 1 : 0
+  client_id = var.atlas_azure_app_id
+}
+
+resource "azuread_application_password" "encryption" {
+  count          = local.create_encryption_client_secret ? 1 : 0
+  application_id = data.azuread_application.atlas[0].id
+  display_name   = "MongoDB Atlas Module - Encryption at Rest"
+}
+
 module "encryption" {
-  count  = var.encryption.enabled && !var.skip_cloud_provider_access ? 1 : 0
+  count  = local.encryption_enabled ? 1 : 0
   source = "./modules/encryption"
 
   project_id           = var.project_id
@@ -48,7 +59,7 @@ module "encryption" {
   key_identifier   = var.encryption.key_identifier
   create_key_vault = var.encryption.create_key_vault
 
-  client_secret              = var.encryption_client_secret
+  client_secret              = local.encryption_client_secret
   require_private_networking = var.encryption.require_private_networking
 
   depends_on = [mongodbatlas_cloud_provider_access_authorization.this]
@@ -56,7 +67,7 @@ module "encryption" {
 
 module "encryption_private_endpoint" {
   source   = "./modules/encryption_private_endpoint"
-  for_each = var.encryption.enabled && var.encryption.require_private_networking ? var.encryption.private_endpoint_regions : toset([])
+  for_each = local.encryption_enabled && var.encryption.require_private_networking ? var.encryption.private_endpoint_regions : toset([])
 
   project_id   = var.project_id
   region_name  = each.key

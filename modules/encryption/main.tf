@@ -4,10 +4,6 @@ data "azuread_service_principal" "atlas" {
   object_id = var.service_principal_id
 }
 
-data "azuread_application" "atlas" {
-  client_id = data.azuread_service_principal.atlas.client_id
-}
-
 locals {
   create_key_vault = var.create_key_vault != null && var.create_key_vault.enabled
 
@@ -18,7 +14,6 @@ locals {
 
   subscription_id = data.azurerm_client_config.current.subscription_id
   tenant_id       = data.azurerm_client_config.current.tenant_id
-  client_secret   = var.client_secret != null ? var.client_secret : azuread_application_password.atlas[0].value
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -59,16 +54,6 @@ resource "azurerm_key_vault_key" "atlas" {
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Client Secret (created if not provided)
-# ─────────────────────────────────────────────────────────────────────────────
-
-resource "azuread_application_password" "atlas" {
-  count          = var.client_secret == null ? 1 : 0
-  application_id = data.azuread_application.atlas.id
-  display_name   = "atlas-encryption-key-vault"
-}
-
-# ─────────────────────────────────────────────────────────────────────────────
 # Role Assignments (grants Atlas service principal access to Key Vault)
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -97,7 +82,7 @@ resource "mongodbatlas_encryption_at_rest" "this" {
     tenant_id                  = local.tenant_id
     subscription_id            = local.subscription_id
     client_id                  = data.azuread_service_principal.atlas.client_id
-    secret                     = local.client_secret
+    secret                     = var.client_secret
     resource_group_name        = local.resource_group_name
     key_vault_name             = local.key_vault_name
     key_identifier             = local.key_identifier
