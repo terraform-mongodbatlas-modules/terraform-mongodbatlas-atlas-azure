@@ -7,6 +7,11 @@ resource "azuread_service_principal" "atlas" {
   app_role_assignment_required = false
 }
 
+data "azuread_service_principal" "existing" {
+  count     = !var.create_service_principal && !var.skip_cloud_provider_access ? 1 : 0
+  object_id = var.service_principal_id
+}
+
 resource "mongodbatlas_cloud_provider_access_setup" "this" {
   count = !var.skip_cloud_provider_access ? 1 : 0
 
@@ -37,15 +42,10 @@ resource "mongodbatlas_cloud_provider_access_authorization" "this" {
 # Encryption at Rest with Azure Key Vault
 # ─────────────────────────────────────────────────────────────────────────────
 
-data "azuread_application" "atlas" {
-  count     = local.create_encryption_client_secret ? 1 : 0
-  client_id = var.atlas_azure_app_id
-}
-
-resource "azuread_application_password" "encryption" {
-  count          = local.create_encryption_client_secret ? 1 : 0
-  application_id = data.azuread_application.atlas[0].id
-  display_name   = "MongoDB Atlas Module - Encryption at Rest"
+resource "azuread_service_principal_password" "encryption" {
+  count                = local.create_encryption_client_secret ? 1 : 0
+  service_principal_id = local.service_principal_resource_id
+  display_name         = "MongoDB Atlas Module - Encryption at Rest"
 }
 
 module "encryption" {

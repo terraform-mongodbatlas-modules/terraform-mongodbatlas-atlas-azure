@@ -204,7 +204,7 @@ run "encryption_user_provided_key_vault" {
   }
 
   assert {
-    condition     = length(azuread_application_password.encryption) == 0
+    condition     = length(azuread_service_principal_password.encryption) == 0
     error_message = "Expected no client secret to be created when provided"
   }
 }
@@ -290,7 +290,7 @@ run "encryption_skipped_when_skip_cloud_provider_access" {
   }
 
   assert {
-    condition     = length(azuread_application_password.encryption) == 0
+    condition     = length(azuread_service_principal_password.encryption) == 0
     error_message = "Expected no client secret when skip_cloud_provider_access=true"
   }
 }
