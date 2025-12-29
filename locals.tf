@@ -4,7 +4,7 @@ locals {
     azuread_service_principal.atlas[0].object_id
   ) : var.service_principal_id
 
-  encryption_key_vault_id = var.encryption.enabled ? (
+  encryption_key_vault_id = var.encryption.enabled && !var.skip_cloud_provider_access ? (
     var.encryption.key_vault_id != null ? var.encryption.key_vault_id : module.encryption[0].key_vault_id
   ) : null
 }
