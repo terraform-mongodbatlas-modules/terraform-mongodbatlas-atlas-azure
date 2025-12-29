@@ -44,6 +44,11 @@ variable "encryption" {
       azure_location             = string
       purge_protection_enabled   = optional(bool, true)
       soft_delete_retention_days = optional(number, 90)
+      key_rotation_policy = optional(object({
+        expire_after         = optional(string, "P365D")
+        rotate_before_expiry = optional(string, "P30D")
+        notify_before_expiry = optional(string, "P30D")
+      }), {})
     }))
     require_private_networking = optional(bool, false)
     private_endpoint_regions   = optional(set(string), [])

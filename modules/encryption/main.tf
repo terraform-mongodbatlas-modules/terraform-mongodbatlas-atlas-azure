@@ -50,7 +50,19 @@ resource "azurerm_key_vault_key" "atlas" {
   key_size     = 2048
   key_opts     = ["encrypt", "decrypt", "wrapKey", "unwrapKey"]
 
+  rotation_policy {
+    automatic {
+      time_before_expiry = var.create_key_vault.key_rotation_policy.rotate_before_expiry
+    }
+    expire_after         = var.create_key_vault.key_rotation_policy.expire_after
+    notify_before_expiry = var.create_key_vault.key_rotation_policy.notify_before_expiry
+  }
+
   depends_on = [azurerm_role_assignment.terraform_key_vault_admin]
+
+  lifecycle {
+    ignore_changes = [expiration_date]
+  }
 }
 
 # ─────────────────────────────────────────────────────────────────────────────

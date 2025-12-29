@@ -28,7 +28,19 @@ resource "azurerm_key_vault_key" "atlas" {
   key_size     = 2048
   key_opts     = ["encrypt", "decrypt", "wrapKey", "unwrapKey"]
 
+  rotation_policy {
+    automatic {
+      time_before_expiry = "P30D"
+    }
+    expire_after         = "P365D"
+    notify_before_expiry = "P30D"
+  }
+
   depends_on = [azurerm_role_assignment.terraform_key_vault_admin]
+
+  lifecycle {
+    ignore_changes = [expiration_date]
+  }
 }
 
 module "atlas_azure" {

@@ -28,9 +28,14 @@ variable "create_key_vault" {
     azure_location             = string
     purge_protection_enabled   = optional(bool, true)
     soft_delete_retention_days = optional(number, 90)
+    key_rotation_policy = optional(object({
+      expire_after         = optional(string, "P365D")
+      rotate_before_expiry = optional(string, "P30D")
+      notify_before_expiry = optional(string, "P30D")
+    }), {})
   })
   default     = null
-  description = "Create module-managed Key Vault. Mutually exclusive with key_vault_id."
+  description = "Create module-managed Key Vault. Mutually exclusive with key_vault_id. key_rotation_policy uses ISO 8601 duration format (P365D = 365 days). Azure auto-rotates keys and Atlas uses versionless key URL."
 }
 
 variable "client_secret" {
