@@ -3,12 +3,6 @@ variable "project_id" {
   description = "MongoDB Atlas project ID"
 }
 
-variable "azure_location" {
-  type        = string
-  description = "Azure location"
-  default     = "eastus"
-}
-
 variable "subscription_id" {
   type        = string
   description = "Azure subscription ID"
