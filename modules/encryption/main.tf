@@ -10,7 +10,7 @@ locals {
   key_vault_id        = local.create_key_vault ? azurerm_key_vault.atlas[0].id : var.key_vault_id
   key_vault_name      = local.create_key_vault ? azurerm_key_vault.atlas[0].name : element(split("/", var.key_vault_id), 8)
   resource_group_name = local.create_key_vault ? var.create_key_vault.resource_group_name : element(split("/", var.key_vault_id), 4)
-  key_identifier      = local.create_key_vault ? azurerm_key_vault_key.atlas[0].versionless_id : var.key_identifier
+  key_identifier      = local.create_key_vault ? azurerm_key_vault_key.atlas[0].id : var.key_identifier
 
   subscription_id = data.azurerm_client_config.current.subscription_id
   tenant_id       = data.azurerm_client_config.current.tenant_id

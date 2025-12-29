@@ -24,6 +24,6 @@ output "key_vault_uri" {
 }
 
 output "key_identifier" {
-  description = "Key Vault key identifier (versionless URL)"
+  description = "Key Vault key identifier (full URL including version)"
   value       = local.key_identifier
 }
