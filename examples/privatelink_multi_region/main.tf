@@ -4,12 +4,7 @@ module "atlas_azure" {
   project_id                 = var.project_id
   skip_cloud_provider_access = true
 
-  privatelink = {
-    enabled            = true
-    azure_location     = var.primary_azure_location
-    subnet_id          = var.primary_subnet_id
-    additional_regions = var.additional_regions
-  }
+  privatelink_module_managed_subnet_ids = var.subnet_ids
 }
 
 output "privatelink" {
