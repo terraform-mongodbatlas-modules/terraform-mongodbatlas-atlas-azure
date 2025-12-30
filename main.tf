@@ -121,7 +121,7 @@ module "privatelink" {
   # Module-managed PrivateLink configuration
   create_azure_private_endpoint = contains(keys(var.privatelink_module_managed_subnet_ids), each.key)
   subnet_id                     = try(var.privatelink_module_managed_subnet_ids[each.key], null)
-  # User-managed PrivateLink configuration
-  azure_private_endpoint_id         = try(var.privatelink_region_user_managed[each.key].azure_private_endpoint_id, null)
-  azure_private_endpoint_ip_address = try(var.privatelink_region_user_managed[each.key].azure_private_endpoint_ip_address, null)
+  # BYOE (Bring Your Own Endpoint) configuration
+  azure_private_endpoint_id         = try(var.privatelink_byoe_locations[each.key].azure_private_endpoint_id, null)
+  azure_private_endpoint_ip_address = try(var.privatelink_byoe_locations[each.key].azure_private_endpoint_ip_address, null)
 }

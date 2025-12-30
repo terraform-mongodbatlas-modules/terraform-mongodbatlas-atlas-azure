@@ -140,20 +140,20 @@ variable "privatelink_locations" {
   description = "List of Azure locations to enable PrivateLink connectivity to Atlas."
 }
 
-variable "privatelink_region_user_managed" {
+variable "privatelink_byoe_locations" {
   type = map(object({
     azure_private_endpoint_id         = string
     azure_private_endpoint_ip_address = string
   }))
   default     = {}
-  description = "User-managed PrivateLink configuration for a specific Azure region."
+  description = "BYOE (Bring Your Own Endpoint) configuration per Azure location. Map keys are Azure locations (e.g., eastus2)."
   validation {
-    condition     = alltrue([for region in keys(var.privatelink_region_user_managed) : can(regex("^[a-z][a-z0-9]+$", region))])
+    condition     = alltrue([for location in keys(var.privatelink_byoe_locations) : can(regex("^[a-z][a-z0-9]+$", location))])
     error_message = "azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
   }
   validation {
-    condition     = alltrue([for region in keys(var.privatelink_region_user_managed) : contains(var.privatelink_locations, region)])
-    error_message = "All locations in privatelink_region_user_managed must be in privatelink_locations."
+    condition     = alltrue([for location in keys(var.privatelink_byoe_locations) : contains(var.privatelink_locations, location)])
+    error_message = "All locations in privatelink_byoe_locations must be in privatelink_locations."
   }
 }
 
@@ -162,33 +162,3 @@ variable "privatelink_module_managed_subnet_ids" {
   default     = {}
   description = "Map of Azure location to subnet ID for module-managed PrivateLink endpoints."
 }
-
-
-# variable "privatelink" {
-#   type = object({
-#     # enabled                           = optional(bool, false)
-#     azure_location                    = optional(string)
-#     create_azure_private_endpoint     = optional(bool, true)
-#     subnet_id                         = optional(string)
-#     azure_private_endpoint_id         = optional(string)
-#     azure_private_endpoint_ip_address = optional(string)
-#     additional_regions = optional(map(object({
-#       create_azure_private_endpoint     = optional(bool, true)
-#       subnet_id                         = optional(string)
-#       azure_private_endpoint_id         = optional(string)
-#       azure_private_endpoint_ip_address = optional(string)
-#     })), {})
-#   })
-#   default     = {}
-#   description = <<-EOT
-#     PrivateLink configuration for private network connectivity to Atlas.
-
-#     For module-managed endpoints: provide subnet_id
-#     For user-managed (BYOE): set create_azure_private_endpoint=false and provide azure_private_endpoint_id + azure_private_endpoint_ip_address
-
-#     Use additional_regions for multi-region/geo-sharded clusters.
-
-#     Note: All validations use resource preconditions to support BYOE patterns where
-#     azure_private_endpoint_id comes from resources in the same configuration.
-#   EOT
-# }

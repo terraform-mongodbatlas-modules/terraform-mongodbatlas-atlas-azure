@@ -45,12 +45,12 @@ run "valid_multi_region_module_managed" {
   }
 }
 
-run "valid_user_managed_byoe" {
+run "valid_byoe" {
   command = plan
 
   variables {
     privatelink_locations = ["eastus2"]
-    privatelink_region_user_managed = {
+    privatelink_byoe_locations = {
       eastus2 = {
         azure_private_endpoint_id         = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/privateEndpoints/pe-atlas"
         azure_private_endpoint_ip_address = "10.0.1.100"
@@ -64,12 +64,12 @@ run "valid_user_managed_byoe" {
   }
 }
 
-run "invalid_user_managed_region_format" {
+run "invalid_byoe_location_format" {
   command = plan
 
   variables {
     privatelink_locations = []
-    privatelink_region_user_managed = {
+    privatelink_byoe_locations = {
       "East US 2" = {
         azure_private_endpoint_id         = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/privateEndpoints/pe-atlas"
         azure_private_endpoint_ip_address = "10.0.1.100"
@@ -77,15 +77,15 @@ run "invalid_user_managed_region_format" {
     }
   }
 
-  expect_failures = [var.privatelink_region_user_managed]
+  expect_failures = [var.privatelink_byoe_locations]
 }
 
-run "invalid_user_managed_region_not_in_privatelink_locations" {
+run "invalid_byoe_location_not_in_privatelink_locations" {
   command = plan
 
   variables {
     privatelink_locations = ["eastus2"]
-    privatelink_region_user_managed = {
+    privatelink_byoe_locations = {
       westeurope = {
         azure_private_endpoint_id         = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/privateEndpoints/pe-atlas"
         azure_private_endpoint_ip_address = "10.0.1.100"
@@ -93,5 +93,5 @@ run "invalid_user_managed_region_not_in_privatelink_locations" {
     }
   }
 
-  expect_failures = [var.privatelink_region_user_managed]
+  expect_failures = [var.privatelink_byoe_locations]
 }

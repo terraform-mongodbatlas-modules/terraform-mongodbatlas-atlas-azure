@@ -9,9 +9,8 @@ module "atlas_azure" {
   project_id                 = var.project_id
   skip_cloud_provider_access = true
 
-  # Only enable privatelink to create Atlas-side resources
-  # Don't pass BYOE values here - they would create a cycle
-  privatelink_region_user_managed = {
+  # BYOE: provide your own Azure Private Endpoint details
+  privatelink_byoe_locations = {
     (var.azure_location) = {
       azure_private_endpoint_id         = azurerm_private_endpoint.custom.id
       azure_private_endpoint_ip_address = azurerm_private_endpoint.custom.private_service_connection[0].private_ip_address
