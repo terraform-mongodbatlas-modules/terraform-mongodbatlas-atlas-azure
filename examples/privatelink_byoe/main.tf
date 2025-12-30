@@ -13,11 +13,11 @@ module "atlas_azure" {
   # Don't pass BYOE values here - they would create a cycle
   privatelink_region_user_managed = {
     (var.azure_location) = {
-      azure_private_endpoint_id = azurerm_private_endpoint.custom.id
+      azure_private_endpoint_id         = azurerm_private_endpoint.custom.id
       azure_private_endpoint_ip_address = azurerm_private_endpoint.custom.private_service_connection[0].private_ip_address
     }
   }
-  privatelink_regions = [ var.azure_location ]
+  privatelink_locations = [var.azure_location]
 }
 
 # Step 2: User-managed Azure Private Endpoint with custom configuration
@@ -42,7 +42,7 @@ resource "azurerm_private_endpoint" "custom" {
 
 output "privatelink" {
   description = "PrivateLink connection details"
-  value = module.atlas_azure.privatelink[var.azure_location]
+  value       = module.atlas_azure.privatelink[var.azure_location]
 }
 
 output "static_ip" {

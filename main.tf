@@ -91,7 +91,7 @@ resource "mongodbatlas_private_endpoint_regional_mode" "this" {
 # Atlas-side PrivateLink endpoint - created at root level to avoid cycles
 # This only depends on location keys, not BYOE values
 resource "mongodbatlas_privatelink_endpoint" "this" {
-  for_each = local.privatelink_regions
+  for_each = local.privatelink_locations
 
   project_id    = var.project_id
   provider_name = "AZURE"
@@ -109,7 +109,7 @@ resource "mongodbatlas_privatelink_endpoint" "this" {
 # BYOE endpoints should use the submodule directly (see examples/privatelink_byoe)
 module "privatelink" {
   source   = "./modules/privatelink"
-  for_each = local.privatelink_regions
+  for_each = local.privatelink_locations
 
   project_id                       = var.project_id
   azure_location                   = each.key
@@ -117,11 +117,11 @@ module "privatelink" {
   private_link_id                  = mongodbatlas_privatelink_endpoint.this[each.key].private_link_id
   private_link_service_name        = mongodbatlas_privatelink_endpoint.this[each.key].private_link_service_name
   private_link_service_resource_id = mongodbatlas_privatelink_endpoint.this[each.key].private_link_service_resource_id
-  
-  # User-managed PrivateLink configuration
-  create_azure_private_endpoint    = contains(keys(var.privatelink_region_module_managed), each.key)
-  subnet_id                        = try(var.privatelink_region_module_managed[each.key].subnet_id, null)
+
   # Module-managed PrivateLink configuration
-  azure_private_endpoint_id        = try(var.privatelink_region_user_managed[each.key].azure_private_endpoint_id, null)
+  create_azure_private_endpoint = contains(keys(var.privatelink_module_managed_subnet_ids), each.key)
+  subnet_id                     = try(var.privatelink_module_managed_subnet_ids[each.key], null)
+  # User-managed PrivateLink configuration
+  azure_private_endpoint_id         = try(var.privatelink_region_user_managed[each.key].azure_private_endpoint_id, null)
   azure_private_endpoint_ip_address = try(var.privatelink_region_user_managed[each.key].azure_private_endpoint_ip_address, null)
 }

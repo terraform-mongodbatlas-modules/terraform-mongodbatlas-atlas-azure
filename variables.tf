@@ -134,10 +134,10 @@ variable "encryption_client_secret" {
   EOT
 }
 
-variable "privatelink_regions" {
+variable "privatelink_locations" {
   type        = list(string)
   default     = []
-  description = "List of Azure regions to enable PrivateLink connectivity to Atlas."
+  description = "List of Azure locations to enable PrivateLink connectivity to Atlas."
 }
 
 variable "privatelink_region_user_managed" {
@@ -152,17 +152,15 @@ variable "privatelink_region_user_managed" {
     error_message = "azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
   }
   validation {
-    condition = alltrue([for region in keys(var.privatelink_region_user_managed) : contains(var.privatelink_regions, region)])
-    error_message = "All regions in privatelink_region_user_managed must be in privatelink_regions."
+    condition     = alltrue([for region in keys(var.privatelink_region_user_managed) : contains(var.privatelink_locations, region)])
+    error_message = "All locations in privatelink_region_user_managed must be in privatelink_locations."
   }
 }
 
-variable "privatelink_region_module_managed" {
-  type = map(object({
-    subnet_id = string
-  }))
+variable "privatelink_module_managed_subnet_ids" {
+  type        = map(string)
   default     = {}
-  description = "Module-managed PrivateLink configuration for a specific Azure region."
+  description = "Map of Azure location to subnet ID for module-managed PrivateLink endpoints."
 }
 
 
@@ -184,12 +182,12 @@ variable "privatelink_region_module_managed" {
 #   default     = {}
 #   description = <<-EOT
 #     PrivateLink configuration for private network connectivity to Atlas.
-    
+
 #     For module-managed endpoints: provide subnet_id
 #     For user-managed (BYOE): set create_azure_private_endpoint=false and provide azure_private_endpoint_id + azure_private_endpoint_ip_address
-    
+
 #     Use additional_regions for multi-region/geo-sharded clusters.
-    
+
 #     Note: All validations use resource preconditions to support BYOE patterns where
 #     azure_private_endpoint_id comes from resources in the same configuration.
 #   EOT

@@ -11,11 +11,9 @@ run "valid_single_region_module_managed" {
   command = plan
 
   variables {
-    privatelink_regions = ["eastus2"]
-    privatelink_region_module_managed = {
-      eastus2 = {
-        subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet"
-      }
+    privatelink_locations = ["eastus2"]
+    privatelink_module_managed_subnet_ids = {
+      eastus2 = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet"
     }
   }
 
@@ -29,14 +27,10 @@ run "valid_multi_region_module_managed" {
   command = plan
 
   variables {
-    privatelink_regions = ["eastus2", "westeurope"]
-    privatelink_region_module_managed = {
-      eastus2 = {
-        subnet_id = "/subscriptions/sub/resourceGroups/rg-east/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet"
-      }
-      westeurope = {
-        subnet_id = "/subscriptions/sub/resourceGroups/rg-west/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet"
-      }
+    privatelink_locations = ["eastus2", "westeurope"]
+    privatelink_module_managed_subnet_ids = {
+      eastus2    = "/subscriptions/sub/resourceGroups/rg-east/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet"
+      westeurope = "/subscriptions/sub/resourceGroups/rg-west/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet"
     }
   }
 
@@ -55,7 +49,7 @@ run "valid_user_managed_byoe" {
   command = plan
 
   variables {
-    privatelink_regions = ["eastus2"]
+    privatelink_locations = ["eastus2"]
     privatelink_region_user_managed = {
       eastus2 = {
         azure_private_endpoint_id         = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/privateEndpoints/pe-atlas"
@@ -74,7 +68,7 @@ run "invalid_user_managed_region_format" {
   command = plan
 
   variables {
-    privatelink_regions = []
+    privatelink_locations = []
     privatelink_region_user_managed = {
       "East US 2" = {
         azure_private_endpoint_id         = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/privateEndpoints/pe-atlas"
@@ -86,11 +80,11 @@ run "invalid_user_managed_region_format" {
   expect_failures = [var.privatelink_region_user_managed]
 }
 
-run "invalid_user_managed_region_not_in_privatelink_regions" {
+run "invalid_user_managed_region_not_in_privatelink_locations" {
   command = plan
 
   variables {
-    privatelink_regions = ["eastus2"]
+    privatelink_locations = ["eastus2"]
     privatelink_region_user_managed = {
       westeurope = {
         azure_private_endpoint_id         = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/privateEndpoints/pe-atlas"
