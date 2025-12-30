@@ -42,7 +42,7 @@ output "encryption_at_rest_provider" {
 }
 
 output "privatelink" {
-  description = "PrivateLink status and identifiers per region"
+  description = "PrivateLink status for module-managed endpoints. For BYOE, use privatelink_service_info and call the submodule directly."
   value = {
     for region, pl in module.privatelink : region => {
       atlas_private_link_id                  = pl.atlas_private_link_id
@@ -52,6 +52,17 @@ output "privatelink" {
       azure_private_endpoint_ip_address      = pl.azure_private_endpoint_ip_address
       status                                 = pl.status
       error_message                          = pl.error_message
+    }
+  }
+}
+
+output "privatelink_service_info" {
+  description = "Atlas PrivateLink service info per region (for BYOE pattern - create your Azure PE using these values)"
+  value = {
+    for region, ep in mongodbatlas_privatelink_endpoint.this : region => {
+      atlas_private_link_id                  = ep.private_link_id
+      atlas_private_link_service_name        = ep.private_link_service_name
+      atlas_private_link_service_resource_id = ep.private_link_service_resource_id
     }
   }
 }

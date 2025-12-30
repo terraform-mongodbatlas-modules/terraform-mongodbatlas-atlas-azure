@@ -88,16 +88,40 @@ resource "mongodbatlas_private_endpoint_regional_mode" "this" {
   enabled    = true
 }
 
-module "privatelink" {
-  source   = "./modules/privatelink"
-  for_each = local.privatelink_locations
+# Atlas-side PrivateLink endpoint - created at root level to avoid cycles
+# This only depends on location keys, not BYOE values
+resource "mongodbatlas_privatelink_endpoint" "this" {
+  for_each = local.privatelink_location_keys
 
-  project_id                        = var.project_id
-  azure_location                    = each.key
-  create_azure_private_endpoint     = each.value.create_azure_private_endpoint
-  subnet_id                         = each.value.subnet_id
-  azure_private_endpoint_id         = each.value.azure_private_endpoint_id
-  azure_private_endpoint_ip_address = each.value.azure_private_endpoint_ip_address
+  project_id    = var.project_id
+  provider_name = "AZURE"
+  region        = each.key
 
   depends_on = [mongodbatlas_private_endpoint_regional_mode.this]
+
+  lifecycle {
+    precondition {
+      condition     = var.privatelink.azure_location != null
+      error_message = "privatelink.enabled=true requires azure_location."
+    }
+    precondition {
+      condition     = can(regex("^[a-z][a-z0-9]+$", each.key))
+      error_message = "azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
+    }
+  }
+}
+
+# Service registration submodule - only for module-managed Azure PEs
+# BYOE endpoints should use the submodule directly (see examples/privatelink_byoe)
+module "privatelink" {
+  source   = "./modules/privatelink"
+  for_each = local.privatelink_managed_locations
+
+  project_id                       = var.project_id
+  azure_location                   = each.key
+  private_link_id                  = mongodbatlas_privatelink_endpoint.this[each.key].private_link_id
+  private_link_service_name        = mongodbatlas_privatelink_endpoint.this[each.key].private_link_service_name
+  private_link_service_resource_id = mongodbatlas_privatelink_endpoint.this[each.key].private_link_service_resource_id
+  create_azure_private_endpoint    = true
+  subnet_id                        = each.value.subnet_id
 }

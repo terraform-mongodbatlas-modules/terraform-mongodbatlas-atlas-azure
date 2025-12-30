@@ -1,16 +1,16 @@
 output "atlas_private_link_id" {
   description = "Atlas PrivateLink connection ID"
-  value       = mongodbatlas_privatelink_endpoint.this.private_link_id
+  value       = var.private_link_id
 }
 
 output "atlas_private_link_service_name" {
   description = "Name of the Azure Private Link Service that Atlas manages"
-  value       = mongodbatlas_privatelink_endpoint.this.private_link_service_name
+  value       = var.private_link_service_name
 }
 
 output "atlas_private_link_service_resource_id" {
   description = "Azure resource ID of the Atlas-managed Private Link Service"
-  value       = mongodbatlas_privatelink_endpoint.this.private_link_service_resource_id
+  value       = var.private_link_service_resource_id
 }
 
 output "azure_private_endpoint_id" {

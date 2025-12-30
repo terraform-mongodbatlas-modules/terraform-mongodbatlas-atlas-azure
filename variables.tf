@@ -157,38 +157,8 @@ variable "privatelink" {
     For user-managed (BYOE): set create_azure_private_endpoint=false and provide azure_private_endpoint_id + azure_private_endpoint_ip_address
     
     Use additional_regions for multi-region/geo-sharded clusters.
+    
+    Note: All validations use resource preconditions to support BYOE patterns where
+    azure_private_endpoint_id comes from resources in the same configuration.
   EOT
-
-  validation {
-    condition     = !var.privatelink.enabled || var.privatelink.azure_location != null
-    error_message = "privatelink.enabled=true requires azure_location."
-  }
-
-  validation {
-    condition     = var.privatelink.azure_location == null || can(regex("^[a-z][a-z0-9]+$", var.privatelink.azure_location))
-    error_message = "azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
-  }
-
-  validation {
-    condition     = !(var.privatelink.subnet_id != null && var.privatelink.azure_private_endpoint_id != null)
-    error_message = "Cannot use both subnet_id and azure_private_endpoint_id."
-  }
-
-  validation {
-    condition     = !var.privatelink.enabled || !try(var.privatelink.create_azure_private_endpoint, true) || var.privatelink.subnet_id != null
-    error_message = "create_azure_private_endpoint=true requires subnet_id."
-  }
-
-  validation {
-    condition = try(var.privatelink.create_azure_private_endpoint, true) || (
-      var.privatelink.azure_private_endpoint_id != null &&
-      var.privatelink.azure_private_endpoint_ip_address != null
-    )
-    error_message = "create_azure_private_endpoint=false requires both azure_private_endpoint_id and azure_private_endpoint_ip_address."
-  }
-
-  validation {
-    condition     = try(var.privatelink.create_azure_private_endpoint, true) || var.privatelink.subnet_id == null
-    error_message = "subnet_id is only used when create_azure_private_endpoint=true."
-  }
 }

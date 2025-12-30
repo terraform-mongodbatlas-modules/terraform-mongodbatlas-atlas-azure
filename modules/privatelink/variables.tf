@@ -8,6 +8,21 @@ variable "azure_location" {
   description = "Azure region in lowercase format (e.g., eastus2, westeurope)"
 }
 
+variable "private_link_id" {
+  type        = string
+  description = "Atlas PrivateLink endpoint ID from mongodbatlas_privatelink_endpoint resource"
+}
+
+variable "private_link_service_name" {
+  type        = string
+  description = "Azure Private Link Service name from mongodbatlas_privatelink_endpoint resource"
+}
+
+variable "private_link_service_resource_id" {
+  type        = string
+  description = "Azure Private Link Service resource ID from mongodbatlas_privatelink_endpoint resource"
+}
+
 variable "create_azure_private_endpoint" {
   type        = bool
   default     = true
