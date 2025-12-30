@@ -138,6 +138,10 @@ variable "privatelink_locations" {
   type        = list(string)
   default     = []
   description = "List of Azure locations to enable PrivateLink connectivity to Atlas. Only required when using privatelink_byoe_locations."
+  validation {
+    condition     = alltrue([for location in var.privatelink_locations : can(regex("^[a-z][a-z0-9]+$", location))])
+    error_message = "All locations must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
+  }
 }
 
 variable "privatelink_byoe_locations" {
@@ -161,4 +165,8 @@ variable "privatelink_module_managed_subnet_ids" {
   type        = map(string)
   default     = {}
   description = "Map of Azure location to subnet ID for module-managed PrivateLink endpoints."
+  validation {
+    condition     = alltrue([for location in keys(var.privatelink_module_managed_subnet_ids) : can(regex("^[a-z][a-z0-9]+$", location))])
+    error_message = "All location keys must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
+  }
 }

@@ -19,33 +19,8 @@ locals {
     var.encryption.key_vault_id != null ? var.encryption.key_vault_id : module.encryption[0].key_vault_id
   ) : null
 
-  # PrivateLink - location keys only (no BYOE values to avoid cycles)
-  # privatelink_location_keys = var.privatelink_enabled ? toset(concat(
-  #   [var.privatelink.azure_location],
-  #   keys(var.privatelink.additional_regions)
-  # )) : toset([])
-
   privatelink_locations = toset(
     distinct(concat(var.privatelink_locations, keys(var.privatelink_module_managed_subnet_ids))),
   )
   enable_regional_mode = length(local.privatelink_locations) > 1
-
-  # # Module-managed endpoints only (create_azure_private_endpoint = true)
-  # # BYOE endpoints should use the submodule directly to avoid cycles
-  # privatelink_managed_primary = var.privatelink.enabled && var.privatelink.create_azure_private_endpoint ? {
-  #   (var.privatelink.azure_location) = {
-  #     subnet_id = var.privatelink.subnet_id
-  #   }
-  # } : {}
-
-  # privatelink_managed_additional = var.privatelink.enabled ? {
-  #   for region, config in var.privatelink.additional_regions :
-  #   region => { subnet_id = config.subnet_id }
-  #   if config.create_azure_private_endpoint
-  # } : {}
-
-  # privatelink_managed_locations = merge(
-  #   local.privatelink_managed_primary,
-  #   local.privatelink_managed_additional
-  # )
 }

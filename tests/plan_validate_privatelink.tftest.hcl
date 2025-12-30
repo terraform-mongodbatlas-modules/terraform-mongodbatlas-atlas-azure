@@ -109,3 +109,25 @@ run "invalid_byoe_location_missing_from_privatelink_locations" {
 
   expect_failures = [var.privatelink_byoe_locations]
 }
+
+run "invalid_privatelink_locations_format" {
+  command = plan
+
+  variables {
+    privatelink_locations = ["East US 2"]
+  }
+
+  expect_failures = [var.privatelink_locations]
+}
+
+run "invalid_module_managed_subnet_ids_location_format" {
+  command = plan
+
+  variables {
+    privatelink_module_managed_subnet_ids = {
+      "East US 2" = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet"
+    }
+  }
+
+  expect_failures = [var.privatelink_module_managed_subnet_ids]
+}
