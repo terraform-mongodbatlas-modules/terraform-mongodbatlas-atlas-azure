@@ -25,7 +25,10 @@ locals {
   #   keys(var.privatelink.additional_regions)
   # )) : toset([])
 
-  enable_regional_mode = length(var.privatelink_regions) > 1
+  privatelink_regions = toset(
+    distinct(concat(var.privatelink_regions, keys(var.privatelink_region_module_managed))),
+  )
+  enable_regional_mode = length(local.privatelink_regions) > 1
 
   # # Module-managed endpoints only (create_azure_private_endpoint = true)
   # # BYOE endpoints should use the submodule directly to avoid cycles

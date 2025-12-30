@@ -82,7 +82,7 @@ module "encryption_private_endpoint" {
 # ─────────────────────────────────────────────────────────────────────────────
 
 resource "mongodbatlas_private_endpoint_regional_mode" "this" {
-  count = length(var.privatelink_regions) > 1 ? 1 : 0
+  count = local.enable_regional_mode ? 1 : 0
 
   project_id = var.project_id
   enabled    = true
@@ -91,7 +91,7 @@ resource "mongodbatlas_private_endpoint_regional_mode" "this" {
 # Atlas-side PrivateLink endpoint - created at root level to avoid cycles
 # This only depends on location keys, not BYOE values
 resource "mongodbatlas_privatelink_endpoint" "this" {
-  for_each = toset(var.privatelink_regions)
+  for_each = local.privatelink_regions
 
   project_id    = var.project_id
   provider_name = "AZURE"
@@ -109,7 +109,7 @@ resource "mongodbatlas_privatelink_endpoint" "this" {
 # BYOE endpoints should use the submodule directly (see examples/privatelink_byoe)
 module "privatelink" {
   source   = "./modules/privatelink"
-  for_each = toset(var.privatelink_regions)
+  for_each = local.privatelink_regions
 
   project_id                       = var.project_id
   azure_location                   = each.key

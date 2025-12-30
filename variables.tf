@@ -147,6 +147,14 @@ variable "privatelink_region_user_managed" {
   }))
   default     = {}
   description = "User-managed PrivateLink configuration for a specific Azure region."
+  validation {
+    condition     = alltrue([for region in keys(var.privatelink_region_user_managed) : can(regex("^[a-z][a-z0-9]+$", region))])
+    error_message = "azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
+  }
+  validation {
+    condition = alltrue([for region in keys(var.privatelink_region_user_managed) : contains(var.privatelink_regions, region)])
+    error_message = "All regions in privatelink_region_user_managed must be in privatelink_regions."
+  }
 }
 
 variable "privatelink_region_module_managed" {
