@@ -95,3 +95,17 @@ run "invalid_byoe_location_not_in_privatelink_locations" {
 
   expect_failures = [var.privatelink_byoe_locations]
 }
+run "invalid_byoe_location_missing_from_privatelink_locations" {
+  command = plan
+
+  variables {
+    privatelink_byoe_locations = {
+      westeurope = {
+        azure_private_endpoint_id         = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/privateEndpoints/pe-atlas"
+        azure_private_endpoint_ip_address = "10.0.1.100"
+      }
+    }
+  }
+
+  expect_failures = [var.privatelink_byoe_locations]
+}

@@ -137,7 +137,7 @@ variable "encryption_client_secret" {
 variable "privatelink_locations" {
   type        = list(string)
   default     = []
-  description = "List of Azure locations to enable PrivateLink connectivity to Atlas."
+  description = "List of Azure locations to enable PrivateLink connectivity to Atlas. Only required when using privatelink_byoe_locations."
 }
 
 variable "privatelink_byoe_locations" {
