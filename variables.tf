@@ -24,6 +24,11 @@ variable "service_principal_id" {
   type        = string
   default     = null
   description = "Existing service principal object ID. Required if create_service_principal = false."
+
+  validation {
+    condition     = var.service_principal_id == null || can(regex("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", lower(var.service_principal_id)))
+    error_message = "service_principal_id must be a valid GUID (e.g., 00000000-0000-0000-0000-000000000000)."
+  }
 }
 
 variable "skip_cloud_provider_access" {
