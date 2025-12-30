@@ -15,7 +15,7 @@ terraform {
       version = ">= 2.53"
     }
     azapi = {
-      source = "azure/azapi"
+      source = "azure/azapi" # intentionally not pinned, only required for private networking (has pin in submodule)
     }
   }
 }
