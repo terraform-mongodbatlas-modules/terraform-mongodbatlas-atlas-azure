@@ -60,6 +60,9 @@ variable "encryption" {
     Provide EITHER:
     - key_vault_id + key_identifier (user-provided Key Vault)
     - create_key_vault.enabled = true (module-managed Key Vault)
+
+    NOTE: private_endpoint_regions uses Atlas region format (e.g., US_EAST_2, EUROPE_WEST),
+    not Azure format (e.g., eastus2, westeurope).
   EOT
 
   validation {
@@ -105,7 +108,7 @@ variable "encryption" {
 
   validation {
     condition     = !var.encryption.require_private_networking || length(var.encryption.private_endpoint_regions) > 0
-    error_message = "When require_private_networking=true, private_endpoint_regions must specify at least one region."
+    error_message = "When require_private_networking=true, private_endpoint_regions must specify at least one Atlas region."
   }
 }
 
