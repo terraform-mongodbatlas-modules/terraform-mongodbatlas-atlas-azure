@@ -37,8 +37,6 @@ resource "azurerm_private_endpoint" "custom" {
   ip_configuration {
     name               = "atlas-static"
     private_ip_address = var.static_ip_address
-    subresource_name   = "mongodb"
-    member_name        = "mongodb"
   }
 }
 
