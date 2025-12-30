@@ -76,3 +76,28 @@ module "encryption_private_endpoint" {
 
   depends_on = [module.encryption]
 }
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PrivateLink
+# ─────────────────────────────────────────────────────────────────────────────
+
+resource "mongodbatlas_private_endpoint_regional_mode" "this" {
+  count = local.enable_regional_mode ? 1 : 0
+
+  project_id = var.project_id
+  enabled    = true
+}
+
+module "privatelink" {
+  source   = "./modules/privatelink"
+  for_each = local.privatelink_locations
+
+  project_id                        = var.project_id
+  azure_location                    = each.key
+  create_azure_private_endpoint     = each.value.create_azure_private_endpoint
+  subnet_id                         = each.value.subnet_id
+  azure_private_endpoint_id         = each.value.azure_private_endpoint_id
+  azure_private_endpoint_ip_address = each.value.azure_private_endpoint_ip_address
+
+  depends_on = [mongodbatlas_private_endpoint_regional_mode.this]
+}

@@ -18,4 +18,21 @@ locals {
   encryption_key_vault_id = var.encryption.enabled ? (
     var.encryption.key_vault_id != null ? var.encryption.key_vault_id : module.encryption[0].key_vault_id
   ) : null
+
+  # PrivateLink
+  privatelink_primary = var.privatelink.enabled ? {
+    (var.privatelink.azure_location) = {
+      create_azure_private_endpoint     = var.privatelink.create_azure_private_endpoint
+      subnet_id                         = var.privatelink.subnet_id
+      azure_private_endpoint_id         = var.privatelink.azure_private_endpoint_id
+      azure_private_endpoint_ip_address = var.privatelink.azure_private_endpoint_ip_address
+    }
+  } : {}
+
+  privatelink_locations = merge(
+    local.privatelink_primary,
+    var.privatelink.enabled ? var.privatelink.additional_regions : {}
+  )
+
+  enable_regional_mode = length(local.privatelink_locations) > 1
 }
