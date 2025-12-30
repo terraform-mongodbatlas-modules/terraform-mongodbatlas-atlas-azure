@@ -46,6 +46,7 @@ resource "azuread_service_principal_password" "encryption" {
   count                = local.create_encryption_client_secret ? 1 : 0
   service_principal_id = local.service_principal_resource_id
   display_name         = "MongoDB Atlas Module - Encryption at Rest"
+  # end_date_relative    = "17520h" # 2 years (maximum allowed and default) TODO: Document or remove in CLOUDP-369548
 }
 
 module "encryption" {
