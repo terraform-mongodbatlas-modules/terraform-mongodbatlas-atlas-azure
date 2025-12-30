@@ -1,16 +1,16 @@
 output "atlas_private_link_id" {
   description = "Atlas PrivateLink connection ID"
-  value       = var.private_link_id
+  value       = local.private_link_id
 }
 
 output "atlas_private_link_service_name" {
   description = "Name of the Azure Private Link Service that Atlas manages"
-  value       = var.private_link_service_name
+  value       = local.private_link_service_name
 }
 
 output "atlas_private_link_service_resource_id" {
   description = "Azure resource ID of the Atlas-managed Private Link Service"
-  value       = var.private_link_service_resource_id
+  value       = local.private_link_service_resource_id
 }
 
 output "azure_private_endpoint_id" {

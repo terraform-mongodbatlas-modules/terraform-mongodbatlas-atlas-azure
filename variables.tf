@@ -134,31 +134,55 @@ variable "encryption_client_secret" {
   EOT
 }
 
-variable "privatelink" {
-  type = object({
-    enabled                           = optional(bool, false)
-    azure_location                    = optional(string)
-    create_azure_private_endpoint     = optional(bool, true)
-    subnet_id                         = optional(string)
-    azure_private_endpoint_id         = optional(string)
-    azure_private_endpoint_ip_address = optional(string)
-    additional_regions = optional(map(object({
-      create_azure_private_endpoint     = optional(bool, true)
-      subnet_id                         = optional(string)
-      azure_private_endpoint_id         = optional(string)
-      azure_private_endpoint_ip_address = optional(string)
-    })), {})
-  })
-  default     = {}
-  description = <<-EOT
-    PrivateLink configuration for private network connectivity to Atlas.
-    
-    For module-managed endpoints: provide subnet_id
-    For user-managed (BYOE): set create_azure_private_endpoint=false and provide azure_private_endpoint_id + azure_private_endpoint_ip_address
-    
-    Use additional_regions for multi-region/geo-sharded clusters.
-    
-    Note: All validations use resource preconditions to support BYOE patterns where
-    azure_private_endpoint_id comes from resources in the same configuration.
-  EOT
+variable "privatelink_regions" {
+  type        = list(string)
+  default     = []
+  description = "List of Azure regions to enable PrivateLink connectivity to Atlas."
 }
+
+variable "privatelink_region_user_managed" {
+  type = map(object({
+    azure_private_endpoint_id         = string
+    azure_private_endpoint_ip_address = string
+  }))
+  default     = {}
+  description = "User-managed PrivateLink configuration for a specific Azure region."
+}
+
+variable "privatelink_region_module_managed" {
+  type = map(object({
+    subnet_id = string
+  }))
+  default     = {}
+  description = "Module-managed PrivateLink configuration for a specific Azure region."
+}
+
+
+# variable "privatelink" {
+#   type = object({
+#     # enabled                           = optional(bool, false)
+#     azure_location                    = optional(string)
+#     create_azure_private_endpoint     = optional(bool, true)
+#     subnet_id                         = optional(string)
+#     azure_private_endpoint_id         = optional(string)
+#     azure_private_endpoint_ip_address = optional(string)
+#     additional_regions = optional(map(object({
+#       create_azure_private_endpoint     = optional(bool, true)
+#       subnet_id                         = optional(string)
+#       azure_private_endpoint_id         = optional(string)
+#       azure_private_endpoint_ip_address = optional(string)
+#     })), {})
+#   })
+#   default     = {}
+#   description = <<-EOT
+#     PrivateLink configuration for private network connectivity to Atlas.
+    
+#     For module-managed endpoints: provide subnet_id
+#     For user-managed (BYOE): set create_azure_private_endpoint=false and provide azure_private_endpoint_id + azure_private_endpoint_ip_address
+    
+#     Use additional_regions for multi-region/geo-sharded clusters.
+    
+#     Note: All validations use resource preconditions to support BYOE patterns where
+#     azure_private_endpoint_id comes from resources in the same configuration.
+#   EOT
+# }

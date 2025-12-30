@@ -8,19 +8,28 @@ variable "azure_location" {
   description = "Azure region in lowercase format (e.g., eastus2, westeurope)"
 }
 
+variable "use_existing_endpoint" {
+  type        = bool
+  default     = false
+  description = "Use existing Atlas PrivateLink endpoint. When true, private_link_id/service_name/service_resource_id are required."
+}
+
 variable "private_link_id" {
   type        = string
-  description = "Atlas PrivateLink endpoint ID from mongodbatlas_privatelink_endpoint resource"
+  default     = null
+  description = "Atlas PrivateLink endpoint ID. Required when use_existing_endpoint = true."
 }
 
 variable "private_link_service_name" {
   type        = string
-  description = "Azure Private Link Service name from mongodbatlas_privatelink_endpoint resource"
+  default     = null
+  description = "Atlas Private Link endpoint name. Required when use_existing_endpoint = true."
 }
 
 variable "private_link_service_resource_id" {
   type        = string
-  description = "Azure Private Link Service resource ID from mongodbatlas_privatelink_endpoint resource"
+  default     = null
+  description = "Atlas Private Link endpoint resource ID. Required when use_existing_endpoint = true."
 }
 
 variable "create_azure_private_endpoint" {

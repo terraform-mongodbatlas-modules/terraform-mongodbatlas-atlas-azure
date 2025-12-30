@@ -1,5 +1,19 @@
 locals {
   resource_group_name = var.create_azure_private_endpoint ? element(split("/", var.subnet_id), 4) : null
+
+  # Resolve endpoint values from either created resource or provided inputs
+  private_link_id                  = var.use_existing_endpoint ? var.private_link_id : mongodbatlas_privatelink_endpoint.this[0].private_link_id
+  private_link_service_name        = var.use_existing_endpoint ? var.private_link_service_name : mongodbatlas_privatelink_endpoint.this[0].private_link_service_name
+  private_link_service_resource_id = var.use_existing_endpoint ? var.private_link_service_resource_id : mongodbatlas_privatelink_endpoint.this[0].private_link_service_resource_id
+}
+
+# Only created in standalone mode (use_existing_endpoint = false)
+resource "mongodbatlas_privatelink_endpoint" "this" {
+  count = var.use_existing_endpoint ? 0 : 1
+
+  project_id    = var.project_id
+  provider_name = "AZURE"
+  region        = var.azure_location
 }
 
 resource "azurerm_private_endpoint" "atlas" {
@@ -11,8 +25,8 @@ resource "azurerm_private_endpoint" "atlas" {
   subnet_id           = var.subnet_id
 
   private_service_connection {
-    name                           = var.private_link_service_name
-    private_connection_resource_id = var.private_link_service_resource_id
+    name                           = local.private_link_service_name
+    private_connection_resource_id = local.private_link_service_resource_id
     is_manual_connection           = true
     request_message                = "MongoDB Atlas PrivateLink"
   }
@@ -27,7 +41,7 @@ resource "azurerm_private_endpoint" "atlas" {
 
 resource "mongodbatlas_privatelink_endpoint_service" "this" {
   project_id      = var.project_id
-  private_link_id = var.private_link_id
+  private_link_id = local.private_link_id
   provider_name   = "AZURE"
 
   endpoint_service_id = var.create_azure_private_endpoint ? (
@@ -53,6 +67,14 @@ resource "mongodbatlas_privatelink_endpoint_service" "this" {
     precondition {
       condition     = var.create_azure_private_endpoint || var.subnet_id == null
       error_message = "subnet_id is only used when create_azure_private_endpoint=true."
+    }
+    precondition {
+      condition = !var.use_existing_endpoint || (
+        var.private_link_id != null &&
+        var.private_link_service_name != null &&
+        var.private_link_service_resource_id != null
+      )
+      error_message = "use_existing_endpoint=true requires private_link_id, private_link_service_name, and private_link_service_resource_id."
     }
   }
 }

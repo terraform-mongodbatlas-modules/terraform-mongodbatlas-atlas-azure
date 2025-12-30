@@ -82,7 +82,7 @@ module "encryption_private_endpoint" {
 # ─────────────────────────────────────────────────────────────────────────────
 
 resource "mongodbatlas_private_endpoint_regional_mode" "this" {
-  count = local.enable_regional_mode ? 1 : 0
+  count = length(var.privatelink_regions) > 1 ? 1 : 0
 
   project_id = var.project_id
   enabled    = true
@@ -91,19 +91,13 @@ resource "mongodbatlas_private_endpoint_regional_mode" "this" {
 # Atlas-side PrivateLink endpoint - created at root level to avoid cycles
 # This only depends on location keys, not BYOE values
 resource "mongodbatlas_privatelink_endpoint" "this" {
-  for_each = local.privatelink_location_keys
+  for_each = toset(var.privatelink_regions)
 
   project_id    = var.project_id
   provider_name = "AZURE"
   region        = each.key
 
-  depends_on = [mongodbatlas_private_endpoint_regional_mode.this]
-
   lifecycle {
-    precondition {
-      condition     = var.privatelink.azure_location != null
-      error_message = "privatelink.enabled=true requires azure_location."
-    }
     precondition {
       condition     = can(regex("^[a-z][a-z0-9]+$", each.key))
       error_message = "azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
@@ -115,13 +109,19 @@ resource "mongodbatlas_privatelink_endpoint" "this" {
 # BYOE endpoints should use the submodule directly (see examples/privatelink_byoe)
 module "privatelink" {
   source   = "./modules/privatelink"
-  for_each = local.privatelink_managed_locations
+  for_each = toset(var.privatelink_regions)
 
   project_id                       = var.project_id
   azure_location                   = each.key
+  use_existing_endpoint            = true
   private_link_id                  = mongodbatlas_privatelink_endpoint.this[each.key].private_link_id
   private_link_service_name        = mongodbatlas_privatelink_endpoint.this[each.key].private_link_service_name
   private_link_service_resource_id = mongodbatlas_privatelink_endpoint.this[each.key].private_link_service_resource_id
-  create_azure_private_endpoint    = true
-  subnet_id                        = each.value.subnet_id
+  
+  # User-managed PrivateLink configuration
+  create_azure_private_endpoint    = contains(keys(var.privatelink_region_module_managed), each.key)
+  subnet_id                        = try(var.privatelink_region_module_managed[each.key].subnet_id, null)
+  # Module-managed PrivateLink configuration
+  azure_private_endpoint_id        = try(var.privatelink_region_user_managed[each.key].azure_private_endpoint_id, null)
+  azure_private_endpoint_ip_address = try(var.privatelink_region_user_managed[each.key].azure_private_endpoint_ip_address, null)
 }
