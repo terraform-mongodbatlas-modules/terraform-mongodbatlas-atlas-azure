@@ -267,7 +267,7 @@ run "encryption_with_private_networking" {
   }
 }
 
-run "encryption_skipped_when_skip_cloud_provider_access" {
+run "encryption_fails_when_skip_cloud_provider_access" {
   command = plan
 
   variables {
@@ -284,13 +284,7 @@ run "encryption_skipped_when_skip_cloud_provider_access" {
     }
   }
 
-  assert {
-    condition     = length(module.encryption) == 0
-    error_message = "Expected no encryption module when skip_cloud_provider_access=true"
-  }
-
-  assert {
-    condition     = length(azuread_service_principal_password.encryption) == 0
-    error_message = "Expected no client secret when skip_cloud_provider_access=true"
-  }
+  expect_failures = [
+    var.skip_cloud_provider_access
+  ]
 }

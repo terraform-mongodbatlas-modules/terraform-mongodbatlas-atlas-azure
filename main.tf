@@ -50,7 +50,7 @@ resource "azuread_service_principal_password" "encryption" {
 }
 
 module "encryption" {
-  count  = local.encryption_enabled ? 1 : 0
+  count  = var.encryption.enabled ? 1 : 0
   source = "./modules/encryption"
 
   project_id           = var.project_id
@@ -68,7 +68,7 @@ module "encryption" {
 
 module "encryption_private_endpoint" {
   source   = "./modules/encryption_private_endpoint"
-  for_each = local.encryption_enabled && var.encryption.require_private_networking ? var.encryption.private_endpoint_regions : toset([])
+  for_each = var.encryption.enabled && var.encryption.require_private_networking ? var.encryption.private_endpoint_regions : toset([])
 
   project_id   = var.project_id
   region_name  = each.key
