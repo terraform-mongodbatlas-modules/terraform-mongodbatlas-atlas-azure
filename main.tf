@@ -125,3 +125,23 @@ module "privatelink" {
   azure_private_endpoint_id         = try(var.privatelink_byoe_locations[each.key].azure_private_endpoint_id, null)
   azure_private_endpoint_ip_address = try(var.privatelink_byoe_locations[each.key].azure_private_endpoint_ip_address, null)
 }
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Backup Export to Azure Blob Storage
+# ─────────────────────────────────────────────────────────────────────────────
+
+module "backup_export" {
+  count  = var.backup_export.enabled ? 1 : 0
+  source = "./modules/backup_export"
+
+  project_id           = var.project_id
+  role_id              = mongodbatlas_cloud_provider_access_authorization.this[0].role_id
+  service_principal_id = local.service_principal_id
+
+  container_name         = var.backup_export.container_name
+  storage_account_id     = var.backup_export.storage_account_id
+  create_container       = var.backup_export.create_container
+  create_storage_account = var.backup_export.create_storage_account
+
+  depends_on = [mongodbatlas_cloud_provider_access_authorization.this]
+}
