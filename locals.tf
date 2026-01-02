@@ -18,4 +18,9 @@ locals {
   encryption_key_vault_id = var.encryption.enabled ? (
     var.encryption.key_vault_id != null ? var.encryption.key_vault_id : module.encryption[0].key_vault_id
   ) : null
+
+  privatelink_locations = toset(
+    concat(var.privatelink_locations, keys(var.privatelink_module_managed_subnet_ids)),
+  )
+  enable_regional_mode = length(local.privatelink_locations) > 1
 }
