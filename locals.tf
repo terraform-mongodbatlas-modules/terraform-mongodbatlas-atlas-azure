@@ -20,7 +20,7 @@ locals {
   ) : null
 
   privatelink_locations = toset(
-    distinct(concat(var.privatelink_locations, keys(var.privatelink_module_managed_subnet_ids))),
+    concat(var.privatelink_locations, keys(var.privatelink_module_managed_subnet_ids)),
   )
   enable_regional_mode = length(local.privatelink_locations) > 1
 }

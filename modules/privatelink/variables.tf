@@ -23,7 +23,7 @@ variable "private_link_id" {
 variable "private_link_service_name" {
   type        = string
   default     = null
-  description = "Atlas Private Link endpoint name. Required when use_existing_endpoint = true."
+  description = "Atlas Private Link service name. Required when use_existing_endpoint = true."
 }
 
 variable "private_link_service_resource_id" {

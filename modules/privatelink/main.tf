@@ -1,4 +1,7 @@
 locals {
+  # Azure subnet ID format:
+  # /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}
+  # Index 4 of split("/", subnet_id) corresponds to {resourceGroupName}
   resource_group_name = var.create_azure_private_endpoint ? element(split("/", var.subnet_id), 4) : null
 
   # Resolve endpoint values from either created resource or provided inputs

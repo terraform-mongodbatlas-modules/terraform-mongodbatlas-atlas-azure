@@ -137,7 +137,7 @@ variable "encryption_client_secret" {
 variable "privatelink_locations" {
   type        = list(string)
   default     = []
-  description = "List of Azure locations to enable PrivateLink connectivity to Atlas. Only required when using privatelink_byoe_locations."
+  description = "List of Azure locations to enable PrivateLink connectivity. Required when using privatelink_byoe_locations to specify which regions should have PrivateLink enabled."
   validation {
     condition     = alltrue([for location in var.privatelink_locations : can(regex("^[a-z][a-z0-9]+$", location))])
     error_message = "All locations must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
