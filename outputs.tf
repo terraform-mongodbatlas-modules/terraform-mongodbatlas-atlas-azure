@@ -17,3 +17,26 @@ output "feature_usages" {
   description = "List of features using this cloud provider access role."
   value       = !var.skip_cloud_provider_access ? mongodbatlas_cloud_provider_access_authorization.this[0].feature_usages : null
 }
+
+output "encryption" {
+  description = "Encryption at rest configuration status"
+  value = var.encryption.enabled ? {
+    valid                       = module.encryption[0].valid
+    encryption_at_rest_provider = module.encryption[0].encryption_at_rest_provider
+    key_vault_id                = module.encryption[0].key_vault_id
+    key_vault_uri               = module.encryption[0].key_vault_uri
+    key_identifier              = module.encryption[0].key_identifier
+    private_endpoints = var.encryption.require_private_networking ? {
+      for region, pe in module.encryption_private_endpoint : region => {
+        id            = pe.id
+        status        = pe.status
+        error_message = pe.error_message
+      }
+    } : {}
+  } : null
+}
+
+output "encryption_at_rest_provider" {
+  description = "Value for cluster's encryption_at_rest_provider attribute"
+  value       = var.encryption.enabled ? "AZURE" : "NONE"
+}
