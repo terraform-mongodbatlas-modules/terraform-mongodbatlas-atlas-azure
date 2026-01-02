@@ -3,6 +3,10 @@ module "atlas_azure" {
   source     = "../../"
   project_id = var.project_id
 
+  atlas_azure_app_id       = var.atlas_azure_app_id
+  create_service_principal = var.create_service_principal
+  service_principal_id     = var.service_principal_id
+
   backup_export = {
     enabled        = true
     container_name = "atlas-backup-exports"
@@ -30,6 +34,10 @@ module "atlas_azure" {
 # module "atlas_azure" {
 #   source     = "../../"
 #   project_id = var.project_id
+
+#   atlas_azure_app_id       = var.atlas_azure_app_id
+#   create_service_principal = var.create_service_principal
+#   service_principal_id     = var.service_principal_id
 #
 #   backup_export = {
 #     enabled            = true
@@ -45,4 +53,8 @@ output "backup_export" {
 
 output "export_bucket_id" {
   value = module.atlas_azure.export_bucket_id
+}
+
+output "module_full" {
+  value = module.atlas_azure
 }
