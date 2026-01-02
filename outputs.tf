@@ -71,3 +71,18 @@ output "regional_mode_enabled" {
   description = "Whether private endpoint regional mode is enabled (auto-enabled for multi-region)"
   value       = local.enable_regional_mode
 }
+
+output "export_bucket_id" {
+  description = "Export bucket ID for backup schedule auto_export_enabled"
+  value       = var.backup_export.enabled ? module.backup_export[0].export_bucket_id : null
+}
+
+output "backup_export" {
+  description = "Backup export configuration status"
+  value = var.backup_export.enabled ? {
+    export_bucket_id   = module.backup_export[0].export_bucket_id
+    storage_account_id = module.backup_export[0].storage_account_id
+    container_name     = module.backup_export[0].container_name
+    service_url        = module.backup_export[0].service_url
+  } : null
+}

@@ -40,6 +40,11 @@ variable "skip_cloud_provider_access" {
     condition     = !var.skip_cloud_provider_access || !var.encryption.enabled
     error_message = "Encryption requires Azure AD integration. Cannot use encryption.enabled=true with skip_cloud_provider_access=true."
   }
+
+  validation {
+    condition     = !var.skip_cloud_provider_access || !var.backup_export.enabled
+    error_message = "Backup export requires Azure AD integration. Cannot use backup_export.enabled=true with skip_cloud_provider_access=true."
+  }
 }
 
 variable "encryption" {
@@ -168,5 +173,63 @@ variable "privatelink_module_managed_subnet_ids" {
   validation {
     condition     = alltrue([for location in keys(var.privatelink_module_managed_subnet_ids) : can(regex("^[a-z][a-z0-9]+$", location))])
     error_message = "All location keys must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
+  }
+}
+
+variable "backup_export" {
+  type = object({
+    enabled        = optional(bool, false)
+    container_name = optional(string)
+    # User-provided storage account
+    storage_account_id = optional(string)
+    create_container   = optional(bool, true)
+    # Module-managed storage account
+    create_storage_account = optional(object({
+      enabled             = bool
+      name                = string
+      resource_group_name = string
+      azure_location      = string
+      replication_type    = optional(string, "LRS")
+      account_tier        = optional(string, "Standard")
+      min_tls_version     = optional(string, "TLS1_2")
+    }))
+  })
+  default     = {}
+  description = "Backup snapshot export to Azure Blob Storage. Provide EITHER storage_account_id (user-provided) OR create_storage_account.enabled = true (module-managed)."
+
+  validation {
+    condition     = !(var.backup_export.storage_account_id != null && try(var.backup_export.create_storage_account.enabled, false))
+    error_message = "Cannot use both storage_account_id (user-provided) and create_storage_account.enabled=true (module-managed)."
+  }
+
+  validation {
+    condition     = !var.backup_export.enabled || (var.backup_export.storage_account_id != null || try(var.backup_export.create_storage_account.enabled, false))
+    error_message = "backup_export.enabled=true requires storage_account_id OR create_storage_account.enabled=true."
+  }
+
+  validation {
+    condition     = !var.backup_export.enabled || var.backup_export.container_name != null
+    error_message = "backup_export.enabled=true requires container_name."
+  }
+
+  validation {
+    condition     = var.backup_export.create_container != false || var.backup_export.storage_account_id != null
+    error_message = "create_container=false only valid with storage_account_id (user-provided storage)."
+  }
+
+  validation {
+    condition = var.backup_export.storage_account_id == null || can(regex(
+      "^/subscriptions/[0-9a-f-]+/resourceGroups/[^/]+/providers/Microsoft\\.Storage/storageAccounts/[a-z0-9]+$",
+      var.backup_export.storage_account_id
+    ))
+    error_message = "storage_account_id must be a valid Azure Storage Account resource ID."
+  }
+
+  validation {
+    condition = var.backup_export.create_storage_account == null || can(regex(
+      "^[a-z][a-z0-9]+$",
+      var.backup_export.create_storage_account.azure_location
+    ))
+    error_message = "create_storage_account.azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
   }
 }
