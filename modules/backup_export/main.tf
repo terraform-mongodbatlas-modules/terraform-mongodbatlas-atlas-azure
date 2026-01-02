@@ -42,9 +42,11 @@ resource "mongodbatlas_cloud_backup_snapshot_export_bucket" "this" {
   project_id     = var.project_id
   bucket_name    = var.container_name
   cloud_provider = "AZURE"
-  service_url = local.create_storage_account ? (
-    azurerm_storage_account.atlas[0].primary_blob_endpoint
-  ) : data.azurerm_storage_account.existing[0].primary_blob_endpoint
+  # trimsuffix: Azure primary_blob_endpoint includes trailing slash, Atlas doesn't expect it
+  service_url = trimsuffix(
+    local.create_storage_account ? azurerm_storage_account.atlas[0].primary_blob_endpoint : data.azurerm_storage_account.existing[0].primary_blob_endpoint,
+    "/"
+  )
   role_id = var.role_id
 
   depends_on = [azurerm_role_assignment.backup_export]
