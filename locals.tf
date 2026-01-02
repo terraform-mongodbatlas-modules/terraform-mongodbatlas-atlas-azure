@@ -23,4 +23,9 @@ locals {
     concat(var.privatelink_locations, keys(var.privatelink_module_managed_subnet_ids)),
   )
   enable_regional_mode = length(local.privatelink_locations) > 1
+
+  # Backup export
+  backup_export_storage_account_id = var.backup_export.enabled ? (
+    var.backup_export.storage_account_id != null ? var.backup_export.storage_account_id : module.backup_export[0].storage_account_id
+  ) : null
 }
