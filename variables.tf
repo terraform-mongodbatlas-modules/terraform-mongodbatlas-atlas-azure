@@ -133,3 +133,40 @@ variable "encryption_client_secret" {
     when the secret expires, causing cluster unavailability. Rotate secrets before expiration.
   EOT
 }
+
+variable "privatelink_locations" {
+  type        = list(string)
+  default     = []
+  description = "List of Azure locations to enable PrivateLink connectivity. Required when using privatelink_byoe_locations to specify which regions should have PrivateLink enabled."
+  validation {
+    condition     = alltrue([for location in var.privatelink_locations : can(regex("^[a-z][a-z0-9]+$", location))])
+    error_message = "All locations must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
+  }
+}
+
+variable "privatelink_byoe_locations" {
+  type = map(object({
+    azure_private_endpoint_id         = string
+    azure_private_endpoint_ip_address = string
+  }))
+  default     = {}
+  description = "BYOE (Bring Your Own Endpoint) configuration per Azure location. Map keys are Azure locations (e.g., eastus2)."
+  validation {
+    condition     = alltrue([for location in keys(var.privatelink_byoe_locations) : can(regex("^[a-z][a-z0-9]+$", location))])
+    error_message = "azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
+  }
+  validation {
+    condition     = alltrue([for location in keys(var.privatelink_byoe_locations) : contains(var.privatelink_locations, location)])
+    error_message = "All locations in privatelink_byoe_locations must be in privatelink_locations."
+  }
+}
+
+variable "privatelink_module_managed_subnet_ids" {
+  type        = map(string)
+  default     = {}
+  description = "Map of Azure location to subnet ID for module-managed PrivateLink endpoints."
+  validation {
+    condition     = alltrue([for location in keys(var.privatelink_module_managed_subnet_ids) : can(regex("^[a-z][a-z0-9]+$", location))])
+    error_message = "All location keys must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
+  }
+}
