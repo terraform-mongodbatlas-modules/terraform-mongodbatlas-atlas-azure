@@ -1,8 +1,12 @@
 # BYOE (Bring Your Own Endpoint) pattern
 # 
 # For BYOE, we use a two-step approach:
-# 1. Submodule uses the user-managed Azure PE with Atlas, that depends on the Atlas-side PrivateLink endpoint.
+# Step 1: Root module creates Atlas-side PrivateLink endpoint and exposes service info
+# Step 2: User-managed Azure Private Endpoint references the Atlas service info (see below)
+#
+# Note: Step 2 (azurerm_private_endpoint.custom) depends on Step 1 output (privatelink_service_info)
 
+# Step 1: Configure Atlas PrivateLink with BYOE locations
 module "atlas_azure" {
   source = "../../"
 

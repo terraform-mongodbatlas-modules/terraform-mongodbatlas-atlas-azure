@@ -1,11 +1,11 @@
 variable "project_id" {
   type        = string
-  description = "MongoDB Atlas project ID"
+  description = "MongoDB Atlas project ID."
 }
 
 variable "azure_location" {
   type        = string
-  description = "Azure region in lowercase format (e.g., eastus2, westeurope)"
+  description = "Azure region in lowercase format (e.g., eastus2, westeurope)."
 }
 
 variable "use_existing_endpoint" {
