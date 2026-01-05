@@ -55,3 +55,9 @@ variable "azure_private_endpoint_ip_address" {
   default     = null
   description = "Private IP address of the user-provided Azure private endpoint. Required when create_azure_private_endpoint = false."
 }
+
+variable "azure_private_endpoint_name" {
+  type        = string
+  default     = null
+  description = "Custom name for the Azure private endpoint. Defaults to 'pe-atlas-{azure_location}'. Must be unique within resource group."
+}

@@ -24,7 +24,7 @@ resource "mongodbatlas_privatelink_endpoint" "this" {
 resource "azurerm_private_endpoint" "atlas" {
   count = var.create_azure_private_endpoint ? 1 : 0
 
-  name                = "pe-atlas-${var.azure_location}"
+  name                = coalesce(var.azure_private_endpoint_name, "pe-atlas-${var.azure_location}")
   location            = var.azure_location
   resource_group_name = local.resource_group_name
   subnet_id           = var.subnet_id
