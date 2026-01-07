@@ -95,7 +95,7 @@ run "invalid_byoe_location_not_in_privatelink_locations" {
 
   expect_failures = [var.privatelink_byoe_locations]
 }
-run "invalid_byoe_location_missing_from_privatelink_locations" {
+run "invalid_byoe_location_with_empty_privatelink_locations" {
   command = plan
 
   variables {
