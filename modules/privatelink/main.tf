@@ -28,6 +28,7 @@ resource "azurerm_private_endpoint" "atlas" {
   location            = var.azure_location
   resource_group_name = local.resource_group_name
   subnet_id           = var.subnet_id
+  tags                = var.azure_private_endpoint_tags
 
   private_service_connection {
     name                           = local.private_link_service_name

@@ -146,40 +146,43 @@ variable "encryption_client_secret" {
   }
 }
 
-variable "privatelink_locations" {
-  type        = list(string)
-  default     = []
-  description = "List of Azure locations to enable PrivateLink connectivity. Required when using privatelink_byoe_locations to specify which regions should have PrivateLink enabled."
+variable "privatelink_byoe_locations" {
+  type        = map(string)
+  default     = {}
+  description = "Atlas-side PrivateLink endpoints for BYOE. Key is user identifier, value is Azure location."
   validation {
-    condition     = alltrue([for location in var.privatelink_locations : can(regex("^[a-z][a-z0-9]+$", location))])
-    error_message = "All locations must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
+    condition     = alltrue([for loc in values(var.privatelink_byoe_locations) : can(regex("^[a-z][a-z0-9]+$", loc))])
+    error_message = "All values must use Azure location format (lowercase, no separators). Examples: eastus2, westeurope"
   }
 }
 
-variable "privatelink_byoe_locations" {
+variable "privatelink_byoe" {
   type = map(object({
     azure_private_endpoint_id         = string
     azure_private_endpoint_ip_address = string
   }))
   default     = {}
-  description = "BYOE (Bring Your Own Endpoint) configuration per Azure location. Map keys are Azure locations (e.g., eastus2)."
+  description = "BYOE endpoint details. Key must exist in privatelink_byoe_locations."
   validation {
-    condition     = alltrue([for location in keys(var.privatelink_byoe_locations) : can(regex("^[a-z][a-z0-9]+$", location))])
-    error_message = "azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
-  }
-  validation {
-    condition     = alltrue([for location in keys(var.privatelink_byoe_locations) : contains(var.privatelink_locations, location)])
-    error_message = "All locations in privatelink_byoe_locations must be in privatelink_locations."
+    condition     = alltrue([for k in keys(var.privatelink_byoe) : contains(keys(var.privatelink_byoe_locations), k)])
+    error_message = "All keys in privatelink_byoe must exist in privatelink_byoe_locations."
   }
 }
 
-variable "privatelink_module_managed_subnet_ids" {
-  type        = map(string)
+variable "privatelink_endpoints" {
+  type = map(object({
+    azure_location = optional(string)
+    subnet_id      = string
+    name           = optional(string)
+    tags           = optional(map(string), {})
+  }))
   default     = {}
-  description = "Map of Azure location to subnet ID for module-managed PrivateLink endpoints."
+  description = "Module-managed PrivateLink endpoints. Key is user identifier (or Azure location if azure_location omitted)."
   validation {
-    condition     = alltrue([for location in keys(var.privatelink_module_managed_subnet_ids) : can(regex("^[a-z][a-z0-9]+$", location))])
-    error_message = "All location keys must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
+    condition = alltrue([
+      for k, v in var.privatelink_endpoints : can(regex("^[a-z][a-z0-9]+$", coalesce(v.azure_location, k)))
+    ])
+    error_message = "azure_location (or key as fallback) must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
   }
 }
 

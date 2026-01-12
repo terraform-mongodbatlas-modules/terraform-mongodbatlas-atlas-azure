@@ -14,13 +14,13 @@ module "atlas_azure" {
   skip_cloud_provider_access = true
 
   # BYOE: provide your own Azure Private Endpoint details
-  privatelink_byoe_locations = {
-    (var.azure_location) = {
+  privatelink_byoe = {
+    pe1 = {
       azure_private_endpoint_id         = azurerm_private_endpoint.custom.id
       azure_private_endpoint_ip_address = azurerm_private_endpoint.custom.private_service_connection[0].private_ip_address
     }
   }
-  privatelink_locations = [var.azure_location]
+  privatelink_byoe_locations = {pe1 = var.azure_location}
 }
 
 # Step 2: User-managed Azure Private Endpoint with custom configuration
