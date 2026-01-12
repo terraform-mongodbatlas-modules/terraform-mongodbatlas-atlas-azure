@@ -3,8 +3,5 @@ terraform {
     mongodbatlas = {
       source = "mongodb/mongodbatlas"
     }
-    azapi = {
-      source = "azure/azapi"
-    }
   }
 }

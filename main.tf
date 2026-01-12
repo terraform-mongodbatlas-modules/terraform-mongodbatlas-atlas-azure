@@ -70,9 +70,8 @@ module "encryption_private_endpoint" {
   source   = "./modules/encryption_private_endpoint"
   for_each = var.encryption.enabled && var.encryption.require_private_networking ? var.encryption.private_endpoint_regions : toset([])
 
-  project_id   = var.project_id
-  region_name  = each.key
-  key_vault_id = local.encryption_key_vault_id
+  project_id  = var.project_id
+  region_name = each.key
 
   depends_on = [module.encryption]
 }

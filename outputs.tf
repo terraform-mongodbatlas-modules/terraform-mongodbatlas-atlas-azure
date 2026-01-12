@@ -28,9 +28,10 @@ output "encryption" {
     key_identifier              = module.encryption[0].key_identifier
     private_endpoints = var.encryption.require_private_networking ? {
       for region, pe in module.encryption_private_endpoint : region => {
-        id            = pe.id
-        status        = pe.status
-        error_message = pe.error_message
+        id                               = pe.id
+        status                           = pe.status
+        error_message                    = pe.error_message
+        private_endpoint_connection_name = pe.private_endpoint_connection_name
       }
     } : {}
   } : null

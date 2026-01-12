@@ -1,7 +1,6 @@
 mock_provider "mongodbatlas" {}
 mock_provider "azurerm" {}
 mock_provider "azuread" {}
-mock_provider "azapi" {}
 
 variables {
   project_id = "000000000000000000000000"

@@ -25,6 +25,23 @@ module "atlas_azure" {
   }
 }
 
+resource "azapi_update_resource" "approval" {
+  for_each = var.require_private_networking ? module.atlas_azure.encryption.private_endpoints : {}
+
+  type      = "Microsoft.KeyVault/Vaults/PrivateEndpointConnections@2023-07-01"
+  name      = each.value.private_endpoint_connection_name
+  parent_id = module.atlas_azure.encryption.key_vault_id
+
+  body = {
+    properties = {
+      privateLinkServiceConnectionState = {
+        status      = "Approved"
+        description = "Approved via Terraform"
+      }
+    }
+  }
+}
+
 output "encryption" {
   value = module.atlas_azure.encryption
 }
