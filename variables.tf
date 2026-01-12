@@ -132,11 +132,18 @@ variable "encryption_client_secret" {
   default     = null
   sensitive   = true
   description = <<-EOT
-    Azure AD application client secret for encryption. If null, module creates one automatically.
+    Azure AD application client secret for encryption. Required when encryption.enabled = true.
     
     IMPORTANT: Azure limits Client Secret lifetime to 2 years. Atlas loses CMK access
     when the secret expires, causing cluster unavailability. Rotate secrets before expiration.
+    
+    Future provider enhancements may support roleId-based authentication, eliminating the need for client_secret.
   EOT
+
+  validation {
+    condition     = !var.encryption.enabled || var.encryption_client_secret != null
+    error_message = "encryption_client_secret is required when encryption.enabled = true."
+  }
 }
 
 variable "privatelink_locations" {

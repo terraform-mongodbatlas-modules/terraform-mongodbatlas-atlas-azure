@@ -1,7 +1,6 @@
 mock_provider "mongodbatlas" {}
 mock_provider "azurerm" {}
 mock_provider "azuread" {}
-mock_provider "azapi" {}
 
 variables {
   project_id = "000000000000000000000000"
@@ -180,6 +179,23 @@ run "encryption_disabled_default" {
   }
 }
 
+run "encryption_enabled_without_client_secret" {
+  command = plan
+
+  variables {
+    project_id = var.project_id
+    encryption = {
+      enabled        = true
+      key_vault_id   = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.KeyVault/vaults/kv"
+      key_identifier = "https://kv.vault.azure.net/keys/my-key"
+    }
+  }
+
+  expect_failures = [
+    var.encryption_client_secret
+  ]
+}
+
 run "encryption_user_provided_key_vault" {
   command = plan
 
@@ -201,11 +217,6 @@ run "encryption_user_provided_key_vault" {
   assert {
     condition     = output.encryption_at_rest_provider == "AZURE"
     error_message = "Expected encryption_at_rest_provider to be AZURE"
-  }
-
-  assert {
-    condition     = length(azuread_service_principal_password.encryption) == 0
-    error_message = "Expected no client secret to be created when provided"
   }
 }
 
@@ -273,6 +284,7 @@ run "encryption_fails_when_skip_cloud_provider_access" {
   variables {
     project_id                 = var.project_id
     skip_cloud_provider_access = true
+    encryption_client_secret   = "test-secret-value"
     encryption = {
       enabled = true
       create_key_vault = {

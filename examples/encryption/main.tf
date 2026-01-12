@@ -4,6 +4,19 @@ data "azurerm_resource_group" "main" {
 
 data "azurerm_client_config" "current" {}
 
+# Create client secret for encryption (only if not provided)
+# TODO: Replace with roleId when CLOUDP-369548 is implemented
+resource "azuread_service_principal_password" "encryption" {
+  count                = var.encryption_client_secret == null ? 1 : 0
+  service_principal_id = var.service_principal_id
+  display_name         = "MongoDB Atlas - Encryption at Rest"
+  # Azure limits Client Secret lifetime to 2 years max. Rotate before expiration.
+}
+
+locals {
+  encryption_client_secret = coalesce(var.encryption_client_secret, try(azuread_service_principal_password.encryption[0].value, null))
+}
+
 resource "azurerm_key_vault" "atlas" {
   name                       = var.key_vault_name
   location                   = data.azurerm_resource_group.main.location
@@ -44,8 +57,11 @@ resource "azurerm_key_vault_key" "atlas" {
 }
 
 module "atlas_azure" {
-  source     = "../../"
-  project_id = var.project_id
+  source                   = "../../"
+  project_id               = var.project_id
+  service_principal_id     = var.service_principal_id
+  create_service_principal = false
+  encryption_client_secret = local.encryption_client_secret
 
   encryption = {
     enabled        = true
