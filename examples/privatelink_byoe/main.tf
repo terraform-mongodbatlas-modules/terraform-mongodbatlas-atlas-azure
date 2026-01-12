@@ -20,7 +20,7 @@ module "atlas_azure" {
       azure_private_endpoint_ip_address = azurerm_private_endpoint.custom.private_service_connection[0].private_ip_address
     }
   }
-  privatelink_byoe_locations = {pe1 = var.azure_location}
+  privatelink_byoe_locations = { pe1 = var.azure_location }
 }
 
 # Step 2: User-managed Azure Private Endpoint with custom configuration

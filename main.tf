@@ -106,12 +106,12 @@ module "privatelink" {
   # Module-managed
   create_azure_private_endpoint = contains(keys(var.privatelink_endpoints), each.key)
   subnet_id                     = try(var.privatelink_endpoints[each.key].subnet_id, null)
-  azure_private_endpoint_name   = try(coalesce(var.privatelink_endpoints[each.key].name, "pe-atlas-${each.key}"))
+  azure_private_endpoint_name   = contains(local.privatelinks_module_managed, each.key) ? coalesce(var.privatelink_endpoints[each.key].name, "pe-atlas-${each.key}") : null
   azure_private_endpoint_tags   = try(var.privatelink_endpoints[each.key].tags, {})
 
   # BYOE
-  azure_private_endpoint_id         = try(each.value.azure_private_endpoint_id, null)
-  azure_private_endpoint_ip_address = try(each.value.azure_private_endpoint_ip_address, null)
+  azure_private_endpoint_id         = try(var.privatelink_byoe[each.key].azure_private_endpoint_id, null)
+  azure_private_endpoint_ip_address = try(var.privatelink_byoe[each.key].azure_private_endpoint_ip_address, null)
 }
 
 # ─────────────────────────────────────────────────────────────────────────────

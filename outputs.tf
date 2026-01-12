@@ -66,11 +66,11 @@ output "privatelink" {
 output "privatelink_service_info" {
   description = "Atlas PrivateLink service info per user key (for BYOE - create your Azure PE using these values)"
   value = {
-    for key, loc in var.privatelink_byoe_locations : key => {
-      azure_location                         = loc
-      atlas_private_link_id                  = mongodbatlas_privatelink_endpoint.this[key].private_link_id
-      atlas_private_link_service_name        = mongodbatlas_privatelink_endpoint.this[key].private_link_service_name
-      atlas_private_link_service_resource_id = mongodbatlas_privatelink_endpoint.this[key].private_link_service_resource_id
+    for key, atlas_endpoint in mongodbatlas_privatelink_endpoint.this : key => {
+      azure_location                         = atlas_endpoint.region
+      atlas_private_link_id                  = atlas_endpoint.private_link_id
+      atlas_private_link_service_name        = atlas_endpoint.private_link_service_name
+      atlas_private_link_service_resource_id = atlas_endpoint.private_link_service_resource_id
     }
   }
 }

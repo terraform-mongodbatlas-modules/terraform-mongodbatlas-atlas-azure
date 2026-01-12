@@ -64,8 +64,8 @@ run "valid_multiple_endpoints_same_location" {
     error_message = "Expected two privatelink module instances"
   }
   assert {
-    condition     = length(mongodbatlas_privatelink_endpoint.this) == 1
-    error_message = "Expected one Atlas endpoint (same location)"
+    condition     = length(mongodbatlas_privatelink_endpoint.this) == 2
+    error_message = "Expected two Atlas endpoints (one per key in same region)"
   }
 }
 
@@ -107,14 +107,20 @@ run "valid_byoe_location_only" {
   command = plan
   variables {
     privatelink_byoe_locations = { myregion = "eastus2" }
+    privatelink_byoe = {
+      myregion = {
+        azure_private_endpoint_id         = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/privateEndpoints/pe-atlas"
+        azure_private_endpoint_ip_address = "10.0.1.100"
+      }
+    }
   }
   assert {
     condition     = length(mongodbatlas_privatelink_endpoint.this) == 1
     error_message = "Expected one Atlas endpoint"
   }
   assert {
-    condition     = length(module.privatelink) == 0
-    error_message = "Expected no privatelink modules for location_only"
+    condition     = length(module.privatelink) == 1
+    error_message = "Expected one privatelink module for BYOE"
   }
 }
 
@@ -165,8 +171,8 @@ run "invalid_duplicate_keys_locations_endpoints" {
   variables {
     privatelink_byoe_locations = { same_key = "eastus2" }
     privatelink_endpoints = {
-      same_key = { azure_location = "westeurope", subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" }
+      same_key = { azure_location = "eastus2", subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" }
     }
   }
-  expect_failures = [terraform_data.privatelink_validation]
+  expect_failures = [var.privatelink_byoe_locations]
 }

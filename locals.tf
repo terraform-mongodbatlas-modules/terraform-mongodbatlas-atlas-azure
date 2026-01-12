@@ -16,10 +16,11 @@ locals {
   # Merge all privatelink configs: BYOE locations-only, BYOE with endpoint, and module-managed
   privatelink_keys = concat(keys(var.privatelink_byoe_locations), keys(var.privatelink_endpoints))
   privatelink_key_location = merge(
-    { for k, v in var.privatelink_byoe_locations : k => coalesce(v.azure_location, k) },
+    var.privatelink_byoe_locations,
     { for k, v in var.privatelink_endpoints : k => coalesce(v.azure_location, k) }
   )
-  privatelink_locations = toset(values(local.privatelink_key_location))
+  privatelinks_module_managed = toset(keys(var.privatelink_endpoints))
+  privatelink_locations       = toset(values(local.privatelink_key_location))
 
   # All unique locations from BYOE + module-managed endpoints
   enable_regional_mode = length(local.privatelink_locations) > 1

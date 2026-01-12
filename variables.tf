@@ -154,6 +154,10 @@ variable "privatelink_byoe_locations" {
     condition     = alltrue([for loc in values(var.privatelink_byoe_locations) : can(regex("^[a-z][a-z0-9]+$", loc))])
     error_message = "All values must use Azure location format (lowercase, no separators). Examples: eastus2, westeurope"
   }
+  validation {
+    condition     = length(setintersection(keys(var.privatelink_byoe_locations), keys(var.privatelink_endpoints))) == 0
+    error_message = "Keys in privatelink_byoe_locations must not overlap with keys in privatelink_endpoints."
+  }
 }
 
 variable "privatelink_byoe" {
