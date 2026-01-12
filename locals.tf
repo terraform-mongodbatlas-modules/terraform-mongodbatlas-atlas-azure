@@ -9,12 +9,6 @@ locals {
     azuread_service_principal.atlas[0].id
   ) : try(data.azuread_service_principal.existing[0].id, null)
 
-  create_encryption_client_secret = var.encryption.enabled && var.encryption_client_secret == null
-
-  encryption_client_secret = var.encryption_client_secret != null ? (
-    var.encryption_client_secret
-  ) : try(azuread_service_principal_password.encryption[0].value, null)
-
   encryption_key_vault_id = var.encryption.enabled ? (
     var.encryption.key_vault_id != null ? var.encryption.key_vault_id : module.encryption[0].key_vault_id
   ) : null

@@ -18,6 +18,18 @@ variable "key_vault_name" {
   description = "Azure Key Vault name (must be globally unique)"
 }
 
+variable "service_principal_id" {
+  type        = string
+  description = "Existing service principal object ID. Create via: az ad sp create --id 9f2deb0d-be22-4524-a403-df531868bac0"
+}
+
+variable "encryption_client_secret" {
+  type        = string
+  default     = null
+  sensitive   = true
+  description = "Client secret for encryption. If null, example creates one automatically."
+}
+
 variable "purge_protection_enabled" {
   type        = bool
   default     = true

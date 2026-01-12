@@ -49,14 +49,14 @@ variable "atlas_azure_app_id" {
   default     = "9f2deb0d-be22-4524-a403-df531868bac0"
 }
 
-variable "create_service_principal" {
-  type        = bool
-  default     = true
-  description = "Create Azure AD service principal. Set false and provide service_principal_id for existing."
-}
-
 variable "service_principal_id" {
   type        = string
+  description = "Existing service principal object ID. Create via: az ad sp create --id 9f2deb0d-be22-4524-a403-df531868bac0"
+}
+
+variable "encryption_client_secret" {
+  type        = string
   default     = null
-  description = "Existing service principal object ID. Required if create_service_principal = false."
+  sensitive   = true
+  description = "Client secret for encryption. If null, example creates one automatically."
 }
