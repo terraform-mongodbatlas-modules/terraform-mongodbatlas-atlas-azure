@@ -137,7 +137,7 @@ variable "encryption_client_secret" {
     IMPORTANT: Azure limits Client Secret lifetime to 2 years. Atlas loses CMK access
     when the secret expires, causing cluster unavailability. Rotate secrets before expiration.
     
-    See CLOUDP-369548 for roleId support that would eliminate the need for client_secret.
+    Future provider enhancements may support roleId-based authentication, eliminating the need for client_secret.
   EOT
 
   validation {

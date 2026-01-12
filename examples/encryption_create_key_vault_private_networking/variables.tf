@@ -51,7 +51,7 @@ variable "atlas_azure_app_id" {
 
 variable "service_principal_id" {
   type        = string
-  description = "Existing service principal object ID. Create via: az ad sp create --id 9f2deb0d-be22-4524-a403-df531868bac0"
+  description = "Existing service principal object ID. Create via: az ad sp create --id <atlas_azure_app_id> (default: 9f2deb0d-be22-4524-a403-df531868bac0, which is MongoDB Atlas's registered Azure AD application ID)"
 }
 
 variable "encryption_client_secret" {
