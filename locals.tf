@@ -13,8 +13,7 @@ locals {
     var.encryption.key_vault_id != null ? var.encryption.key_vault_id : module.encryption[0].key_vault_id
   ) : null
 
-  # Merge all privatelink configs: BYOE locations-only, BYOE with endpoint, and module-managed
-  privatelink_keys = concat(keys(var.privatelink_byoe_locations), keys(var.privatelink_endpoints))
+  # user key -> location
   privatelink_key_location = merge(
     var.privatelink_byoe_locations,
     { for k, v in var.privatelink_endpoints : k => coalesce(v.azure_location, k) }
@@ -22,7 +21,6 @@ locals {
   privatelinks_module_managed = toset(keys(var.privatelink_endpoints))
   privatelink_locations       = toset(values(local.privatelink_key_location))
 
-  # All unique locations from BYOE + module-managed endpoints
   enable_regional_mode = length(local.privatelink_locations) > 1
 
   # Backup export
