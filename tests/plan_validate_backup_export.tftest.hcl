@@ -138,8 +138,8 @@ run "backup_export_fails_when_skip_cloud_provider_access" {
   variables {
     project_id                 = var.project_id
     skip_cloud_provider_access = true
-    privatelink_module_managed_subnet_ids = {
-      eastus2 = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/subnet"
+    privatelink_endpoints = {
+      eastus2 = { subnet_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/subnet" }
     }
     backup_export = {
       enabled        = true

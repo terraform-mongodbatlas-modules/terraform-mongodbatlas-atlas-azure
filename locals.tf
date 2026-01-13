@@ -13,9 +13,14 @@ locals {
     var.encryption.key_vault_id != null ? var.encryption.key_vault_id : module.encryption[0].key_vault_id
   ) : null
 
-  privatelink_locations = toset(
-    concat(var.privatelink_locations, keys(var.privatelink_module_managed_subnet_ids)),
+  # user key -> location
+  privatelink_key_location = merge(
+    var.privatelink_byoe_locations,
+    { for k, v in var.privatelink_endpoints : k => coalesce(v.azure_location, k) }
   )
+  privatelinks_module_managed = toset(keys(var.privatelink_endpoints))
+  privatelink_locations       = toset(values(local.privatelink_key_location))
+
   enable_regional_mode = length(local.privatelink_locations) > 1
 
   # Backup export

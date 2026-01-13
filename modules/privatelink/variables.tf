@@ -61,3 +61,9 @@ variable "azure_private_endpoint_name" {
   default     = null
   description = "Custom name for the Azure private endpoint. Defaults to 'pe-atlas-{azure_location}'. Must be unique within resource group."
 }
+
+variable "azure_private_endpoint_tags" {
+  type        = map(string)
+  default     = {}
+  description = "Tags for the Azure private endpoint resource."
+}
