@@ -1,0 +1,53 @@
+sections:
+  - id: required
+    title: "Required Variables"
+    level: 2
+    match:
+      names:
+        - project_id
+
+  - id: service_principal
+    title: "Azure Service Principal"
+    level: 2
+    description: |
+      Configure the Azure AD service principal used by MongoDB Atlas.
+    match:
+      names:
+        - atlas_azure_app_id
+        - create_service_principal
+        - service_principal_id
+
+  - id: encryption
+    title: "Encryption at Rest"
+    level: 2
+    description: |
+      Configure encryption at rest using Azure Key Vault. See the [Azure encryption documentation](https://www.mongodb.com/docs/atlas/security-azure-kms/) for details.
+    match:
+      names:
+        - encryption
+        - encryption_client_secret
+
+  - id: privatelink
+    title: "Private Link"
+    level: 2
+    description: |
+      Configure Azure Private Link endpoints for secure connectivity. See the [Azure Private Link documentation](https://www.mongodb.com/docs/atlas/security-private-endpoint/) for details.
+    match:
+      names:
+        - privatelink_endpoints
+        - privatelink_byoe_locations
+        - privatelink_byoe
+
+  - id: backup
+    title: "Backup Export"
+    level: 2
+    description: |
+      Configure backup snapshot export to Azure Blob Storage.
+    match:
+      names:
+        - backup_export
+
+  - id: optional
+    title: "Optional Variables"
+    level: 2
+    is_default: true
