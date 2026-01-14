@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 """Generate complete GitHub release body from CHANGELOG.md and git repository info."""
 
 import re

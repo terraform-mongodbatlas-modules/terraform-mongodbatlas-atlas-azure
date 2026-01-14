@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 """Generate release notes by comparing current version with previous release."""
 
 import subprocess

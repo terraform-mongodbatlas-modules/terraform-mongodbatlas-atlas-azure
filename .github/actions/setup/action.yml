@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 name: 'Setup'
 description: 'Consolidated setup action for tool installation'
 inputs:

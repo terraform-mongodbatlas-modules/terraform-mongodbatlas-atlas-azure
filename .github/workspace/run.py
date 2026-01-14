@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 """Orchestrate workspace test workflows: gen -> plan -> reg."""
 
 from __future__ import annotations

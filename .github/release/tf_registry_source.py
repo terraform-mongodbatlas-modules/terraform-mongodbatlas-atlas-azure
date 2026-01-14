@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 """Compute Terraform Registry source from git repository information."""
 
 import re

@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 # Terraform CLI versions for compatibility testing
 # Must be subset of provider compatibility matrix (>= 1.9 for cross-variable validation)
 # See: https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs#hashicorp-terraform-version-compatibility-matrix

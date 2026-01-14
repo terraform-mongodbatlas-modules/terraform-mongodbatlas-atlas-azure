@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 name: Generate Changelog
 # Based on https://github.com/mongodb/terraform-provider-mongodbatlas/blob/master/.github/workflows/generate-changelog.yml
 on:

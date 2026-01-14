@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 name: Pre-Release Tests
 run-name: "Pre-Release: examples=${{ inputs.include_examples }}, provider=${{ inputs.provider_ref }}${{ inputs.skip_tftest && ', skip_tftest' || '' }}"
 

@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 """Update module_version in versions.tf file."""
 
 import re

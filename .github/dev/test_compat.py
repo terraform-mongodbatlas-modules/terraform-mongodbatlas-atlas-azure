@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 """Terraform CLI version compatibility testing.
 
 Runs `terraform init -backend=false` and `terraform validate` across all configured

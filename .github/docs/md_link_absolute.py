@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 """Convert relative links in markdown files to absolute GitHub URLs."""
 
 import argparse

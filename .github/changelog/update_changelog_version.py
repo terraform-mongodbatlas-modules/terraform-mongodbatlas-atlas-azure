@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# path-sync copy -n sdlc
 """Update CHANGELOG.md with version and current date."""
 
 import re

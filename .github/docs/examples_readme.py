@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 """Generate README.md and versions.tf files for examples using terraform-docs config."""
 
 import argparse

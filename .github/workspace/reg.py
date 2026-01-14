@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 """Generate regression test files from terraform plan output."""
 
 from __future__ import annotations

@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 """Tests for the Go changelog entry validator.
 
 This module tests the Go script that validates changelog entry files

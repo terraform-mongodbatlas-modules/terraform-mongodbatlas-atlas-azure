@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 blank_issues_enabled: true
 contact_links:
   - name: MongoDB Atlas Support

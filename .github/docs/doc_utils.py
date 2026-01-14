@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 """Shared utilities for documentation generation."""
 
 

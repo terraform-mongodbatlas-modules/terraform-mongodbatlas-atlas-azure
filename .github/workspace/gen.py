@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 """Generate terraform files and pytest file for workspace plan tests."""
 
 from __future__ import annotations

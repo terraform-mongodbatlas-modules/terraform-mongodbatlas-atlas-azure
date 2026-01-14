@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 """Generate and update root README.md TOC and TABLES sections."""
 
 import argparse

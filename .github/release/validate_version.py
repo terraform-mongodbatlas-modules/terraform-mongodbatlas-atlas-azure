@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 """Validate version format and check if it already exists."""
 
 import re

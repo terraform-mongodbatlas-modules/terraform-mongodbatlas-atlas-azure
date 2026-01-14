@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 """Run terraform plan for workspace tests."""
 
 from __future__ import annotations

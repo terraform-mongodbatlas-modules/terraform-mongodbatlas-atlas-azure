@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 [project]
 name = "module-github-scripts"
 version = "0.1.0"

@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 from __future__ import annotations
 
 import sys

@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 """Transform submodule README.md code blocks to use registry source."""
 
 import argparse

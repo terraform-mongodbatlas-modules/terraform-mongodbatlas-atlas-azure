@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 """Shared configuration loading and parsing for documentation generation."""
 
 from __future__ import annotations

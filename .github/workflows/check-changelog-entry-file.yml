@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 name: Check changelog entry file
 
 on:

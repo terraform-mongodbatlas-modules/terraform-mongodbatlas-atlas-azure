@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 """Generate grouped inputs markdown from terraform-docs output in README.md."""
 
 import argparse

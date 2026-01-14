@@ -1,3 +1,4 @@
+# path-sync copy -n sdlc
 name: 'Setup Provider Dev'
 description: 'Build provider from source and configure dev_overrides'
 inputs:
