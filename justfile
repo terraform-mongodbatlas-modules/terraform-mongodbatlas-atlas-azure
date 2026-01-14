@@ -194,5 +194,33 @@ apply-examples *args:
 destroy-examples *args:
     just ws-run -m destroy {{args}}
 
+# DEV SETUP
+dev-vars-project project_id:
+    {{py}} dev.dev_vars project {{project_id}}
+
+dev-vars-org org_id:
+    {{py}} dev.dev_vars org {{org_id}}
+
+setup-provider-dev provider_path:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    PROVIDER_ABS="$(cd "{{provider_path}}" && pwd)"
+    PLUGIN_DIR="$PROVIDER_ABS/bin"
+    cd "{{provider_path}}"
+    echo "Building provider from source at $PROVIDER_ABS"
+    make build
+    echo "Creating dev.tfrc at {{justfile_directory()}}/dev.tfrc"
+    uv run --directory "{{gh_dir}}" python -m dev.dev_vars tfrc "$PLUGIN_DIR" > "{{justfile_directory()}}/dev.tfrc"
+    echo "Provider built at $PLUGIN_DIR"
+    echo "Run: export TF_CLI_CONFIG_FILE=\"{{justfile_directory()}}/dev.tfrc\""
+
+# TESTING
+tftest-all:
+    terraform init
+    terraform test -var 'org_id={{env_var("MONGODB_ATLAS_ORG_ID")}}'
+
+test-compat:
+    {{py}} dev.test_compat
+
 # === OK_EDIT: path-sync footer ===
 # Module-specific recipes below (not synced)
