@@ -17,10 +17,6 @@ locals {
     azuread_service_principal.atlas[0].id
   ) : try(data.azuread_service_principal.existing[0].id, null)
 
-  encryption_key_vault_id = var.encryption.enabled ? (
-    var.encryption.key_vault_id != null ? var.encryption.key_vault_id : module.encryption[0].key_vault_id
-  ) : null
-
   # user key -> location
   privatelink_key_location = merge(
     var.privatelink_byoe_locations,
@@ -30,9 +26,4 @@ locals {
   privatelink_locations       = toset(values(local.privatelink_key_location))
 
   enable_regional_mode = length(local.privatelink_locations) > 1
-
-  # Backup export
-  backup_export_storage_account_id = var.backup_export.enabled ? (
-    var.backup_export.storage_account_id != null ? var.backup_export.storage_account_id : module.backup_export[0].storage_account_id
-  ) : null
 }
