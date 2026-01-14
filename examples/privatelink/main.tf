@@ -1,8 +1,7 @@
 module "atlas_azure" {
   source = "../../"
 
-  project_id                 = var.project_id
-  skip_cloud_provider_access = true
+  project_id = var.project_id
 
   # Key is used as azure_location when azure_location is not specified
   privatelink_endpoints = {

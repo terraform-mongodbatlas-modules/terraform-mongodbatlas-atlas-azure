@@ -31,22 +31,6 @@ variable "service_principal_id" {
   }
 }
 
-variable "skip_cloud_provider_access" {
-  type        = bool
-  default     = false
-  description = "Skip cloud_provider_access setup. Set true ONLY for privatelink-only usage where azuread provider is not available."
-
-  validation {
-    condition     = !var.skip_cloud_provider_access || !var.encryption.enabled
-    error_message = "Encryption requires Azure AD integration. Cannot use encryption.enabled=true with skip_cloud_provider_access=true."
-  }
-
-  validation {
-    condition     = !var.skip_cloud_provider_access || !var.backup_export.enabled
-    error_message = "Backup export requires Azure AD integration. Cannot use backup_export.enabled=true with skip_cloud_provider_access=true."
-  }
-}
-
 variable "encryption" {
   type = object({
     enabled        = optional(bool, false)

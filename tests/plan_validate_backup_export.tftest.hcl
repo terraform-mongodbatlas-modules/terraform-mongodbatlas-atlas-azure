@@ -132,32 +132,6 @@ run "backup_export_invalid_azure_location_format" {
   ]
 }
 
-run "backup_export_fails_when_skip_cloud_provider_access" {
-  command = plan
-
-  variables {
-    project_id                 = var.project_id
-    skip_cloud_provider_access = true
-    privatelink_endpoints = {
-      eastus2 = { subnet_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/subnet" }
-    }
-    backup_export = {
-      enabled        = true
-      container_name = "test-container"
-      create_storage_account = {
-        enabled             = true
-        name                = "teststorage"
-        resource_group_name = "rg"
-        azure_location      = "eastus2"
-      }
-    }
-  }
-
-  expect_failures = [
-    var.skip_cloud_provider_access
-  ]
-}
-
 # ─────────────────────────────────────────────────────────────────────────────
 # Valid Configuration Tests
 # ─────────────────────────────────────────────────────────────────────────────

@@ -277,26 +277,3 @@ run "encryption_with_private_networking" {
     error_message = "Expected 2 private endpoints to be created"
   }
 }
-
-run "encryption_fails_when_skip_cloud_provider_access" {
-  command = plan
-
-  variables {
-    project_id                 = var.project_id
-    skip_cloud_provider_access = true
-    encryption_client_secret   = "test-secret-value"
-    encryption = {
-      enabled = true
-      create_key_vault = {
-        enabled             = true
-        name                = "test-kv"
-        resource_group_name = "rg"
-        azure_location      = "eastus2"
-      }
-    }
-  }
-
-  expect_failures = [
-    var.skip_cloud_provider_access
-  ]
-}
