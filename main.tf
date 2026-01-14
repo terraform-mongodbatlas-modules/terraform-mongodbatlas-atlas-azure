@@ -1,19 +1,19 @@
 data "azurerm_client_config" "current" {}
 
 resource "azuread_service_principal" "atlas" {
-  count = var.create_service_principal && !var.skip_cloud_provider_access ? 1 : 0
+  count = var.create_service_principal && !local.skip_cloud_provider_access ? 1 : 0
 
   client_id                    = var.atlas_azure_app_id
   app_role_assignment_required = false
 }
 
 data "azuread_service_principal" "existing" {
-  count     = !var.create_service_principal && !var.skip_cloud_provider_access ? 1 : 0
+  count     = !var.create_service_principal && !local.skip_cloud_provider_access ? 1 : 0
   object_id = var.service_principal_id
 }
 
 resource "mongodbatlas_cloud_provider_access_setup" "this" {
-  count = !var.skip_cloud_provider_access ? 1 : 0
+  count = !local.skip_cloud_provider_access ? 1 : 0
 
   project_id    = var.project_id
   provider_name = "AZURE"
@@ -26,7 +26,7 @@ resource "mongodbatlas_cloud_provider_access_setup" "this" {
 }
 
 resource "mongodbatlas_cloud_provider_access_authorization" "this" {
-  count = !var.skip_cloud_provider_access ? 1 : 0
+  count = !local.skip_cloud_provider_access ? 1 : 0
 
   project_id = var.project_id
   role_id    = mongodbatlas_cloud_provider_access_setup.this[0].role_id

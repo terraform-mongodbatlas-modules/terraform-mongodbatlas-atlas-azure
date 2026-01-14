@@ -3,8 +3,7 @@ mock_provider "azurerm" {}
 mock_provider "azuread" {}
 
 variables {
-  project_id                 = "000000000000000000000000"
-  skip_cloud_provider_access = true
+  project_id = "000000000000000000000000"
 }
 
 run "valid_single_region_module_managed" {

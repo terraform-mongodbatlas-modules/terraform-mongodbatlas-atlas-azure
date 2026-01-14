@@ -15,8 +15,7 @@ locals {
 module "atlas_azure" {
   source = "../../"
 
-  project_id                 = var.project_id
-  skip_cloud_provider_access = true
+  project_id = var.project_id
 
   # BYOE: provide your own Azure Private Endpoint details
   privatelink_byoe = {
