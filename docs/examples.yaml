@@ -23,24 +23,21 @@ tables:
     columns: ["feature", "name"]
     link_column: name
     example_rows:
-      - folder: cloud_provider_access
-        feature: Cloud Provider Access
-        name: Basic Azure Service Principal Setup
-      - folder: encryption
-        feature: Encryption at Rest
-        name: Azure Key Vault Integration (User-Provided)
-      - folder: encryption_create_key_vault_private_networking
-        feature: Encryption at Rest
-        name: Azure Key Vault (Module-Managed with Private Networking)
-      - folder: privatelink
-        feature: Private Link
-        name: Azure Private Endpoint (Module-Managed)
-      - folder: privatelink_byoe
-        feature: Private Link
-        name: Azure Private Endpoint (Bring Your Own Endpoint)
-      - folder: privatelink_multi_region
-        feature: Private Link
-        name: Multi-Region Private Endpoints
-      - folder: backup_export
+      - folder_name: backup_export
         feature: Backup Export
         name: Azure Blob Storage Export
+      - folder_name: encryption
+        feature: Encryption at Rest
+        name: Azure Key Vault Integration (User-Provided)
+      - folder_name: encryption_create_key_vault_private_networking
+        feature: Encryption at Rest
+        name: Azure Key Vault (Module-Managed with Private Networking)
+      - folder_name: privatelink
+        feature: Private Link
+        name: Azure Private Endpoint (Module-Managed)
+      - folder_name: privatelink_byoe
+        feature: Private Link
+        name: Azure Private Endpoint (Bring Your Own Endpoint)
+      - folder_name: privatelink_multi_region
+        feature: Private Link
+        name: Multi-Region Private Endpoints
