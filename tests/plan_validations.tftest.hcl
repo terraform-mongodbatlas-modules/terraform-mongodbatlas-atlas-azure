@@ -115,6 +115,26 @@ run "dynamic_skip_cloud_provider_access_privatelink_only" {
     condition     = output.role_id == null
     error_message = "Expected role_id to be null when cloud_provider_access is skipped"
   }
+
+  assert {
+    condition     = output.service_principal_id == null
+    error_message = "Expected service_principal_id to be null when cloud_provider_access is skipped"
+  }
+
+  assert {
+    condition     = output.service_principal_resource_id == null
+    error_message = "Expected service_principal_resource_id to be null when cloud_provider_access is skipped"
+  }
+
+  assert {
+    condition     = output.authorized_date == null
+    error_message = "Expected authorized_date to be null when cloud_provider_access is skipped"
+  }
+
+  assert {
+    condition     = output.feature_usages == null
+    error_message = "Expected feature_usages to be null when cloud_provider_access is skipped"
+  }
 }
 
 run "dynamic_enable_cloud_provider_access_encryption" {
