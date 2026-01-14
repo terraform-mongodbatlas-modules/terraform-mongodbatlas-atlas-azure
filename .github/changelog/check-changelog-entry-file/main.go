@@ -1,3 +1,4 @@
+// path-sync copy -n sdlc
 package main
 
 import (
