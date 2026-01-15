@@ -115,7 +115,6 @@ run "dynamic_skip_cloud_provider_access_privatelink_only" {
     condition     = output.role_id == null
     error_message = "Expected role_id to be null when cloud_provider_access is skipped"
   }
-
   assert {
     condition     = output.service_principal_id == null
     error_message = "Expected service_principal_id to be null when cloud_provider_access is skipped"

@@ -1,0 +1,43 @@
+examples_readme:
+  readme_template: docs/example_readme.md
+  skip_examples: []
+  code_snippet_files:
+    additional: []
+  template_vars:
+    production_considerations_comment: ""
+    production_considerations: ""
+    skip_if_name_contains: []
+  versions_tf:
+    add: |
+      provider "mongodbatlas" {}
+      provider "azurerm" {
+        features {}
+      }
+      provider "azuread" {}
+    skip_if_name_contains: []
+    generate_when_missing_only: false
+    force_generate: false
+
+tables:
+  - name: Examples
+    columns: ["feature", "name"]
+    link_column: name
+    example_rows:
+      - folder_name: backup_export
+        feature: Backup Export
+        name: Azure Blob Storage Export
+      - folder_name: encryption
+        feature: Encryption at Rest
+        name: Azure Key Vault Integration (User-Provided)
+      - folder_name: encryption_create_key_vault_private_networking
+        feature: Encryption at Rest
+        name: Azure Key Vault (Module-Managed with Private Networking)
+      - folder_name: privatelink
+        feature: Private Link
+        name: Azure Private Endpoint (Module-Managed)
+      - folder_name: privatelink_byoe
+        feature: Private Link
+        name: Azure Private Endpoint (Bring Your Own Endpoint)
+      - folder_name: privatelink_multi_region
+        feature: Private Link
+        name: Multi-Region Private Endpoints
