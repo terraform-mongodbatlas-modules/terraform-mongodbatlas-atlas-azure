@@ -30,9 +30,7 @@ def extract_planned_resources(plan: dict[str, Any]) -> dict[str, dict[str, Any]]
     return result
 
 
-def _extract_from_module(
-    module: dict[str, Any], result: dict[str, dict[str, Any]]
-) -> None:
+def _extract_from_module(module: dict[str, Any], result: dict[str, dict[str, Any]]) -> None:
     for resource in module.get("resources", []):
         result[resource["address"]] = resource.get("values", {})
     for child in module.get("child_modules", []):
@@ -54,8 +52,7 @@ def filter_values(
             val = filter_values(val, skip_attrs, skip_values)
         elif isinstance(val, list):
             val = [
-                filter_values(v, skip_attrs, skip_values) if isinstance(v, dict) else v
-                for v in val
+                filter_values(v, skip_attrs, skip_values) if isinstance(v, dict) else v for v in val
             ]
         filtered[key] = val
     return filtered
@@ -69,9 +66,7 @@ def dump_resource_yaml(
     if "null" not in skip_values:
         skip_values = skip_values + ["null"]
     filtered = filter_values(values, skip_attrs, skip_values)
-    return yaml.dump(
-        filtered, default_flow_style=False, sort_keys=True, allow_unicode=True
-    )
+    return yaml.dump(filtered, default_flow_style=False, sort_keys=True, allow_unicode=True)
 
 
 def find_matching_address(

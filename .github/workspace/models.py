@@ -152,16 +152,12 @@ def sanitize_address(address: str) -> str:
 WORKSPACE_CONFIG_FILE = "workspace_test_config.yaml"
 
 
-def resolve_workspaces(
-    workspace: str, tests_dir: Path = DEFAULT_TESTS_DIR
-) -> list[Path]:
+def resolve_workspaces(workspace: str, tests_dir: Path = DEFAULT_TESTS_DIR) -> list[Path]:
     if not tests_dir.exists():
         raise ValueError(f"{tests_dir} does not exist")
     if workspace == "all":
         ws_dirs = sorted(
-            d
-            for d in tests_dir.iterdir()
-            if d.is_dir() and d.name.startswith("workspace_")
+            d for d in tests_dir.iterdir() if d.is_dir() and d.name.startswith("workspace_")
         )
         if not ws_dirs:
             raise ValueError(f"No workspace_* directories found in {tests_dir}")

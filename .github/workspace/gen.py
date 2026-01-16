@@ -44,8 +44,7 @@ def parse_include_examples(value: str, config: models.WsConfig) -> list[models.E
     return [
         ex
         for ex in config.examples
-        if ex.identifier in filters
-        or (ex.number is not None and str(ex.number) in filters)
+        if ex.identifier in filters or (ex.number is not None and str(ex.number) in filters)
     ]
 
 
@@ -131,9 +130,7 @@ def process_workspace(ws_dir: Path, include_examples: str = "all") -> None:
 
 @app.command()
 def main(
-    ws: str = typer.Option(
-        "all", "--ws", help="Workspace name or 'all' for all ws_* directories"
-    ),
+    ws: str = typer.Option("all", "--ws", help="Workspace name or 'all' for all ws_* directories"),
     tests_dir: Path = typer.Option(models.DEFAULT_TESTS_DIR, "--tests-dir"),
     include_examples: str = typer.Option("all", "--include-examples", "-e"),
 ) -> None:

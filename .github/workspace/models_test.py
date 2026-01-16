@@ -135,9 +135,7 @@ def test_ws_config_vars_for_example_duplicate_raises():
         },
     )
     ex = models.Example(number=1, var_groups=["shared", "group1"])
-    with pytest.raises(
-        ValueError, match="Duplicate variable 'project_id' in example 01"
-    ):
+    with pytest.raises(ValueError, match="Duplicate variable 'project_id' in example 01"):
         config.vars_for_example(ex)
 
 
