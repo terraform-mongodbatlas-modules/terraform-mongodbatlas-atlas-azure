@@ -30,7 +30,9 @@ def extract_planned_resources(plan: dict[str, Any]) -> dict[str, dict[str, Any]]
     return result
 
 
-def _extract_from_module(module: dict[str, Any], result: dict[str, dict[str, Any]]) -> None:
+def _extract_from_module(
+    module: dict[str, Any], result: dict[str, dict[str, Any]]
+) -> None:
     for resource in module.get("resources", []):
         result[resource["address"]] = resource.get("values", {})
     for child in module.get("child_modules", []):
@@ -52,7 +54,8 @@ def filter_values(
             val = filter_values(val, skip_attrs, skip_values)
         elif isinstance(val, list):
             val = [
-                filter_values(v, skip_attrs, skip_values) if isinstance(v, dict) else v for v in val
+                filter_values(v, skip_attrs, skip_values) if isinstance(v, dict) else v
+                for v in val
             ]
         filtered[key] = val
     return filtered
@@ -66,13 +69,15 @@ def dump_resource_yaml(
     if "null" not in skip_values:
         skip_values = skip_values + ["null"]
     filtered = filter_values(values, skip_attrs, skip_values)
-    return yaml.dump(filtered, default_flow_style=False, sort_keys=True, allow_unicode=True)
+    return yaml.dump(
+        filtered, default_flow_style=False, sort_keys=True, allow_unicode=True
+    )
 
 
 def find_matching_address(
-    resources: dict[str, dict[str, Any]], suffix: str, example_num: int
+    resources: dict[str, dict[str, Any]], suffix: str, example_id: str
 ) -> str | None:
-    example_prefix = f"module.ex_{example_num:02d}."
+    example_prefix = f"module.ex_{example_id}."
     for addr in resources:
         if addr.endswith(suffix) and addr.startswith(example_prefix):
             return addr
@@ -98,11 +103,11 @@ def process_workspace(ws_dir: Path, force_regen: bool) -> None:
     actual_dir.mkdir(exist_ok=True)
     for ex in config.examples:
         for reg in ex.plan_regressions:
-            full_addr = find_matching_address(resources, reg.address, ex.number)
+            full_addr = find_matching_address(resources, reg.address, ex.identifier)
             if not full_addr:
                 typer.echo(f"  Warning: {reg.address} not found in plan", err=True)
                 continue
-            filename = f"{ex.number:02d}_{models.sanitize_address(reg.address)}.yaml"
+            filename = f"{ex.identifier}_{models.sanitize_address(reg.address)}.yaml"
             content = dump_resource_yaml(resources[full_addr], config, reg.dump)
             (actual_dir / filename).write_text(content)
             typer.echo(f"  Generated {filename}")
