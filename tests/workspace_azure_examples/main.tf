@@ -12,10 +12,6 @@ terraform {
       source  = "hashicorp/azuread"
       version = "~> 3.0"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.0"
-    }
   }
   required_version = ">= 1.9"
 }
@@ -56,46 +52,20 @@ variable "atlas_azure_app_id" {
   default = "9f2deb0d-be22-4524-a403-df531868bac0"
 }
 
-variable "project_name_prefix" {
-  type    = string
-  default = "test-acc-tf-p-"
-}
-
-variable "resource_group_prefix" {
-  type    = string
-  default = "rg-atlas-test"
-}
-
 variable "azure_location" {
   type    = string
   default = "eastus2"
 }
 
-locals {
-  needs_generation = var.project_id == "" || var.resource_group_name == "" || var.service_principal_id == ""
-}
-
-resource "random_string" "suffix" {
-  count = local.needs_generation ? 1 : 0
-  keepers = {
-    first = timestamp()
-  }
-  length  = 6
-  special = false
-  upper   = false
-}
-
 module "project" {
-  count        = var.project_id == "" ? 1 : 0
-  source       = "../project_generator"
-  org_id       = var.org_id
-  project_name = "${var.project_name_prefix}${random_string.suffix[0].id}"
+  count  = var.project_id == "" ? 1 : 0
+  source = "../project_generator"
+  org_id = var.org_id
 }
 
 module "rg" {
   count    = var.resource_group_name == "" ? 1 : 0
   source   = "../resource_group_generator"
-  name     = "${var.resource_group_prefix}-${random_string.suffix[0].id}"
   location = var.azure_location
 }
 

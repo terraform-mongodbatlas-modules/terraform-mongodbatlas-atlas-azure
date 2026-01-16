@@ -11,3 +11,4 @@ plan_snapshots_actual/
 
 # Local dev vars
 dev.tfvars
+*generated*
