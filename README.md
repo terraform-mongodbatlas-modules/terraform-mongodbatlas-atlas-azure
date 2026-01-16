@@ -77,7 +77,7 @@ The following providers are used by this module:
 
 ## Resources
 
-The following resources are used by this module:
+The following resources are used by this module: 
 
 - [azuread_service_principal.atlas](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/service_principal) (resource)
 - [mongodbatlas_cloud_provider_access_authorization.this](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/cloud_provider_access_authorization) (resource)
