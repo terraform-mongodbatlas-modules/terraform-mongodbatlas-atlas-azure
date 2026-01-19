@@ -117,9 +117,9 @@ variable "encryption_client_secret" {
   description = <<-EOT
     Azure AD application client secret for encryption. This value is required when using module-managed encryption (`encryption.enabled = true`).
 
-**IMPORTANT:** Azure limits the client secret lifetime to two years. When the secret expires, Atlas loses CMK access, causing cluster unavailability. Rotate secrets before expiration.
+    **IMPORTANT:** Azure limits the client secret lifetime to two years. When the secret expires, Atlas loses CMK access, causing cluster unavailability. Rotate secrets before expiration.
 
-Future provider enhancements may support `roleId`-based authentication, eliminating the need for `client_secret`.
+    Future provider enhancements may support `roleId`-based authentication, eliminating the need for `client_secret`.
   EOT
 
   validation {
