@@ -55,7 +55,7 @@ Run 'just docs' to regenerate.
 -->
 ## Requirements
 
-Using this module requires the following tools:
+The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9)
 
@@ -67,7 +67,7 @@ Using this module requires the following tools:
 
 ## Providers
 
- This module uses the following providers:
+The following providers are used by this module:
 
 - <a name="provider_azuread"></a> [azuread](#provider\_azuread) (>= 2.53)
 
@@ -77,15 +77,15 @@ Using this module requires the following tools:
 
 ## Resources
 
-This module uses the following resources:
+The following resources are used by this module:
 
-- [azuread_service_principal.atlas](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/service_principal) (Resource)
-- [mongodbatlas_cloud_provider_access_authorization.this](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/cloud_provider_access_authorization) (Resource)
-- [mongodbatlas_cloud_provider_access_setup.this](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/cloud_provider_access_setup) (Resource)
-- [mongodbatlas_private_endpoint_regional_mode.this](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/private_endpoint_regional_mode) (Resource)
-- [mongodbatlas_privatelink_endpoint.this](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/privatelink_endpoint) (Resource)
-- [azuread_service_principal.existing](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/service_principal) (Data source)
-- [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (Data source)
+- [azuread_service_principal.atlas](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/service_principal) (resource)
+- [mongodbatlas_cloud_provider_access_authorization.this](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/cloud_provider_access_authorization) (resource)
+- [mongodbatlas_cloud_provider_access_setup.this](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/cloud_provider_access_setup) (resource)
+- [mongodbatlas_private_endpoint_regional_mode.this](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/private_endpoint_regional_mode) (resource)
+- [mongodbatlas_privatelink_endpoint.this](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/privatelink_endpoint) (resource)
+- [azuread_service_principal.existing](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/service_principal) (data source)
+- [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 
 <!-- BEGIN_TF_INPUTS_RAW -->
 <!-- @generated
@@ -95,21 +95,18 @@ Run 'just docs' to regenerate.
 -->
 ## Required Variables
 
-This module requires the following variables:
-
-### MongoDB
-
-#### project_id
+### project_id
 
 MongoDB Atlas project ID
 
 Type: `string`
 
-### Azure Service Principal
+
+## Azure Service Principal
 
 Configure the Azure AD service principal used by MongoDB Atlas.
 
-#### atlas_azure_app_id
+### atlas_azure_app_id
 
 MongoDB Atlas Azure application ID. This is the application ID registered in Azure AD for MongoDB Atlas.
 
@@ -117,15 +114,15 @@ Type: `string`
 
 Default: `"9f2deb0d-be22-4524-a403-df531868bac0"`
 
-#### create_service_principal
+### create_service_principal
 
-Create Azure AD service principal. Set false and provide `service_principal_id` for existing.
+Create Azure AD service principal. Set as `false` and provide `service_principal_id` for existing.
 
 Type: `bool`
 
 Default: `true`
 
-#### service_principal_id
+### service_principal_id
 
 Existing service principal object ID. Required if `create_service_principal = false`.
 
@@ -133,20 +130,20 @@ Type: `string`
 
 Default: `null`
 
+
 ## Encryption at Rest
 
-Configure encryption at rest using [Azure Key Vault](https://learn.microsoft.com/en-us/azure/key-vault/general/overview). See the [Azure encryption documentation](https://www.mongodb.com/docs/atlas/security-azure-kms/) for details.
+Configure encryption at rest using Azure Key Vault. See the [Azure encryption documentation](https://www.mongodb.com/docs/atlas/security-azure-kms/) for details.
 
-### Encryption (Azure Key Vault)
+### encryption
 
 Encryption at rest configuration with Azure Key Vault.
-
-Provide **either** of the following:
+Provide EITHER:
 
 - `key_vault_id` + `key_identifier` (for user-provided Key Vault)
-- `create_key_vault.enabled = true` ( for module-managed Key Vault)
+- `create_key_vault.enabled` = true (for module-managed Key Vault)
 
-**NOTE:** `private_endpoint_regions` uses the Atlas region format (e.g., `US_EAST_2`, `EUROPE_WEST`), not Azure format (e.g., eastus2, westeurope). See [Availability Zones and Supported Regions](https://www.mongodb.com/docs/atlas/reference/microsoft-azure/#availability-zones-and-supported-regions) for a comprehensive list of equivalencies between Atlas and Azure regions.  
+**NOTE:** `private_endpoint_regions` uses the Atlas region format (e.g., `US_EAST_2`, `EUROPE_WEST`), not Azure format (e.g., `eastus2`, `westeurope`). See [Availability Zones and Supported Regions](https://www.mongodb.com/docs/atlas/reference/microsoft-azure/#availability-zones-and-supported-regions) for a comprehensive list of equivalencies between Atlas and Azure regions.
 
 Type:
 
@@ -177,15 +174,16 @@ Default: `{}`
 
 ### encryption_client_secret
 
-Azure AD application client secret for encryption. This value is required when using module-managed encryption (`encryption.enabled = true`).
+    Azure AD application client secret for encryption. This value is required when using module-managed encryption (`encryption.enabled = true`).
 
 **IMPORTANT:** Azure limits the client secret lifetime to two years. When the secret expires, Atlas loses CMK access, causing cluster unavailability. Rotate secrets before expiration.
 
-Future provider enhancements may support roleId-based authentication, eliminating the need for `client_secret`.
+Future provider enhancements may support `roleId`-based authentication, eliminating the need for `client_secret`.
 
 Type: `string`
 
 Default: `null`
+
 
 ## Private Link
 
@@ -193,7 +191,7 @@ Configure Azure Private Link endpoints for secure connectivity. See the [Azure P
 
 ### privatelink_endpoints
 
-Module-managed PrivateLink endpoints. Key is user identifier (or Azure location if `azure_location` omitted).
+Module-managed PrivateLink endpoints. Key is user identifier (or Azure location if `azure_location` is omitted).
 
 Type:
 
@@ -289,11 +287,11 @@ Description: Encryption at rest configuration status
 
 ### <a name="output_encryption_at_rest_provider"></a> [encryption\_at\_rest\_provider](#output\_encryption\_at\_rest\_provider)
 
-Description: Value for cluster's `encryption_at_rest_provider` attribute
+Description: Value for cluster's encryption\_at\_rest\_provider attribute
 
 ### <a name="output_export_bucket_id"></a> [export\_bucket\_id](#output\_export\_bucket\_id)
 
-Description: Export bucket ID for backup schedule `auto_export_enabled`
+Description: Export bucket ID for backup schedule auto\_export\_enabled
 
 ### <a name="output_feature_usages"></a> [feature\_usages](#output\_feature\_usages)
 
