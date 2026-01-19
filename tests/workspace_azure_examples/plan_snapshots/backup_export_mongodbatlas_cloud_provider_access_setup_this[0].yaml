@@ -1,0 +1,3 @@
+azure_config:
+- tenant_id: 91405384-d71e-47f5-92dd-759e272cdc1c
+provider_name: AZURE

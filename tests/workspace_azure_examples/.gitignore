@@ -12,3 +12,4 @@ plan_snapshots_actual/
 # Local dev vars
 dev.tfvars
 *generated*
+test_plan_snapshot.py

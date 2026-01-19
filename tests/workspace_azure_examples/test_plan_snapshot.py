@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 ACTUAL_DIR = Path(__file__).parent / "plan_snapshots_actual"
+EXPECTED_DIR = Path(__file__).parent / "plan_snapshots"
 
 TEST_CASES = [
     "backup_export_mongodbatlas_cloud_provider_access_setup_this[0]",
@@ -18,5 +19,6 @@ TEST_CASES = [
 @pytest.mark.parametrize("name", TEST_CASES)
 def test_plan_snapshot(name: str, file_regression) -> None:
     actual_file = ACTUAL_DIR / f"{name}.yaml"
+    expected_file = EXPECTED_DIR / f"{name}.yaml"
     assert actual_file.exists(), f'Actual file not found: {actual_file}'
-    file_regression.check(actual_file.read_text(), basename=name, extension=".yaml")
+    file_regression.check(actual_file.read_text(), fullpath=expected_file)
