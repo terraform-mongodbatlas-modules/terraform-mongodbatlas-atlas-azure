@@ -1,6 +1,5 @@
 # path-sync copy -n sdlc
 
-# === OK_EDIT: path-sync header ===
 # Module-specific configuration
 PLAN_TEST_FILES := "-filter=tests/plan_validations.tftest.hcl -filter=tests/plan_validate_backup_export.tftest.hcl -filter=tests/plan_validate_encryption.tftest.hcl -filter=tests/plan_validate_privatelink.tftest.hcl"
 
@@ -15,7 +14,7 @@ default:
     just --list
 
 # CHECKS
-pre-commit: fmt validate lint check-docs py-check
+pre-commit: fmt validate lint check-docs py-check py-fmt
     @echo "Pre-commit checks passed"
 
 pre-push: pre-commit unit-plan-tests py-test
