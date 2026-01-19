@@ -12,7 +12,7 @@ variable "atlas_azure_app_id" {
 variable "create_service_principal" {
   type        = bool
   default     = true
-  description = "Create Azure AD service principal. Set false and provide service_principal_id for existing."
+  description = "Create Azure AD service principal. Set as `false` and provide `service_principal_id` for existing."
 
   validation {
     condition     = var.create_service_principal || var.service_principal_id != null
@@ -23,7 +23,7 @@ variable "create_service_principal" {
 variable "service_principal_id" {
   type        = string
   default     = null
-  description = "Existing service principal object ID. Required if create_service_principal = false."
+  description = "Existing service principal object ID. Required if `create_service_principal = false`."
 
   validation {
     condition     = var.service_principal_id == null || can(regex("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", lower(var.service_principal_id)))
@@ -54,14 +54,13 @@ variable "encryption" {
   })
   default     = {}
   description = <<-EOT
-    Encryption at rest configuration with Azure Key Vault.
-    
+    Encryption at rest configuration with Azure Key Vault. 
     Provide EITHER:
-    - key_vault_id + key_identifier (user-provided Key Vault)
-    - create_key_vault.enabled = true (module-managed Key Vault)
 
-    NOTE: private_endpoint_regions uses Atlas region format (e.g., US_EAST_2, EUROPE_WEST),
-    not Azure format (e.g., eastus2, westeurope).
+    - `key_vault_id` + `key_identifier` (for user-provided Key Vault)
+    - `create_key_vault.enabled` = true (for module-managed Key Vault)
+
+    **NOTE:** `private_endpoint_regions` uses the Atlas region format (e.g., `US_EAST_2`, `EUROPE_WEST`), not Azure format (e.g., `eastus2`, `westeurope`). See [Availability Zones and Supported Regions](https://www.mongodb.com/docs/atlas/reference/microsoft-azure/#availability-zones-and-supported-regions) for a comprehensive list of equivalencies between Atlas and Azure regions.  
   EOT
 
   validation {
@@ -116,12 +115,11 @@ variable "encryption_client_secret" {
   default     = null
   sensitive   = true
   description = <<-EOT
-    Azure AD application client secret for encryption. Required when encryption.enabled = true.
-    
-    IMPORTANT: Azure limits Client Secret lifetime to 2 years. Atlas loses CMK access
-    when the secret expires, causing cluster unavailability. Rotate secrets before expiration.
-    
-    Future provider enhancements may support roleId-based authentication, eliminating the need for client_secret.
+    Azure AD application client secret for encryption. This value is required when using module-managed encryption (`encryption.enabled = true`).
+
+**IMPORTANT:** Azure limits the client secret lifetime to two years. When the secret expires, Atlas loses CMK access, causing cluster unavailability. Rotate secrets before expiration.
+
+Future provider enhancements may support `roleId`-based authentication, eliminating the need for `client_secret`.
   EOT
 
   validation {
@@ -150,7 +148,7 @@ variable "privatelink_byoe" {
     azure_private_endpoint_ip_address = string
   }))
   default     = {}
-  description = "BYOE endpoint details. Key must exist in privatelink_byoe_locations."
+  description = "BYOE endpoint details. Key must exist in `privatelink_byoe_locations`."
   validation {
     condition     = alltrue([for k in keys(var.privatelink_byoe) : contains(keys(var.privatelink_byoe_locations), k)])
     error_message = "All keys in privatelink_byoe must exist in privatelink_byoe_locations."
@@ -165,7 +163,7 @@ variable "privatelink_endpoints" {
     tags           = optional(map(string), {})
   }))
   default     = {}
-  description = "Module-managed PrivateLink endpoints. Key is user identifier (or Azure location if azure_location omitted)."
+  description = "Module-managed PrivateLink endpoints. Key is user identifier (or Azure location if `azure_location` is omitted)."
   validation {
     condition = alltrue([
       for k, v in var.privatelink_endpoints : can(regex("^[a-z][a-z0-9]+$", coalesce(v.azure_location, k)))
@@ -193,7 +191,7 @@ variable "backup_export" {
     }))
   })
   default     = {}
-  description = "Backup snapshot export to Azure Blob Storage. Provide EITHER storage_account_id (user-provided) OR create_storage_account.enabled = true (module-managed)."
+  description = "Backup snapshot export to Azure Blob Storage. Provide EITHER `storage_account_id` (user-provided) OR `create_storage_account.enabled = true` (module-managed)."
 
   validation {
     condition     = !(var.backup_export.storage_account_id != null && try(var.backup_export.create_storage_account.enabled, false))
