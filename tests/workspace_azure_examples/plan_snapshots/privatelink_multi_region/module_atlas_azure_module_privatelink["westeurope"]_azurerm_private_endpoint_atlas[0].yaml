@@ -1,0 +1,7 @@
+ip_configuration: []
+location: westeurope
+name: pe-atlas-westeurope
+private_dns_zone_group: []
+private_service_connection:
+- is_manual_connection: true
+  request_message: MongoDB Atlas PrivateLink

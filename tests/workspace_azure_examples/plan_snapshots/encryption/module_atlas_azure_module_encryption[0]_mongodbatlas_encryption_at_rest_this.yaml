@@ -1,0 +1,9 @@
+aws_kms_config: []
+azure_key_vault_config:
+- azure_environment: AZURE
+  enabled: true
+  require_private_networking: false
+  secret: <secret>
+enabled_for_search_nodes: false
+google_cloud_kms_config: []
+project_id: <project_id>
