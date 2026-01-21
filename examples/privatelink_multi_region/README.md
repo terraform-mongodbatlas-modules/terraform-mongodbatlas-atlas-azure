@@ -56,7 +56,6 @@ output "regional_mode_enabled" {
 ```
 
 **Additional files needed:**
-- [providers.tf](./providers.tf)
 - [variables.tf](./variables.tf)
 - [versions.tf](./versions.tf)
 

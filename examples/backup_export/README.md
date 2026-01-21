@@ -98,7 +98,6 @@ output "module_full" {
 ```
 
 **Additional files needed:**
-- [providers.tf](./providers.tf)
 - [variables.tf](./variables.tf)
 - [versions.tf](./versions.tf)
 

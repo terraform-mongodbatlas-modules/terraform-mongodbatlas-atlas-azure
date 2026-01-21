@@ -11,10 +11,12 @@ examples_readme:
     add: |
       provider "mongodbatlas" {}
       provider "azurerm" {
+        subscription_id = var.subscription_id
         features {}
       }
       provider "azuread" {}
-    skip_if_name_contains: []
+    skip_if_name_contains:
+      - Module-Managed with Private Networking
     generate_when_missing_only: false
     force_generate: false
 

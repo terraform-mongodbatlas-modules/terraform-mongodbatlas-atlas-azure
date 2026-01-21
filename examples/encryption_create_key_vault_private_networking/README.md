@@ -113,7 +113,6 @@ output "private_endpoints" {
 ```
 
 **Additional files needed:**
-- [providers.tf](./providers.tf)
 - [variables.tf](./variables.tf)
 - [versions.tf](./versions.tf)
 
