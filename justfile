@@ -1,6 +1,5 @@
 # path-sync copy -n sdlc
 
-# === OK_EDIT: path-sync header ===
 # Module-specific configuration
 PLAN_TEST_FILES := "-filter=tests/plan_validations.tftest.hcl -filter=tests/plan_validate_backup_export.tftest.hcl -filter=tests/plan_validate_encryption.tftest.hcl -filter=tests/plan_validate_privatelink.tftest.hcl"
 
