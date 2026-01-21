@@ -1,0 +1,40 @@
+examples:
+  - name: backup_export
+    var_groups: [shared, azure_storage]
+    plan_regressions:
+      - address: mongodbatlas_cloud_provider_access_setup.this[0]
+      - address: mongodbatlas_cloud_provider_access_authorization.this[0]
+      - address: module.backup_export[0].azurerm_storage_account.atlas[0]
+      - address: module.backup_export[0].azurerm_storage_container.atlas[0]
+      - address: module.backup_export[0].azurerm_role_assignment.backup_export
+      - address: module.backup_export[0].mongodbatlas_cloud_backup_snapshot_export_bucket.this
+
+var_groups:
+  shared:
+    - name: project_id
+      expose_in_workspace: false
+      module_value: local.project_id
+    - name: subscription_id
+      expose_in_workspace: false
+      module_value: var.subscription_id
+    - name: resource_group_name
+      expose_in_workspace: false
+      module_value: local.resource_group_name
+    - name: atlas_azure_app_id
+      expose_in_workspace: false
+      module_value: local.atlas_azure_app_id
+    - name: service_principal_id
+      expose_in_workspace: false
+      module_value: local.service_principal_id
+    - name: create_service_principal
+      expose_in_workspace: false
+      module_value: "false"
+
+  azure_storage:
+    - name: azure_location
+      expose_in_workspace: false
+      module_value: var.azure_location
+    - name: storage_account_name
+      expose_in_workspace: true
+      var_type: string
+      module_value: '""'
