@@ -22,3 +22,9 @@ terraform {
     module_version = "local"
   }
 }
+
+provider "mongodbatlas" {}
+provider "azurerm" {
+  features {}
+}
+provider "azuread" {}

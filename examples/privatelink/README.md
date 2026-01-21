@@ -1,0 +1,65 @@
+<!-- @generated
+WARNING: This file is auto-generated. Do not edit directly.
+Changes will be overwritten when documentation is regenerated.
+Run 'just gen-examples' to regenerate.
+-->
+# Privatelink
+
+## Pre Requirements
+
+If you are familiar with Terraform and already have a project configured in MongoDB Atlas go to [commands](#commands).
+
+To use MongoDB Atlas with Azure through Terraform, ensure you meet the following requirements:
+
+1. Install [Terraform](https://developer.hashicorp.com/terraform/install) to be able to run the `terraform` commands.
+2. Sign up for a [MongoDB Atlas Account](https://www.mongodb.com/products/integrations/hashicorp-terraform)
+3. Configure [authentication](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs#authentication)
+4. An existing [MongoDB Atlas Project](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/project)
+5. Azure CLI authenticated (`az login`) or service principal credentials configured
+
+## Commands
+
+```sh
+terraform init # this will download the required providers and create a `terraform.lock.hcl` file.
+# configure authentication env-vars (MONGODB_ATLAS_XXX, ARM_XXX)
+# configure your `vars.tfvars` with required variables
+
+terraform apply -var-file vars.tfvars
+# cleanup
+terraform destroy -var-file vars.tfvars
+```
+
+## Code Snippet
+
+Copy and use this code to get started quickly:
+
+**main.tf**
+```hcl
+module "atlas_azure" {
+  source  = "terraform-mongodbatlas-modules/atlas-azure/mongodbatlas"
+
+  project_id = var.project_id
+
+  # Key is used as azure_location when azure_location is not specified
+  privatelink_endpoints = {
+    (var.azure_location) = { subnet_id = var.subnet_id }
+  }
+}
+
+output "privatelink" {
+  description = "PrivateLink connection details"
+  value       = module.atlas_azure.privatelink
+}
+```
+
+**Additional files needed:**
+- [providers.tf](./providers.tf)
+- [variables.tf](./variables.tf)
+- [versions.tf](./versions.tf)
+
+
+
+
+## Feedback or Help
+
+- If you have any feedback or trouble please open a Github Issue
