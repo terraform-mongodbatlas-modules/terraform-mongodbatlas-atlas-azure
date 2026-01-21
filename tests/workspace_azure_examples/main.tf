@@ -56,30 +56,21 @@ variable "azure_location" {
   default = "eastus2"
 }
 
-# Per-example project variables (for cloud-dev override)
-variable "project_id_backup_export" {
-  type    = string
-  default = ""
+variable "project_ids" {
+  type = object({
+    backup_export            = optional(string)
+    encryption               = optional(string)
+    privatelink              = optional(string)
+    privatelink_byoe         = optional(string)
+    privatelink_multi_region = optional(string)
+  })
+  default = {}
 }
 
-variable "project_id_encryption" {
-  type    = string
-  default = ""
-}
-
-variable "project_id_privatelink" {
-  type    = string
-  default = ""
-}
-
-variable "project_id_privatelink_byoe" {
-  type    = string
-  default = ""
-}
-
-variable "project_id_privatelink_multi_region" {
-  type    = string
-  default = ""
+variable "encryption_client_secret" {
+  type      = string
+  default   = ""
+  sensitive = true
 }
 
 # Shared resource group
@@ -96,23 +87,12 @@ module "sp" {
   atlas_azure_app_id = var.atlas_azure_app_id
 }
 
-# Per-example projects
-locals {
-  example_names = ["backup_export", "encryption", "privatelink", "privatelink_byoe", "privatelink_multi_region"]
-  project_vars = {
-    backup_export            = var.project_id_backup_export
-    encryption               = var.project_id_encryption
-    privatelink              = var.project_id_privatelink
-    privatelink_byoe         = var.project_id_privatelink_byoe
-    privatelink_multi_region = var.project_id_privatelink_multi_region
-  }
-  examples_needing_projects = [for name in local.example_names : name if local.project_vars[name] == ""]
-}
-
+# Creates projects for examples that don't have a project_id in var.project_ids
 module "project" {
-  for_each = toset(local.examples_needing_projects)
-  source   = "../project_generator"
-  org_id   = var.org_id
+  for_each = toset(local.missing_project_ids)
+
+  source = "../project_generator"
+  org_id = var.org_id
 }
 
 # VNets for privatelink examples
@@ -139,8 +119,9 @@ resource "random_string" "kv_suffix" {
   upper   = false
 }
 
-# Client secret for encryption
+# Client secret for encryption (only if not provided)
 resource "azuread_service_principal_password" "encryption" {
+  count                = var.encryption_client_secret == "" ? 1 : 0
   service_principal_id = local.service_principal_id
   display_name         = "MongoDB Atlas - Encryption Test"
 }
@@ -148,25 +129,28 @@ resource "azuread_service_principal_password" "encryption" {
 locals {
   resource_group_name  = var.resource_group_name != "" ? var.resource_group_name : module.rg[0].name
   service_principal_id = var.service_principal_id != "" ? var.service_principal_id : module.sp[0].service_principal_id
-  atlas_azure_app_id   = var.atlas_azure_app_id
+  # tflint-ignore: terraform_unused_declarations
+  atlas_azure_app_id = var.atlas_azure_app_id
 
-  # Per-example project IDs
+  # Project ID handling (follows cluster workspace pattern)
+  missing_project_ids = [for k, v in var.project_ids : k if v == null]
+  project_ids         = { for k, v in var.project_ids : k => v != null ? v : module.project[k].project_id }
   # tflint-ignore: terraform_unused_declarations
-  project_id_backup_export = var.project_id_backup_export != "" ? var.project_id_backup_export : module.project["backup_export"].project_id
+  project_id_backup_export = local.project_ids.backup_export
   # tflint-ignore: terraform_unused_declarations
-  project_id_encryption = var.project_id_encryption != "" ? var.project_id_encryption : module.project["encryption"].project_id
+  project_id_encryption = local.project_ids.encryption
   # tflint-ignore: terraform_unused_declarations
-  project_id_privatelink = var.project_id_privatelink != "" ? var.project_id_privatelink : module.project["privatelink"].project_id
+  project_id_privatelink = local.project_ids.privatelink
   # tflint-ignore: terraform_unused_declarations
-  project_id_privatelink_byoe = var.project_id_privatelink_byoe != "" ? var.project_id_privatelink_byoe : module.project["privatelink_byoe"].project_id
+  project_id_privatelink_byoe = local.project_ids.privatelink_byoe
   # tflint-ignore: terraform_unused_declarations
-  project_id_privatelink_multi_region = var.project_id_privatelink_multi_region != "" ? var.project_id_privatelink_multi_region : module.project["privatelink_multi_region"].project_id
+  project_id_privatelink_multi_region = local.project_ids.privatelink_multi_region
 
   # Encryption locals
   # tflint-ignore: terraform_unused_declarations
   key_vault_name = "kv-atlas-${random_string.kv_suffix.id}"
   # tflint-ignore: terraform_unused_declarations
-  encryption_client_secret = azuread_service_principal_password.encryption.value
+  encryption_client_secret = var.encryption_client_secret != "" ? var.encryption_client_secret : azuread_service_principal_password.encryption[0].value
 
   # PrivateLink locals
   # tflint-ignore: terraform_unused_declarations

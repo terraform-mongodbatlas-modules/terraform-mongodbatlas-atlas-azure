@@ -1,6 +1,6 @@
 examples:
   - name: backup_export
-    var_groups: [shared_backup_export, cpa, azure_storage]
+    var_groups: [backup_export]
     plan_regressions:
       - address: mongodbatlas_cloud_provider_access_setup.this[0]
       - address: mongodbatlas_cloud_provider_access_authorization.this[0]
@@ -10,32 +10,31 @@ examples:
       - address: module.backup_export[0].mongodbatlas_cloud_backup_snapshot_export_bucket.this
 
   - name: encryption
-    var_groups: [shared_encryption, encryption]
+    var_groups: [encryption]
     plan_regressions:
       - address: mongodbatlas_cloud_provider_access_setup.this[0]
       - address: mongodbatlas_cloud_provider_access_authorization.this[0]
       - address: module.encryption[0].mongodbatlas_encryption_at_rest.this
 
   - name: privatelink
-    var_groups: [shared_privatelink, privatelink]
+    var_groups: [privatelink]
     plan_regressions:
       - address: module.privatelink["eastus2"].azurerm_private_endpoint.atlas[0]
       - address: module.privatelink["eastus2"].mongodbatlas_privatelink_endpoint_service.this
 
   - name: privatelink_byoe
-    var_groups: [shared_privatelink_byoe, privatelink_byoe]
+    var_groups: [privatelink_byoe]
     plan_regressions:
       - address: module.privatelink["pe1"].mongodbatlas_privatelink_endpoint_service.this
 
   - name: privatelink_multi_region
-    var_groups: [shared_privatelink_multi, privatelink_multi]
+    var_groups: [privatelink_multi_region]
     plan_regressions:
       - address: module.privatelink["eastus2"].azurerm_private_endpoint.atlas[0]
       - address: module.privatelink["westeurope"].azurerm_private_endpoint.atlas[0]
 
 var_groups:
-  # Per-example shared groups with separate project_ids
-  shared_backup_export:
+  backup_export:
     - name: project_id
       expose_in_workspace: false
       module_value: local.project_id_backup_export
@@ -45,8 +44,24 @@ var_groups:
     - name: resource_group_name
       expose_in_workspace: false
       module_value: local.resource_group_name
+    - name: atlas_azure_app_id
+      expose_in_workspace: false
+      module_value: local.atlas_azure_app_id
+    - name: service_principal_id
+      expose_in_workspace: false
+      module_value: local.service_principal_id
+    - name: create_service_principal
+      expose_in_workspace: false
+      module_value: "false"
+    - name: azure_location
+      expose_in_workspace: false
+      module_value: var.azure_location
+    - name: storage_account_name
+      expose_in_workspace: true
+      var_type: string
+      module_value: '""'
 
-  shared_encryption:
+  encryption:
     - name: project_id
       expose_in_workspace: false
       module_value: local.project_id_encryption
@@ -59,56 +74,9 @@ var_groups:
     - name: service_principal_id
       expose_in_workspace: false
       module_value: local.service_principal_id
-
-  shared_privatelink:
-    - name: project_id
-      expose_in_workspace: false
-      module_value: local.project_id_privatelink
-    - name: subscription_id
-      expose_in_workspace: false
-      module_value: var.subscription_id
-
-  shared_privatelink_byoe:
-    - name: project_id
-      expose_in_workspace: false
-      module_value: local.project_id_privatelink_byoe
-    - name: subscription_id
-      expose_in_workspace: false
-      module_value: var.subscription_id
-    - name: resource_group_name
-      expose_in_workspace: false
-      module_value: local.resource_group_name
-
-  shared_privatelink_multi:
-    - name: project_id
-      expose_in_workspace: false
-      module_value: local.project_id_privatelink_multi_region
-    - name: subscription_id
-      expose_in_workspace: false
-      module_value: var.subscription_id
-
-  # CPA vars for backup_export only (encryption handles this internally)
-  cpa:
     - name: atlas_azure_app_id
       expose_in_workspace: false
       module_value: local.atlas_azure_app_id
-    - name: service_principal_id
-      expose_in_workspace: false
-      module_value: local.service_principal_id
-    - name: create_service_principal
-      expose_in_workspace: false
-      module_value: "false"
-
-  azure_storage:
-    - name: azure_location
-      expose_in_workspace: false
-      module_value: var.azure_location
-    - name: storage_account_name
-      expose_in_workspace: true
-      var_type: string
-      module_value: '""'
-
-  encryption:
     - name: key_vault_name
       expose_in_workspace: false
       module_value: local.key_vault_name
@@ -123,6 +91,12 @@ var_groups:
       module_value: "7"
 
   privatelink:
+    - name: project_id
+      expose_in_workspace: false
+      module_value: local.project_id_privatelink
+    - name: subscription_id
+      expose_in_workspace: false
+      module_value: var.subscription_id
     - name: azure_location
       expose_in_workspace: false
       module_value: var.azure_location
@@ -131,6 +105,15 @@ var_groups:
       module_value: local.subnet_id_eastus2
 
   privatelink_byoe:
+    - name: project_id
+      expose_in_workspace: false
+      module_value: local.project_id_privatelink_byoe
+    - name: subscription_id
+      expose_in_workspace: false
+      module_value: var.subscription_id
+    - name: resource_group_name
+      expose_in_workspace: false
+      module_value: local.resource_group_name
     - name: azure_location
       expose_in_workspace: false
       module_value: var.azure_location
@@ -141,7 +124,13 @@ var_groups:
       expose_in_workspace: false
       module_value: local.static_ip_eastus2
 
-  privatelink_multi:
+  privatelink_multi_region:
+    - name: project_id
+      expose_in_workspace: false
+      module_value: local.project_id_privatelink_multi_region
+    - name: subscription_id
+      expose_in_workspace: false
+      module_value: var.subscription_id
     - name: subnet_ids
       expose_in_workspace: false
       module_value: local.subnet_ids_multi_region

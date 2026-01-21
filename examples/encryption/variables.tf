@@ -23,6 +23,12 @@ variable "service_principal_id" {
   description = "Existing service principal object ID for Atlas-Azure integration"
 }
 
+variable "atlas_azure_app_id" {
+  type        = string
+  default     = "9f2deb0d-be22-4524-a403-df531868bac0"
+  description = "MongoDB Atlas Azure application ID"
+}
+
 variable "encryption_client_secret" {
   type        = string
   default     = null

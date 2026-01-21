@@ -59,6 +59,7 @@ resource "azurerm_key_vault_key" "atlas" {
 module "atlas_azure" {
   source                   = "../../"
   project_id               = var.project_id
+  atlas_azure_app_id       = var.atlas_azure_app_id
   service_principal_id     = var.service_principal_id
   create_service_principal = false
   encryption_client_secret = local.encryption_client_secret
