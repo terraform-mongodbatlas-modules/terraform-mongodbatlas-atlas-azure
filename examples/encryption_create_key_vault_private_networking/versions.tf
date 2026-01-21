@@ -14,6 +14,10 @@ terraform {
       source  = "hashicorp/azuread"
       version = ">= 2.53"
     }
+    azapi = {
+      source  = "azure/azapi"
+      version = ">= 2.0"
+    }
   }
 
   # These values are used in the User-Agent Header
@@ -25,6 +29,10 @@ terraform {
 
 provider "mongodbatlas" {}
 provider "azurerm" {
+  subscription_id = var.subscription_id
   features {}
 }
 provider "azuread" {}
+provider "azapi" {
+  subscription_id = var.subscription_id
+}
