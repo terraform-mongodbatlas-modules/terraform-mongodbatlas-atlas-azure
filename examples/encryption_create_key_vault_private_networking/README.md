@@ -3,7 +3,7 @@ WARNING: This file is auto-generated. Do not edit directly.
 Changes will be overwritten when documentation is regenerated.
 Run 'just gen-examples' to regenerate.
 -->
-# Encryption Create Key Vault Private Networking
+# Azure Key Vault (Module-Managed with Private Networking)
 
 ## Pre Requirements
 

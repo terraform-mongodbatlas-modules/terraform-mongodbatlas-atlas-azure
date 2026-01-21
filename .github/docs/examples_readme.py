@@ -14,10 +14,15 @@ def load_template(template_path: Path) -> str:
     return template_path.read_text(encoding="utf-8")
 
 
-def get_example_name_from_config(folder_number: int, config: dict) -> str | None:
+def get_example_name_from_config(
+    folder_name: str, folder_number: int | None, config: dict
+) -> str | None:
     for table in config.get("tables", []):
         for example_row in table.get("example_rows", []):
-            if example_row.get("folder") == folder_number:
+            # Match by folder_name (string) or folder (numeric prefix)
+            if example_row.get("folder_name") == folder_name or (
+                folder_number is not None and example_row.get("folder") == folder_number
+            ):
                 name = example_row.get("name", "")
                 title_suffix = example_row.get("title_suffix", "")
                 if title_suffix:
@@ -28,11 +33,10 @@ def get_example_name_from_config(folder_number: int, config: dict) -> str | None
 
 def get_example_name(folder_name: str, config: dict) -> str:
     match = re.match(r"^(\d+)_", folder_name)
-    if match:
-        folder_number = int(match.group(1))
-        config_name = get_example_name_from_config(folder_number, config)
-        if config_name:
-            return config_name
+    folder_number = int(match.group(1)) if match else None
+    config_name = get_example_name_from_config(folder_name, folder_number, config)
+    if config_name:
+        return config_name
     name_without_number = re.sub(r"^\d+_", "", folder_name)
     return name_without_number.replace("_", " ").title()
 
