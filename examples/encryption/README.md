@@ -5,16 +5,16 @@ Run 'just gen-examples' to regenerate.
 -->
 # Azure Key Vault Integration (User-Provided)
 
-## Pre Requirements
+## Prerequisites
 
-If you are familiar with Terraform and already have a project configured in MongoDB Atlas go to [commands](#commands).
+If you are familiar with Terraform and already have a project configured in MongoDB Atlas, go to [commands](#commands).
 
 To use MongoDB Atlas with Azure through Terraform, ensure you meet the following requirements:
 
-1. Install [Terraform](https://developer.hashicorp.com/terraform/install) to be able to run the `terraform` commands.
+1. Install [Terraform](https://developer.hashicorp.com/terraform/install) to be able to run the `terraform` commands
 2. Sign up for a [MongoDB Atlas Account](https://www.mongodb.com/products/integrations/hashicorp-terraform)
 3. Configure [authentication](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs#authentication)
-4. An existing [MongoDB Atlas Project](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/project)
+4. An existing [MongoDB Atlas Project](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/project).
 5. Azure CLI authenticated (`az login`) or service principal credentials configured
 
 ## Commands
@@ -121,4 +121,4 @@ output "encryption" {
 
 ## Feedback or Help
 
-- If you have any feedback or trouble please open a Github Issue
+- If you have any feedback or trouble please open a GitHub issue
