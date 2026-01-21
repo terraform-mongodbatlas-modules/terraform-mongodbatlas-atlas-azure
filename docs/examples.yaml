@@ -16,6 +16,7 @@ examples_readme:
       }
       provider "azuread" {}
     skip_if_name_contains:
+      # Skipped because this example uses the azapi provider
       - Module-Managed with Private Networking
     generate_when_missing_only: false
     force_generate: false

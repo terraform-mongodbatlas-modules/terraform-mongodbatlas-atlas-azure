@@ -325,7 +325,7 @@ Description: Service principal full resource ID for creating passwords/credentia
 
 ## FAQ
 
-### What is the `provider_meta "mongodbatlas"` doing?
+### What is `provider_meta "mongodbatlas"` doing?
 
 This block tracks module usage by updating the User-Agent of requests to Atlas:
 
@@ -333,10 +333,10 @@ This block tracks module usage by updating the User-Agent of requests to Atlas:
 User-Agent: terraform-provider-mongodbatlas/2.1.0 Terraform/1.13.1 module_name/atlas-azure module_version/0.1.0
 ```
 
-- No configuration-specific values are sent, only module name and version for feature adoption tracking
+- `provider_meta "mongodbatlas"` does not send any configuration-specific data, only the module's name and version for feature adoption tracking
 - Use `export TF_LOG=debug` to see API requests with headers and responses
 
-### Why does encryption require a client secret with 2-year expiration?
+### Why does encryption require a client secret with a two-year expiration?
 
 Azure limits Client Secret lifetime for CMKs to two years maximum. When the secret expires, Atlas loses access to your encryption key, causing cluster unavailability. Rotate secrets before expiration.
 
