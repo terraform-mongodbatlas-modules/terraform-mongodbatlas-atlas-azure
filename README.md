@@ -116,7 +116,7 @@ Default: `"9f2deb0d-be22-4524-a403-df531868bac0"`
 
 ### create_service_principal
 
-Create Azure AD service principal. Set false and provide service_principal_id for existing.
+Create Azure AD service principal. Set as `false` and provide `service_principal_id` for existing.
 
 Type: `bool`
 
@@ -124,7 +124,7 @@ Default: `true`
 
 ### service_principal_id
 
-Existing service principal object ID. Required if create_service_principal = false.
+Existing service principal object ID. Required if `create_service_principal = false`.
 
 Type: `string`
 
@@ -138,13 +138,12 @@ Configure encryption at rest using Azure Key Vault. See the [Azure encryption do
 ### encryption
 
 Encryption at rest configuration with Azure Key Vault.
-
 Provide EITHER:
-- key_vault_id + key_identifier (user-provided Key Vault)
-- create_key_vault.enabled = true (module-managed Key Vault)
 
-NOTE: private_endpoint_regions uses Atlas region format (e.g., US_EAST_2, EUROPE_WEST),
-not Azure format (e.g., eastus2, westeurope).
+- `key_vault_id` + `key_identifier` (for user-provided Key Vault)
+- `create_key_vault.enabled` = true (for module-managed Key Vault)
+
+**NOTE:** `private_endpoint_regions` uses the Atlas region format (e.g., `US_EAST_2`, `EUROPE_WEST`), not Azure format (e.g., `eastus2`, `westeurope`). See [Availability Zones and Supported Regions](https://www.mongodb.com/docs/atlas/reference/microsoft-azure/#availability-zones-and-supported-regions) for a comprehensive list of equivalencies between Atlas and Azure regions.
 
 Type:
 
@@ -175,12 +174,11 @@ Default: `{}`
 
 ### encryption_client_secret
 
-Azure AD application client secret for encryption. Required when encryption.enabled = true.
+Azure AD application client secret for encryption. This value is required when using module-managed encryption (`encryption.enabled = true`).
 
-IMPORTANT: Azure limits Client Secret lifetime to 2 years. Atlas loses CMK access
-when the secret expires, causing cluster unavailability. Rotate secrets before expiration.
+**IMPORTANT:** Azure limits the client secret lifetime to two years. When the secret expires, Atlas loses CMK access, causing cluster unavailability. Rotate secrets before expiration.
 
-Future provider enhancements may support roleId-based authentication, eliminating the need for client_secret.
+Future provider enhancements may support `roleId`-based authentication, eliminating the need for `client_secret`.
 
 Type: `string`
 
@@ -193,7 +191,7 @@ Configure Azure Private Link endpoints for secure connectivity. See the [Azure P
 
 ### privatelink_endpoints
 
-Module-managed PrivateLink endpoints. Key is user identifier (or Azure location if azure_location omitted).
+Module-managed PrivateLink endpoints. Key is user identifier (or Azure location if `azure_location` is omitted).
 
 Type:
 
@@ -218,7 +216,7 @@ Default: `{}`
 
 ### privatelink_byoe
 
-BYOE endpoint details. Key must exist in privatelink_byoe_locations.
+BYOE endpoint details. Key must exist in `privatelink_byoe_locations`.
 
 Type:
 
@@ -238,7 +236,7 @@ Configure backup snapshot export to Azure Blob Storage.
 
 ### backup_export
 
-Backup snapshot export to Azure Blob Storage. Provide EITHER storage_account_id (user-provided) OR create_storage_account.enabled = true (module-managed).
+Backup snapshot export to Azure Blob Storage. Provide EITHER `storage_account_id` (user-provided) OR `create_storage_account.enabled = true` (module-managed).
 
 Type:
 
