@@ -18,6 +18,7 @@ Run 'just gen-readme' to regenerate. -->
 - [Backup Export](#backup-export)
 - [Optional Variables](#optional-variables)
 - [Outputs](#outputs)
+- [FAQ](#faq)
 <!-- END_TOC -->
 
 ## Public Preview Note
@@ -321,3 +322,22 @@ Description: Service principal object ID used for Atlas-Azure integration.
 
 Description: Service principal full resource ID for creating passwords/credentials.
 <!-- END_TF_DOCS -->
+
+## FAQ
+
+### What is `provider_meta "mongodbatlas"` doing?
+
+This block tracks module usage by updating the User-Agent of requests to Atlas:
+
+```
+User-Agent: terraform-provider-mongodbatlas/2.1.0 Terraform/1.13.1 module_name/atlas-azure module_version/0.1.0
+```
+
+- `provider_meta "mongodbatlas"` does not send any configuration-specific data, only the module's name and version for feature adoption tracking
+- Use `export TF_LOG=debug` to see API requests with headers and responses
+
+### Why does encryption require a client secret with a two-year expiration?
+
+Azure limits Client Secret lifetime for CMKs to two years maximum. When the secret expires, Atlas loses access to your encryption key, causing cluster unavailability. Rotate secrets before expiration.
+
+**Future enhancement:** The Terraform provider will support `role_id`-based authentication soon, eliminating the need for client secrets.

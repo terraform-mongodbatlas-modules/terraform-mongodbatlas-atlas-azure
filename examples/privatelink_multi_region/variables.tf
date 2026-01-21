@@ -6,6 +6,7 @@ variable "project_id" {
 variable "subscription_id" {
   type        = string
   description = "Azure subscription ID"
+  default     = ""
 }
 
 variable "subnet_ids" {

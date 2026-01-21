@@ -1,6 +1,6 @@
 variable "project_id" {
   type        = string
-  description = "MongoDB Atlas project ID."
+  description = "MongoDB Atlas project ID"
 }
 
 variable "azure_location" {
