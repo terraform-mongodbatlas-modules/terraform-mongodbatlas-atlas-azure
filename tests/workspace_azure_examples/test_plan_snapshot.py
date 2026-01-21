@@ -13,6 +13,14 @@ TEST_CASES = [
     "backup_export_module_backup_export[0]_azurerm_storage_container_atlas[0]",
     "backup_export_module_backup_export[0]_azurerm_role_assignment_backup_export",
     "backup_export_module_backup_export[0]_mongodbatlas_cloud_backup_snapshot_export_bucket_this",
+    "encryption_mongodbatlas_cloud_provider_access_setup_this[0]",
+    "encryption_mongodbatlas_cloud_provider_access_authorization_this[0]",
+    "encryption_module_encryption[0]_mongodbatlas_encryption_at_rest_this",
+    "privatelink_module_privatelink["eastus2"]_azurerm_private_endpoint_atlas[0]",
+    "privatelink_module_privatelink["eastus2"]_mongodbatlas_privatelink_endpoint_service_this",
+    "privatelink_byoe_module_privatelink["pe1"]_mongodbatlas_privatelink_endpoint_service_this",
+    "privatelink_multi_region_module_privatelink["eastus2"]_azurerm_private_endpoint_atlas[0]",
+    "privatelink_multi_region_module_privatelink["westeurope"]_azurerm_private_endpoint_atlas[0]",
 ]
 
 
