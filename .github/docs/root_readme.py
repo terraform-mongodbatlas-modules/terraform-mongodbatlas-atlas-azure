@@ -21,14 +21,11 @@ def extract_getting_started_from_template(template_text: str) -> str:
     capture = False
     captured: list[str] = []
     allowed_headings = {"Prerequisites", "Commands"}
-    current_section = None
-
     for line in lines:
         if line.startswith("## "):
             heading = line[3:].strip()
             if heading in allowed_headings:
                 capture = True
-                current_section = heading
                 # downgrade heading level for root README nesting
                 captured.append(f"### {heading}")
                 continue
@@ -231,10 +228,18 @@ def main() -> None:
         print("Generating GETTING_STARTED from example template...")
         # Load examples config to locate the README template
         examples_cfg = config_loader.parse_examples_readme_config(config_dict)
-        template_rel_path = examples_cfg.readme_template if examples_cfg.readme_template else "docs/example_readme.md"
+        template_rel_path = (
+            examples_cfg.readme_template
+            if examples_cfg.readme_template
+            else "docs/example_readme.md"
+        )
         template_path = root_dir / template_rel_path
         if not template_path.exists():
-            print(f"Warning: example README template not found at {template_path}; skipping GETTING_STARTED update")
+            msg = (
+                "Warning: example README template not found at "
+                f"{template_path}; skipping GETTING_STARTED update"
+            )
+            print(msg)
         else:
             template_text = template_path.read_text(encoding="utf-8")
             getting_started_content = extract_getting_started_from_template(template_text)
