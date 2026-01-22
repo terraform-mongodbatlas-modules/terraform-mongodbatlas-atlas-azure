@@ -122,7 +122,7 @@ resource "random_string" "kv_suffix" {
 # Client secret for encryption (only if not provided)
 resource "azuread_service_principal_password" "encryption" {
   count                = var.encryption_client_secret == "" ? 1 : 0
-  service_principal_id = local.service_principal_id
+  service_principal_id = "/servicePrincipals/${local.service_principal_id}"
   display_name         = "MongoDB Atlas - Encryption Test"
 }
 

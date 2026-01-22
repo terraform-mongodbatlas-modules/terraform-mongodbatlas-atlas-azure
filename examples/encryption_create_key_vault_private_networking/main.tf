@@ -5,9 +5,9 @@ data "azurerm_resource_group" "main" {
 # Create client secret for encryption (only if not provided)
 # TODO: Replace with roleId when CLOUDP-369548 is implemented
 resource "azuread_service_principal_password" "encryption" {
-  count                = var.encryption_client_secret == null ? 1 : 0
-  service_principal_id = var.service_principal_id
-  display_name         = "MongoDB Atlas - Encryption at Rest"
+  count                = var.encryption_client_secret == "" ? 1 : 0
+  service_principal_id = "/servicePrincipals/${var.service_principal_id}"
+  display_name         = "MongoDB Atlas - Encryption Test"
   # Azure limits Client Secret lifetime to 2 years max. Rotate before expiration.
 }
 
