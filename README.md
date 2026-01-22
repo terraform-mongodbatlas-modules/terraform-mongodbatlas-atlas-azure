@@ -65,12 +65,56 @@ terraform destroy -var-file vars.tfvars
 
 <!-- END_GETTING_STARTED -->
 
-### Create a New [Something]
+### Set Up Atlas-Azure Access
 
-- Step 1: Describe the initial setup action.
-- Step 2: Add configuration or files needed.
-- Step 3: Run the command to create the resource.
-- Step 4: Verify the result and note cleanup.
+Take the following steps to configure your Atlas-Azure access:  
+
+1. Prepare your `vars.tfvars` file.
+  Choose whether to create a new Azure AD service principal or reuse an existing one.
+
+    The following example shows a `vars.tfvars` configuration that reuses an existing `service_principal_id`:
+
+    ```hcl
+    # vars.tfvars
+    project_id               = "YOUR_ATLAS_PROJECT_ID"
+    create_service_principal = false
+    service_principal_id     = "00000000-0000-0000-0000-000000000000" # Azure AD object ID
+    ```
+
+    The following example shows a `vars.tfvars` configuration that uses a module-managed service principal (`create_service_principal = true`):
+
+    ```hcl
+    # vars.tfvars
+    project_id              = "YOUR_ATLAS_PROJECT_ID"
+    create_service_principal = true
+    # atlas_azure_app_id has a sensible default; override only if needed
+    ```
+
+    **IMPORTANT:** Do not set `service_principal_id` when `create_service_principal = true`.
+
+2. Ensure your authentication environment variables are configured.
+
+      ```sh
+    export MONGODB_ATLAS_CLIENT_ID="your-client-id-goes-here"
+    export MONGODB_ATLAS_CLIENT_SECRET="your-client-secret-goes-here"
+    ```
+
+   See [Prerequisites](#prerequisites) for more details.
+
+3. Initialize and apply your Terraform configuration (see [Commands](#commands)).
+
+4. Verify outputs. After apply, note:
+  
+    - [role_id](#output_role_id)
+    - [authorized_date](#output_authorized_date)
+    - [service_principal_id](#output_service_principal_id)
+    - [service_principal_resource_id](#output_service_principal_resource_id)
+
+You now have access. See the [Examples](#examples) section for additional details of specific actions you can execute with this module.
+
+### Clean up your configuration
+
+Run `terraform destroy -var-file vars.tfvars` to undo all changes that Terraform did on your infrastructure.
 
 <!-- BEGIN_TABLES -->
 <!-- @generated
