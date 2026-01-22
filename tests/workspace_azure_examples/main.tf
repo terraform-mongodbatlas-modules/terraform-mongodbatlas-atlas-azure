@@ -67,10 +67,17 @@ variable "project_ids" {
   default = {}
 }
 
-variable "encryption_client_secret" {
-  type      = string
-  default   = ""
-  sensitive = true
+variable "existing_encryption_client_secret" {
+  type        = object({
+    enabled = bool
+    value   = string
+  })
+  sensitive   = true
+  description = "Existing client secret for encryption. If not provided, example creates one automatically."
+  default     = {
+    enabled = false
+    value   = null
+  }
 }
 
 # Shared resource group
@@ -129,7 +136,7 @@ resource "random_string" "kv_suffix" {
 
 # Client secret for encryption (only if not provided)
 resource "azuread_service_principal_password" "encryption" {
-  count                = var.encryption_client_secret == "" ? 1 : 0
+  count                = var.existing_encryption_client_secret.enabled ? 0 : 1
   service_principal_id = "/servicePrincipals/${local.service_principal_id}"
   display_name         = "MongoDB Atlas - Encryption Test"
 }
@@ -158,7 +165,10 @@ locals {
   # tflint-ignore: terraform_unused_declarations
   key_vault_name = "kv-atlas-${random_string.kv_suffix.id}"
   # tflint-ignore: terraform_unused_declarations
-  encryption_client_secret = var.encryption_client_secret != "" ? var.encryption_client_secret : azuread_service_principal_password.encryption[0].value
+  existing_encryption_client_secret = {
+    enabled = var.existing_encryption_client_secret.enabled
+    value   = var.existing_encryption_client_secret.enabled ? var.existing_encryption_client_secret.value : azuread_service_principal_password.encryption[0].value
+  }
 
   # PrivateLink locals
   # tflint-ignore: terraform_unused_declarations

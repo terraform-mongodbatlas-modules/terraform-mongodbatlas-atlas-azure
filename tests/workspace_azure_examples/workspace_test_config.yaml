@@ -89,9 +89,9 @@ var_groups:
     - name: key_vault_name
       expose_in_workspace: false
       module_value: local.key_vault_name
-    - name: encryption_client_secret
+    - name: existing_encryption_client_secret
       expose_in_workspace: false
-      module_value: local.encryption_client_secret
+      module_value: local.existing_encryption_client_secret
     - name: purge_protection_enabled
       expose_in_workspace: false
       module_value: "false"
