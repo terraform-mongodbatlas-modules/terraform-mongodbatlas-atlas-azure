@@ -7,6 +7,7 @@ Changes will be overwritten when documentation is regenerated.
 Run 'just gen-readme' to regenerate. -->
 - [Public Preview Note](#public-preview-note)
 - [Disclaimer](#disclaimer)
+- [Getting Started](#getting-started)
 - [Examples](#examples)
 - [Requirements](#requirements)
 - [Providers](#providers)
@@ -31,6 +32,46 @@ The MongoDB Atlas Azure Module (Public Preview) simplifies Atlas-Azure integrati
 One of this project's primary objectives is to provide durable modules that support non-breaking migration and upgrade paths. The v0 release (public preview) of the MongoDB Atlas Azure Module focuses on gathering feedback and refining the design. Upgrades from v0 to v1 may not be seamless. We plan to deliver a finalized v1 release early next year with long term upgrade support.  
 
 <!-- END_DISCLAIMER -->
+## Getting Started
+
+<!-- BEGIN_GETTING_STARTED -->
+<!-- @generated
+WARNING: This section is auto-generated. Do not edit directly.
+Changes will be overwritten when documentation is regenerated.
+Run 'just gen-readme' to regenerate. -->
+### Prerequisites
+
+If you are familiar with Terraform and already have a project configured in MongoDB Atlas, go to [commands](#commands).
+
+To use MongoDB Atlas with Azure through Terraform, ensure you meet the following requirements:
+
+1. Install [Terraform](https://developer.hashicorp.com/terraform/install) to be able to run the `terraform` [commands](#commands)
+2. [Sign in](https://account.mongodb.com/account/login) or [create](https://account.mongodb.com/account/register) your MongoDB Atlas Account
+3. Configure your [authentication](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs#authentication) method
+   **NOTE**: Service Accounts (SA) is the preferred authentication method. See [Grant Programatic Access to an Organization](https://www.mongodb.com/docs/atlas/configure-api-access/#grant-programmatic-access-to-an-organization) in the MongoDB Atlas documentation for detailed instructions on configuring SA access to your project
+4. Use an existing [MongoDB Atlas Project](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/project) or [optionally create a new Atlas project resource](#optionally-create-a-new-atlas-project-resource)
+5. Authenticate your Azure CLI (`az login`) or configure your service principal credentials.
+
+### Commands
+
+```sh
+terraform init # this will download the required providers and create a `terraform.lock.hcl` file.
+# configure authentication env-vars (MONGODB_ATLAS_XXX, ARM_XXX)
+# configure your `vars.tfvars` with required variables
+terraform apply -var-file vars.tfvars
+# cleanup
+terraform destroy -var-file vars.tfvars
+```
+
+<!-- END_GETTING_STARTED -->
+
+### Create a New [Something]
+
+- Step 1: Describe the initial setup action.
+- Step 2: Add configuration or files needed.
+- Step 3: Run the command to create the resource.
+- Step 4: Verify the result and note cleanup.
+
 <!-- BEGIN_TABLES -->
 <!-- @generated
 WARNING: This section is auto-generated. Do not edit directly.
