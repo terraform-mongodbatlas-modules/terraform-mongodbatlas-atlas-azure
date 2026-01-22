@@ -104,7 +104,15 @@ module "vnet_eastus2" {
   subnet_prefix       = "10.0.1.0/24"
 }
 
-module "vnet_westus2" {
+module "vnet_multi_region_eastus2" {
+  source              = "../vnet_generator"
+  location            = "eastus2"
+  resource_group_name = local.resource_group_name
+  address_space       = "10.0.0.0/16"
+  subnet_prefix       = "10.0.1.0/24"
+}
+
+module "vnet_multi_region_westus2" {
   source              = "../vnet_generator"
   location            = "westus2"
   resource_group_name = local.resource_group_name
@@ -159,8 +167,8 @@ locals {
   static_ip_eastus2 = module.vnet_eastus2.first_usable_ip
   # tflint-ignore: terraform_unused_declarations
   subnet_ids_multi_region = {
-    eastus2 = module.vnet_eastus2.subnet_id
-    westus2 = module.vnet_westus2.subnet_id
+    eastus2 = { subnet_id = module.vnet_multi_region_eastus2.subnet_id, name = "pe-atlas-multi-eastus2" }
+    westus2 = { subnet_id = module.vnet_multi_region_westus2.subnet_id }
   }
 }
 
