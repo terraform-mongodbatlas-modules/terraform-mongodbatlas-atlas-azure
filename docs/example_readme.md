@@ -7,11 +7,12 @@ If you are familiar with Terraform and already have a project configured in Mong
 
 To use MongoDB Atlas with Azure through Terraform, ensure you meet the following requirements:
 
-1. Install [Terraform](https://developer.hashicorp.com/terraform/install) to be able to run the `terraform` commands
-2. Sign up for a [MongoDB Atlas Account](https://www.mongodb.com/products/integrations/hashicorp-terraform)
-3. Configure [authentication](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs#authentication)
-4. An existing [MongoDB Atlas Project](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/project).
-5. Azure CLI authenticated (`az login`) or service principal credentials configured
+1. Install [Terraform](https://developer.hashicorp.com/terraform/install) to be able to run the `terraform` [commands](#commands)
+2. [Sign in](https://account.mongodb.com/account/login) or [create](https://account.mongodb.com/account/register) your MongoDB Atlas Account
+3. Configure your [authentication](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs#authentication) method
+   **NOTE**: Service Accounts (SA) is the preferred authentication method. See [Grant Programatic Access to an Organization](https://www.mongodb.com/docs/atlas/configure-api-access/#grant-programmatic-access-to-an-organization) in the MongoDB Atlas documentation for detailed instructions on configuring SA access to your project
+4. Use an existing [MongoDB Atlas Project](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/project) or [optionally create a new Atlas project resource](#optionally-create-a-new-atlas-project-resource)
+5. Authenticate your Azure CLI (`az login`) or configure your service principal credentials.
 
 ## Commands
 
@@ -27,6 +28,22 @@ terraform destroy -var-file vars.tfvars
 
 {{ .CODE_SNIPPET }}
 {{ .PRODUCTION_CONSIDERATIONS }}
+
+## Optionally Create a New Atlas Project Resource
+
+```hcl
+variable "org_id" {
+  type    = string
+  default = "{ORG_ID}" # REPLACE with your organization id, for example `65def6ce0f722a1507105aa5`.
+}
+
+resource "mongodbatlas_project" "this" {
+  name   = "cluster-module"
+  org_id = var.org_id
+}
+```
+
+- You can use this and replace the `var.project_id` with `mongodbatlas_project.this.project_id` in the [main.tf](./main.tf) file.
 
 ## Feedback or Help
 
