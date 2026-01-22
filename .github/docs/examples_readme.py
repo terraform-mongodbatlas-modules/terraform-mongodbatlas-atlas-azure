@@ -17,10 +17,12 @@ def load_template(template_path: Path) -> str:
 def get_example_name_from_config(
     folder_name: str, folder_number: int | None, config: dict
 ) -> str | None:
+    folder_name_lower = folder_name.lower()
     for table in config.get("tables", []):
         for example_row in table.get("example_rows", []):
-            # Match by folder_name (string) or folder (numeric prefix)
-            if example_row.get("folder_name") == folder_name or (
+            # Match by folder_name (string, case-insensitive) or folder (numeric prefix)
+            config_folder_name = example_row.get("folder_name", "")
+            if config_folder_name.lower() == folder_name_lower or (
                 folder_number is not None and example_row.get("folder") == folder_number
             ):
                 name = example_row.get("name", "")
@@ -106,9 +108,7 @@ def generate_code_snippet(
     snippet += transformed_main
     snippet += "```\n\n"
     for filename, content in sorted(additional_contents.items()):
-        transformed_content = transform_main_tf_for_registry(
-            content, registry_source, version
-        )
+        transformed_content = transform_main_tf_for_registry(content, registry_source, version)
         snippet += f"**{filename}**\n"
         snippet += "```hcl\n"
         snippet += transformed_content
@@ -151,9 +151,7 @@ def generate_readme(
         + "\n"
     )
     content = template.replace("{{ .NAME }}", example_name)
-    code_snippet = generate_code_snippet(
-        example_dir, registry_source, version, additional_files
-    )
+    code_snippet = generate_code_snippet(example_dir, registry_source, version, additional_files)
     content = content.replace("{{ .CODE_SNIPPET }}", code_snippet)
     for key, value in sorted(template_vars.items()):
         if should_skip_template_var(example_name, key, skip_var_patterns):
@@ -179,9 +177,26 @@ def generate_versions_tf(base_versions_tf: str, provider_config: str) -> str:
 
 
 def find_example_folders(examples_dir: Path) -> list[Path]:
-    """Find example folders - supports both numeric prefixes (01_name) and plain names."""
+    """Find and sort example folders within a directory.
+
+    An example folder is any subdirectory of ``examples_dir`` that contains a
+    ``main.tf`` file. The returned list is sorted so that:
+
+    * Folders with a leading numeric prefix in the form ``NN_name`` (for example
+      ``01_basic``) appear first, ordered by the numeric value of the prefix.
+    * Remaining folders without such a prefix appear afterwards, ordered
+      alphabetically by their directory name.
+
+    Args:
+        examples_dir: Directory containing example subfolders to scan.
+
+    Returns:
+        A list of paths to example folders under ``examples_dir``, sorted with
+        numeric-prefixed folders first (by numeric value) and all others
+        alphabetically by name.
+    """
     folders = []
-    for item in sorted(examples_dir.iterdir()):
+    for item in examples_dir.iterdir():
         if item.is_dir() and (item / "main.tf").exists():
             folders.append(item)
 
@@ -281,19 +296,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Generate README.md and versions.tf files for examples"
     )
-    parser.add_argument(
-        "--dry-run", action="store_true", help="Preview changes without modifying"
-    )
-    parser.add_argument(
-        "--skip-readme", action="store_true", help="Skip generating README.md"
-    )
-    parser.add_argument(
-        "--skip-versions", action="store_true", help="Skip generating versions.tf"
-    )
+    parser.add_argument("--dry-run", action="store_true", help="Preview changes without modifying")
+    parser.add_argument("--skip-readme", action="store_true", help="Skip generating README.md")
+    parser.add_argument("--skip-versions", action="store_true", help="Skip generating versions.tf")
     parser.add_argument("--no-skip", action="store_true", help="Process all examples")
-    parser.add_argument(
-        "--check", action="store_true", help="Check if documentation is up-to-date"
-    )
+    parser.add_argument("--check", action="store_true", help="Check if documentation is up-to-date")
     parser.add_argument(
         "--version", type=str, default=None, help="Module version for code snippets"
     )
@@ -315,9 +322,7 @@ def main() -> None:
 
     template = load_template(template_path)
     base_versions_tf = load_root_versions_tf(root_dir)
-    skip_list: list[str] | None = (
-        None if args.no_skip else examples_readme_config.skip_examples
-    )
+    skip_list: list[str] | None = None if args.no_skip else examples_readme_config.skip_examples
 
     try:
         registry_source = get_registry_source()
@@ -386,9 +391,7 @@ def main() -> None:
     print()
     if args.check:
         if examples_with_changes:
-            print(
-                f"ERROR: {len(examples_with_changes)} example(s) have outdated documentation:"
-            )
+            print(f"ERROR: {len(examples_with_changes)} example(s) have outdated documentation:")
             for example_name in examples_with_changes:
                 print(f"  - {example_name}")
             print()
@@ -398,9 +401,7 @@ def main() -> None:
             print("All example documentation is up to date")
     else:
         action = "would be generated" if args.dry_run else "generated"
-        print(
-            f"Summary: {total_readme} READMEs {action}, {total_versions} versions.tf {action}"
-        )
+        print(f"Summary: {total_readme} READMEs {action}, {total_versions} versions.tf {action}")
         print(f"  {total_skipped} skipped")
 
 
