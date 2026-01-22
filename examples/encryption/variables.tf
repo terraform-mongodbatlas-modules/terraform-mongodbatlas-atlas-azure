@@ -30,13 +30,13 @@ variable "atlas_azure_app_id" {
 }
 
 variable "existing_encryption_client_secret" {
-  type        = object({
+  type = object({
     enabled = bool
     value   = string
   })
   sensitive   = true
   description = "Existing client secret for encryption. If not provided, example creates one automatically."
-  default     = {
+  default = {
     enabled = false
     value   = null
   }
