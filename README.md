@@ -67,10 +67,11 @@ terraform destroy -var-file vars.tfvars
 
 ### Set Up Atlas-Azure Access
 
-Take the following steps to configure your Atlas-Azure access:  
+Take the following steps to configure access to your Atlas-Azure:  
 
 1. Prepare your `vars.tfvars` file.
-  Choose whether to create a new Azure AD service principal or reuse an existing one.
+  
+    Choose whether to create a new Azure AD service principal or reuse an existing one.
 
     The following example shows a `vars.tfvars` configuration that reuses an existing `service_principal_id`:
 
@@ -94,12 +95,12 @@ Take the following steps to configure your Atlas-Azure access:
 
 2. Ensure your authentication environment variables are configured.
 
-      ```sh
+    ```sh
     export MONGODB_ATLAS_CLIENT_ID="your-client-id-goes-here"
     export MONGODB_ATLAS_CLIENT_SECRET="your-client-secret-goes-here"
     ```
 
-   See [Prerequisites](#prerequisites) for more details.
+    See [Prerequisites](#prerequisites) for more details.
 
 3. Initialize and apply your Terraform configuration (see [Commands](#commands)).
 
@@ -110,7 +111,9 @@ Take the following steps to configure your Atlas-Azure access:
     - [service_principal_id](#output_service_principal_id)
     - [service_principal_resource_id](#output_service_principal_resource_id)
 
-You now have access. See the [Examples](#examples) section for additional details of specific actions you can execute with this module.
+You now have access.
+
+See the [Examples](#examples) section for additional details of specific actions you can execute with this module.
 
 ### Clean up your configuration
 
