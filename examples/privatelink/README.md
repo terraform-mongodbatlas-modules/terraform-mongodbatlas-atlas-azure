@@ -11,11 +11,11 @@ If you are familiar with Terraform and already have a project configured in Mong
 
 To use MongoDB Atlas with Azure through Terraform, ensure you meet the following requirements:
 
-1. Install [Terraform](https://developer.hashicorp.com/terraform/install) to be able to run the `terraform` [commands](#commands)
-2. [Sign in](https://account.mongodb.com/account/login) or [create](https://account.mongodb.com/account/register) your MongoDB Atlas Account
-3. Configure your [authentication](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs#authentication) method
-   **NOTE**: Service Accounts (SA) is the preferred authentication method. See [Grant Programatic Access to an Organization](https://www.mongodb.com/docs/atlas/configure-api-access/#grant-programmatic-access-to-an-organization) in the MongoDB Atlas documentation for detailed instructions on configuring SA access to your project
-4. Use an existing [MongoDB Atlas Project](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/project) or [optionally create a new Atlas project resource](#optionally-create-a-new-atlas-project-resource)
+1. Install [Terraform](https://developer.hashicorp.com/terraform/install) to be able to run `terraform` [commands](#commands).
+2. [Sign in](https://account.mongodb.com/account/login) or [create](https://account.mongodb.com/account/register) your MongoDB Atlas Account.
+3. Configure your [authentication](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs#authentication) method.
+   **NOTE**: Service Accounts (SA) is the preferred authentication method. See [Grant Programmatic Access to an Organization](https://www.mongodb.com/docs/atlas/configure-api-access/#grant-programmatic-access-to-an-organization) in the MongoDB Atlas documentation for detailed instructions on configuring SA access to your project.
+4. Use an existing [MongoDB Atlas Project](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/project) or [optionally create a new Atlas project resource](#optionally-create-a-new-atlas-project-resource).
 5. Authenticate your Azure CLI (`az login`) or configure your service principal credentials.
 
 ## Commands
@@ -78,4 +78,4 @@ resource "mongodbatlas_project" "this" {
 
 ## Feedback or Help
 
-- If you have any feedback or trouble please open a GitHub issue
+- If you have any feedback or trouble please open a GitHub issue.
