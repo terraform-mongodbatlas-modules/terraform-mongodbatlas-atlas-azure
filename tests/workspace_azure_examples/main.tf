@@ -111,19 +111,22 @@ module "vnet_eastus2" {
   subnet_prefix       = "10.0.1.0/24"
 }
 
+# Multi-region uses separate CIDR ranges to avoid conflicts:
+# - eastus2: 10.2.0.0/16 (distinct from single-region vnet_eastus2 which uses 10.0.0.0/16)
+# - westus2: 10.1.0.0/16
 module "vnet_multi_region_eastus2" {
   source              = "../vnet_generator"
   location            = "eastus2"
   resource_group_name = local.resource_group_name
-  address_space       = "10.0.0.0/16"
-  subnet_prefix       = "10.0.1.0/24"
+  address_space       = "10.2.0.0/16"
+  subnet_prefix       = "10.2.1.0/24"
 }
 
 module "vnet_multi_region_westus2" {
   source              = "../vnet_generator"
   location            = "westus2"
   resource_group_name = local.resource_group_name
-  address_space       = "10.1.0.0/16"
+  address_space       = "10.1.0.0/16" # Distinct from eastus2 ranges
   subnet_prefix       = "10.1.1.0/24"
 }
 
@@ -170,7 +173,7 @@ locals {
     value   = var.existing_encryption_client_secret.enabled ? var.existing_encryption_client_secret.value : azuread_service_principal_password.encryption[0].value
   }
 
-  # PrivateLink locals
+  # PrivateLink locals - used by generated example modules (modules.generated.tf)
   # tflint-ignore: terraform_unused_declarations
   subnet_id_eastus2 = module.vnet_eastus2.subnet_id
   # tflint-ignore: terraform_unused_declarations
