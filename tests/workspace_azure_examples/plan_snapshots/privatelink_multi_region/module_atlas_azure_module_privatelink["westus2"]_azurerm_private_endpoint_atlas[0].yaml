@@ -1,6 +1,6 @@
 ip_configuration: []
-location: westeurope
-name: pe-atlas-westeurope
+location: westus2
+name: pe-atlas-westus2
 private_dns_zone_group: []
 private_service_connection:
 - is_manual_connection: true

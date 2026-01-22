@@ -36,11 +36,11 @@ examples:
     plan_regressions:
       - address: module.atlas_azure.mongodbatlas_private_endpoint_regional_mode.this[0]
       - address: module.atlas_azure.mongodbatlas_privatelink_endpoint.this["eastus2"]
-      - address: module.atlas_azure.mongodbatlas_privatelink_endpoint.this["westeurope"]
+      - address: module.atlas_azure.mongodbatlas_privatelink_endpoint.this["westus2"]
       - address: module.atlas_azure.module.privatelink["eastus2"].azurerm_private_endpoint.atlas[0]
       - address: module.atlas_azure.module.privatelink["eastus2"].mongodbatlas_privatelink_endpoint_service.this
-      - address: module.atlas_azure.module.privatelink["westeurope"].azurerm_private_endpoint.atlas[0]
-      - address: module.atlas_azure.module.privatelink["westeurope"].mongodbatlas_privatelink_endpoint_service.this
+      - address: module.atlas_azure.module.privatelink["westus2"].azurerm_private_endpoint.atlas[0]
+      - address: module.atlas_azure.module.privatelink["westus2"].mongodbatlas_privatelink_endpoint_service.this
 
 var_groups:
   backup_export:
