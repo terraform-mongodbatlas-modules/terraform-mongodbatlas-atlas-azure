@@ -1,2 +1,3 @@
 bucket_name: atlas-backup-exports
 cloud_provider: AZURE
+project_id: <project_id>

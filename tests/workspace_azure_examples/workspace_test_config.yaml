@@ -1,19 +1,52 @@
 examples:
   - name: backup_export
-    var_groups: [shared, azure_storage]
+    var_groups: [backup_export]
     plan_regressions:
-      - address: mongodbatlas_cloud_provider_access_setup.this[0]
-      - address: mongodbatlas_cloud_provider_access_authorization.this[0]
-      - address: module.backup_export[0].azurerm_storage_account.atlas[0]
-      - address: module.backup_export[0].azurerm_storage_container.atlas[0]
-      - address: module.backup_export[0].azurerm_role_assignment.backup_export
-      - address: module.backup_export[0].mongodbatlas_cloud_backup_snapshot_export_bucket.this
+      - address: module.atlas_azure.mongodbatlas_cloud_provider_access_setup.this[0]
+      - address: module.atlas_azure.mongodbatlas_cloud_provider_access_authorization.this[0]
+      - address: module.atlas_azure.module.backup_export[0].azurerm_storage_account.atlas[0]
+      - address: module.atlas_azure.module.backup_export[0].azurerm_storage_container.atlas[0]
+      - address: module.atlas_azure.module.backup_export[0].azurerm_role_assignment.backup_export
+      - address: module.atlas_azure.module.backup_export[0].mongodbatlas_cloud_backup_snapshot_export_bucket.this
+
+  - name: encryption
+    var_groups: [encryption]
+    plan_regressions:
+      - address: module.atlas_azure.mongodbatlas_cloud_provider_access_setup.this[0]
+      - address: module.atlas_azure.mongodbatlas_cloud_provider_access_authorization.this[0]
+      - address: module.atlas_azure.module.encryption[0].mongodbatlas_encryption_at_rest.this
+      - address: module.atlas_azure.module.encryption[0].azurerm_role_assignment.key_vault_crypto
+      - address: module.atlas_azure.module.encryption[0].azurerm_role_assignment.key_vault_reader
+
+  - name: privatelink
+    var_groups: [privatelink]
+    plan_regressions:
+      - address: module.atlas_azure.mongodbatlas_privatelink_endpoint.this["eastus2"]
+      - address: module.atlas_azure.module.privatelink["eastus2"].azurerm_private_endpoint.atlas[0]
+      - address: module.atlas_azure.module.privatelink["eastus2"].mongodbatlas_privatelink_endpoint_service.this
+
+  - name: privatelink_byoe
+    var_groups: [privatelink_byoe]
+    plan_regressions:
+      - address: module.atlas_azure.mongodbatlas_privatelink_endpoint.this["pe1"]
+      - address: module.atlas_azure.module.privatelink["pe1"].mongodbatlas_privatelink_endpoint_service.this
+
+  - name: privatelink_multi_region
+    var_groups: [privatelink_multi_region]
+    plan_regressions:
+      - address: module.atlas_azure.mongodbatlas_private_endpoint_regional_mode.this[0]
+      - address: module.atlas_azure.mongodbatlas_privatelink_endpoint.this["eastus2"]
+      - address: module.atlas_azure.mongodbatlas_privatelink_endpoint.this["westus2"]
+      - address: module.atlas_azure.module.privatelink["eastus2"].azurerm_private_endpoint.atlas[0]
+      - address: module.atlas_azure.module.privatelink["eastus2"].mongodbatlas_privatelink_endpoint_service.this
+      - address: module.atlas_azure.module.privatelink["westus2"].azurerm_private_endpoint.atlas[0]
+      - address: module.atlas_azure.module.privatelink["westus2"].mongodbatlas_privatelink_endpoint_service.this
 
 var_groups:
-  shared:
+  backup_export:
     - name: project_id
       expose_in_workspace: false
-      module_value: local.project_id
+      module_value: local.project_id_backup_export
     - name: subscription_id
       expose_in_workspace: false
       module_value: var.subscription_id
@@ -29,8 +62,6 @@ var_groups:
     - name: create_service_principal
       expose_in_workspace: false
       module_value: "false"
-
-  azure_storage:
     - name: azure_location
       expose_in_workspace: false
       module_value: var.azure_location
@@ -38,3 +69,77 @@ var_groups:
       expose_in_workspace: true
       var_type: string
       module_value: '""'
+
+  encryption:
+    - name: project_id
+      expose_in_workspace: false
+      module_value: local.project_id_encryption
+    - name: subscription_id
+      expose_in_workspace: false
+      module_value: var.subscription_id
+    - name: resource_group_name
+      expose_in_workspace: false
+      module_value: local.resource_group_name
+    - name: service_principal_id
+      expose_in_workspace: false
+      module_value: local.service_principal_id
+    - name: atlas_azure_app_id
+      expose_in_workspace: false
+      module_value: local.atlas_azure_app_id
+    - name: key_vault_name
+      expose_in_workspace: false
+      module_value: local.key_vault_name
+    - name: existing_encryption_client_secret
+      expose_in_workspace: false
+      module_value: local.existing_encryption_client_secret
+    - name: purge_protection_enabled
+      expose_in_workspace: false
+      module_value: "false"
+    - name: soft_delete_retention_days
+      expose_in_workspace: false
+      module_value: "7"
+
+  privatelink:
+    - name: project_id
+      expose_in_workspace: false
+      module_value: local.project_id_privatelink
+    - name: subscription_id
+      expose_in_workspace: false
+      module_value: var.subscription_id
+    - name: azure_location
+      expose_in_workspace: false
+      module_value: var.azure_location
+    - name: subnet_id
+      expose_in_workspace: false
+      module_value: local.subnet_id_eastus2
+
+  privatelink_byoe:
+    - name: project_id
+      expose_in_workspace: false
+      module_value: local.project_id_privatelink_byoe
+    - name: subscription_id
+      expose_in_workspace: false
+      module_value: var.subscription_id
+    - name: resource_group_name
+      expose_in_workspace: false
+      module_value: local.resource_group_name
+    - name: azure_location
+      expose_in_workspace: false
+      module_value: var.azure_location
+    - name: subnet_id
+      expose_in_workspace: false
+      module_value: local.subnet_id_eastus2
+    - name: static_ip_address
+      expose_in_workspace: false
+      module_value: local.static_ip_eastus2
+
+  privatelink_multi_region:
+    - name: project_id
+      expose_in_workspace: false
+      module_value: local.project_id_privatelink_multi_region
+    - name: subscription_id
+      expose_in_workspace: false
+      module_value: var.subscription_id
+    - name: subnet_ids
+      expose_in_workspace: false
+      module_value: local.subnet_ids_multi_region

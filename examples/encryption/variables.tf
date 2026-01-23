@@ -23,11 +23,23 @@ variable "service_principal_id" {
   description = "Existing service principal object ID for Atlas-Azure integration"
 }
 
-variable "encryption_client_secret" {
+variable "atlas_azure_app_id" {
   type        = string
-  default     = null
+  default     = "9f2deb0d-be22-4524-a403-df531868bac0"
+  description = "MongoDB Atlas Azure application ID"
+}
+
+variable "existing_encryption_client_secret" {
+  type = object({
+    enabled = bool
+    value   = string
+  })
   sensitive   = true
-  description = "Client secret for encryption. If null, example creates one automatically."
+  description = "Existing client secret for encryption. If not provided, example creates one automatically."
+  default = {
+    enabled = false
+    value   = null
+  }
 }
 
 variable "purge_protection_enabled" {

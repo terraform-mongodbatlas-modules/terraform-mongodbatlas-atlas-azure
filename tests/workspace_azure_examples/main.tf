@@ -12,6 +12,10 @@ terraform {
       source  = "hashicorp/azuread"
       version = "~> 3.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
   }
   required_version = ">= 1.9"
 }
@@ -22,11 +26,6 @@ provider "azurerm" {
   subscription_id = var.subscription_id
 }
 provider "azuread" {}
-
-variable "project_id" {
-  type    = string
-  default = ""
-}
 
 variable "org_id" {
   type    = string
@@ -57,33 +56,133 @@ variable "azure_location" {
   default = "eastus2"
 }
 
-module "project" {
-  count  = var.project_id == "" ? 1 : 0
-  source = "../project_generator"
-  org_id = var.org_id
+variable "project_ids" {
+  type = object({
+    backup_export            = optional(string)
+    encryption               = optional(string)
+    privatelink              = optional(string)
+    privatelink_byoe         = optional(string)
+    privatelink_multi_region = optional(string)
+  })
+  default = {}
 }
 
+variable "existing_encryption_client_secret" {
+  type = object({
+    enabled = bool
+    value   = string
+  })
+  sensitive   = true
+  description = "Existing client secret for encryption. If not provided, example creates one automatically."
+  default = {
+    enabled = false
+    value   = null
+  }
+}
+
+# Shared resource group
 module "rg" {
   count    = var.resource_group_name == "" ? 1 : 0
   source   = "../resource_group_generator"
   location = var.azure_location
 }
 
+# Shared service principal (tenant-scoped)
 module "sp" {
   count              = var.service_principal_id == "" ? 1 : 0
   source             = "../service_principal_generator"
   atlas_azure_app_id = var.atlas_azure_app_id
 }
 
+# Creates projects for examples that don't have a project_id in var.project_ids
+module "project" {
+  for_each = toset(local.missing_project_ids)
+
+  source = "../project_generator"
+  org_id = var.org_id
+}
+
+# VNets for privatelink examples
+module "vnet_eastus2" {
+  source              = "../vnet_generator"
+  location            = "eastus2"
+  resource_group_name = local.resource_group_name
+  address_space       = "10.0.0.0/16"
+  subnet_prefix       = "10.0.1.0/24"
+}
+
+# Multi-region uses separate CIDR ranges to avoid conflicts:
+# - eastus2: 10.2.0.0/16 (distinct from single-region vnet_eastus2 which uses 10.0.0.0/16)
+# - westus2: 10.1.0.0/16
+module "vnet_multi_region_eastus2" {
+  source              = "../vnet_generator"
+  location            = "eastus2"
+  resource_group_name = local.resource_group_name
+  address_space       = "10.2.0.0/16"
+  subnet_prefix       = "10.2.1.0/24"
+}
+
+module "vnet_multi_region_westus2" {
+  source              = "../vnet_generator"
+  location            = "westus2"
+  resource_group_name = local.resource_group_name
+  address_space       = "10.1.0.0/16" # Distinct from eastus2 ranges
+  subnet_prefix       = "10.1.1.0/24"
+}
+
+# Random suffix for key vault name
+resource "random_string" "kv_suffix" {
+  length  = 6
+  special = false
+  upper   = false
+}
+
+# Client secret for encryption (only if not provided)
+resource "azuread_service_principal_password" "encryption" {
+  count                = var.existing_encryption_client_secret.enabled ? 0 : 1
+  service_principal_id = "/servicePrincipals/${local.service_principal_id}"
+  display_name         = "MongoDB Atlas - Encryption Test"
+}
+
 locals {
-  # tflint-ignore: terraform_unused_declarations
-  project_id = var.project_id != "" ? var.project_id : module.project[0].project_id
-  # tflint-ignore: terraform_unused_declarations
-  resource_group_name = var.resource_group_name != "" ? var.resource_group_name : module.rg[0].name
-  # tflint-ignore: terraform_unused_declarations
+  resource_group_name  = var.resource_group_name != "" ? var.resource_group_name : module.rg[0].name
   service_principal_id = var.service_principal_id != "" ? var.service_principal_id : module.sp[0].service_principal_id
   # tflint-ignore: terraform_unused_declarations
   atlas_azure_app_id = var.atlas_azure_app_id
+
+  # Project ID handling (follows cluster workspace pattern)
+  missing_project_ids = [for k, v in var.project_ids : k if v == null]
+  project_ids         = { for k, v in var.project_ids : k => v != null ? v : module.project[k].project_id }
+  # tflint-ignore: terraform_unused_declarations
+  project_id_backup_export = local.project_ids.backup_export
+  # tflint-ignore: terraform_unused_declarations
+  project_id_encryption = local.project_ids.encryption
+  # tflint-ignore: terraform_unused_declarations
+  project_id_privatelink = local.project_ids.privatelink
+  # tflint-ignore: terraform_unused_declarations
+  project_id_privatelink_byoe = local.project_ids.privatelink_byoe
+  # tflint-ignore: terraform_unused_declarations
+  project_id_privatelink_multi_region = local.project_ids.privatelink_multi_region
+
+  # Encryption locals
+  # tflint-ignore: terraform_unused_declarations
+  key_vault_name = "kv-atlas-${random_string.kv_suffix.id}"
+  # tflint-ignore: terraform_unused_declarations
+  existing_encryption_client_secret = {
+    enabled = var.existing_encryption_client_secret.enabled
+    value   = var.existing_encryption_client_secret.enabled ? var.existing_encryption_client_secret.value : azuread_service_principal_password.encryption[0].value
+  }
+
+  # PrivateLink locals - used by generated example modules (modules.generated.tf)
+  # tflint-ignore: terraform_unused_declarations
+  subnet_id_eastus2 = module.vnet_eastus2.subnet_id
+  # tflint-ignore: terraform_unused_declarations
+  static_ip_eastus2 = module.vnet_eastus2.first_usable_ip
+  # tflint-ignore: terraform_unused_declarations
+  subnet_ids_multi_region = {
+    eastus2 = { subnet_id = module.vnet_multi_region_eastus2.subnet_id, name = "pe-atlas-multi-eastus2" }
+    westus2 = { subnet_id = module.vnet_multi_region_westus2.subnet_id }
+  }
 }
 
 # Example module calls are generated in modules.generated.tf
