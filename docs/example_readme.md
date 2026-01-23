@@ -1,6 +1,7 @@
 <!-- This file is used to generate the examples/README.md files -->
 # {{ .NAME }}
 
+<!-- BEGIN_GETTING_STARTED -->
 ## Prerequisites
 
 If you are familiar with Terraform and already have a project configured in MongoDB Atlas, go to [commands](#commands).
@@ -22,14 +23,10 @@ To use MongoDB Atlas with Azure through Terraform, ensure you meet the following
 terraform init # this will download the required providers and create a `terraform.lock.hcl` file.
 # configure authentication env-vars (MONGODB_ATLAS_XXX, ARM_XXX)
 # configure your `vars.tfvars` with required variables
-{{ .PRODUCTION_CONSIDERATIONS_COMMENT }}
 terraform apply -var-file vars.tfvars
 # cleanup
 terraform destroy -var-file vars.tfvars
 ```
-
-{{ .CODE_SNIPPET }}
-{{ .PRODUCTION_CONSIDERATIONS }}
 
 ## (Optional) Create a New Atlas Project Resource
 
@@ -46,6 +43,10 @@ resource "mongodbatlas_project" "this" {
 ```
 
 - You can use this and replace the `var.project_id` with `mongodbatlas_project.this.project_id` in the [main.tf](./main.tf) file.
+<!-- END_GETTING_STARTED -->
+
+{{ .CODE_SNIPPET }}
+{{ .PRODUCTION_CONSIDERATIONS }}
 
 ## Feedback or Help
 
