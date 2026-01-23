@@ -26,44 +26,6 @@ def extract_getting_started(template_text: str) -> str:
     return downgrade_headers(match.group(1).strip()) + "\n"
 
 
-def extract_getting_started_from_template(template_text: str) -> str:
-    """Extract Prerequisites and Commands from example README template.
-
-    - Finds sections starting at '## Prerequisites' and '## Commands'
-    - Stops before the next '##' heading that is not these two (e.g., '## Feedback or Help')
-    - Downgrades '##' to '###' so they nest under '## Getting Started'
-    - Removes any template placeholders that aren't relevant to root README
-    """
-    lines = template_text.splitlines()
-    capture = False
-    captured: list[str] = []
-    allowed_headings = {"Prerequisites", "Commands"}
-    for line in lines:
-        if line.startswith("## "):
-            heading = line[3:].strip()
-            if heading in allowed_headings:
-                capture = True
-                # downgrade heading level for root README nesting
-                captured.append(f"### {heading}")
-                continue
-            else:
-                # encountered a new section; stop capturing if we were
-                if capture:
-                    break
-                else:
-                    continue
-
-        if capture:
-            # skip template placeholders not useful in root README
-            if "{{ .CODE_SNIPPET }}" in line or "{{ .PRODUCTION_CONSIDERATIONS" in line:
-                continue
-            captured.append(line)
-
-    # Trim leading/trailing empty lines and ensure a single trailing newline
-    content = "\n".join(captured).strip() + "\n"
-    return content
-
-
 def find_example_folder(folder_id: str | int, examples_dir: Path) -> str | None:
     """Find example folder by numeric prefix (e.g., 01) or exact name match."""
     for folder in examples_dir.iterdir():
