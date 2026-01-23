@@ -33,6 +33,23 @@ terraform apply -var-file vars.tfvars
 terraform destroy -var-file vars.tfvars
 ```
 
+## (Optional) Create a New Atlas Project Resource
+
+```hcl
+variable "org_id" {
+  type    = string
+  default = "{ORG_ID}" # REPLACE with your organization id, for example `65def6ce0f722a1507105aa5`.
+}
+
+resource "mongodbatlas_project" "this" {
+  name   = "cluster-module"
+  org_id = var.org_id
+}
+```
+
+- You can use this and replace the `var.project_id` with `mongodbatlas_project.this.project_id` in the [main.tf](./main.tf) file.
+<!-- END_GETTING_STARTED -->
+
 ## Code Snippet
 
 Copy and use this code to get started quickly:
@@ -62,23 +79,6 @@ output "privatelink" {
 
 
 
-
-## (Optional) Create a New Atlas Project Resource
-
-```hcl
-variable "org_id" {
-  type    = string
-  default = "{ORG_ID}" # REPLACE with your organization id, for example `65def6ce0f722a1507105aa5`.
-}
-
-resource "mongodbatlas_project" "this" {
-  name   = "cluster-module"
-  org_id = var.org_id
-}
-```
-
-- You can use this and replace the `var.project_id` with `mongodbatlas_project.this.project_id` in the [main.tf](./main.tf) file.
-<!-- END_GETTING_STARTED -->
 
 ## Feedback or Help
 
