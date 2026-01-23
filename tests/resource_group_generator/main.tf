@@ -31,10 +31,7 @@ variable "location" {
 }
 
 resource "random_string" "suffix" {
-  count = var.name == "" ? 1 : 0
-  keepers = {
-    first = timestamp()
-  }
+  count   = var.name == "" ? 1 : 0
   length  = 6
   special = false
   upper   = false

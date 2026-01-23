@@ -10,6 +10,9 @@ variable "subscription_id" {
 }
 
 variable "subnet_ids" {
-  type        = map(string)
-  description = "Map of Azure location to subnet ID for PrivateLink endpoints (e.g., {eastus2 = '/subscriptions/.../subnets/...', westeurope = '...'})"
+  type = map(object({
+    subnet_id = string
+    name      = optional(string)
+  }))
+  description = "Map of Azure location to PrivateLink endpoint config (e.g., {eastus2 = {subnet_id = '/subscriptions/.../subnets/...', name = 'pe-my-eastus2'}})"
 }
