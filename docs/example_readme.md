@@ -13,8 +13,7 @@ To use MongoDB Atlas with Azure through Terraform, ensure you meet the following
 
    **NOTE**: Service Accounts (SA) is the preferred authentication method. See [Grant Programmatic Access to an Organization](https://www.mongodb.com/docs/atlas/configure-api-access/#grant-programmatic-access-to-an-organization) in the MongoDB Atlas documentation for detailed instructions on configuring SA access to your project.
 
-
-4. Use an existing [MongoDB Atlas project](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/project) or [create a new Atlas project resource](#optionally-create-a-new-atlas-project-resource) for ___ .
+4. Use an existing [MongoDB Atlas project](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/project) or [create a new Atlas project resource](#optional-create-a-new-atlas-project-resource).
 5. Authenticate your Azure CLI (`az login`) or configure your service principal credentials.
 
 ## Commands
