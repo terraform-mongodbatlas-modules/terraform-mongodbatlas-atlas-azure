@@ -27,7 +27,6 @@ To use MongoDB Atlas with Azure through Terraform, ensure you meet the following
 terraform init # this will download the required providers and create a `terraform.lock.hcl` file.
 # configure authentication env-vars (MONGODB_ATLAS_XXX, ARM_XXX)
 # configure your `vars.tfvars` with required variables
-
 terraform apply -var-file vars.tfvars
 # cleanup
 terraform destroy -var-file vars.tfvars
@@ -136,7 +135,6 @@ output "private_endpoints" {
 **Additional files needed:**
 - [variables.tf](./variables.tf)
 - [versions.tf](./versions.tf)
-
 
 
 
