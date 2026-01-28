@@ -60,7 +60,7 @@ def azure(
         lines.append(f'azure_location = "{azure_location}"')
     else:
         typer.secho(
-            "AZURE_LOCATION not set, using default {DEFAULT_AZURE_LOCATION}",
+            f"AZURE_LOCATION not set, using default {DEFAULT_AZURE_LOCATION}",
             fg="yellow",
         )
     content = "\n".join(lines) + "\n"
