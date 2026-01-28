@@ -63,6 +63,7 @@ jobs:
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      AZURE_SERVICE_PRINCIPAL_ID: ${{ secrets.AZURE_SERVICE_PRINCIPAL_ID }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: ./.github/actions/setup
@@ -73,5 +74,5 @@ jobs:
       - uses: ./.github/actions/setup-provider-dev
         with:
           provider-ref: ${{ inputs.provider_ref }}
-      - run: just dev-vars-azure "${{ secrets.MONGODB_ATLAS_ORG_ID }}" "${{ secrets.ARM_SUBSCRIPTION_ID }}"
+      - run: just dev-vars-azure
       - run: just plan-snapshot-test --var-file $(pwd)/tests/workspace_azure_examples/dev.tfvars

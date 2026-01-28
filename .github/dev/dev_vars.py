@@ -31,14 +31,14 @@ def org(org_id: str) -> None:
 
 @app.command()
 def azure(
-    org_id: str,
-    subscription_id: str,
-    resource_group_name: str = typer.Option("", help="Azure resource group name"),
-    service_principal_id: str = typer.Option("", help="Azure service principal ID"),
-    atlas_azure_app_id: str = typer.Option(DEFAULT_ATLAS_AZURE_APP_ID, help="Atlas Azure App ID"),
-    azure_location: str = typer.Option(DEFAULT_AZURE_LOCATION, help="Azure location"),
+    org_id: str = typer.Option(..., envvar="MONGODB_ATLAS_ORG_ID"),
+    subscription_id: str = typer.Option(..., envvar="ARM_SUBSCRIPTION_ID"),
+    resource_group_name: str = typer.Option("", envvar="AZURE_RESOURCE_GROUP_NAME"),
+    service_principal_id: str = typer.Option("", envvar="AZURE_SERVICE_PRINCIPAL_ID"),
+    atlas_azure_app_id: str = typer.Option(DEFAULT_ATLAS_AZURE_APP_ID, envvar="ATLAS_AZURE_APP_ID"),
+    azure_location: str = typer.Option(DEFAULT_AZURE_LOCATION, envvar="AZURE_LOCATION"),
 ) -> None:
-    """Generate dev.tfvars with all Azure-specific variables."""
+    """Generate dev.tfvars from environment variables."""
     WORKSPACE_DIR.mkdir(parents=True, exist_ok=True)
     lines = [
         f'org_id = "{org_id}"',
@@ -46,12 +46,23 @@ def azure(
     ]
     if resource_group_name:
         lines.append(f'resource_group_name = "{resource_group_name}"')
+    else:
+        typer.secho("AZURE_RESOURCE_GROUP_NAME not set, will create new", fg="yellow")
     if service_principal_id:
         lines.append(f'service_principal_id = "{service_principal_id}"')
+    else:
+        typer.secho("AZURE_SERVICE_PRINCIPAL_ID not set, will create new", fg="yellow")
     if atlas_azure_app_id != DEFAULT_ATLAS_AZURE_APP_ID:
         lines.append(f'atlas_azure_app_id = "{atlas_azure_app_id}"')
+    else:
+        typer.secho("ATLAS_AZURE_APP_ID not set, using default", fg="yellow")
     if azure_location != DEFAULT_AZURE_LOCATION:
         lines.append(f'azure_location = "{azure_location}"')
+    else:
+        typer.secho(
+            "AZURE_LOCATION not set, using default {DEFAULT_AZURE_LOCATION}",
+            fg="yellow",
+        )
     content = "\n".join(lines) + "\n"
     DEV_TFVARS.write_text(content)
     typer.echo(f"Generated {DEV_TFVARS}")

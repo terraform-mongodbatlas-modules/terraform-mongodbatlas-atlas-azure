@@ -44,13 +44,16 @@ Plan snapshot tests verify `terraform plan` output consistency. They use workspa
 
 ### Generating dev.tfvars
 
-```bash
-# Generate dev.tfvars with Azure-specific variables
-just dev-vars-azure "$MONGODB_ATLAS_ORG_ID" "$ARM_SUBSCRIPTION_ID"
+The `dev-vars-azure` command reads from environment variables (see Authentication Setup above):
 
-# With optional resource group and service principal
-just dev-vars-azure "$MONGODB_ATLAS_ORG_ID" "$ARM_SUBSCRIPTION_ID" "my-rg" "my-sp-id"
+```bash
+# Generate dev.tfvars from environment variables
+just dev-vars-azure
 ```
+
+Optional env vars for pre-existing resources:
+- `AZURE_RESOURCE_GROUP_NAME` - Use existing resource group
+- `AZURE_SERVICE_PRINCIPAL_ID` - Use existing service principal
 
 ### Workspace Commands
 
@@ -103,3 +106,4 @@ just unit-plan-tests
 | `ARM_CLIENT_SECRET` | Azure service principal client secret |
 | `ARM_TENANT_ID` | Azure tenant ID |
 | `ARM_SUBSCRIPTION_ID` | Azure subscription ID |
+| `AZURE_SERVICE_PRINCIPAL_ID` | Azure service principal object ID (for Atlas integration) |

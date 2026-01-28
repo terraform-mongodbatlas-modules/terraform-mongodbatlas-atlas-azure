@@ -29,6 +29,7 @@ env:
   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  AZURE_SERVICE_PRINCIPAL_ID: ${{ secrets.AZURE_SERVICE_PRINCIPAL_ID }}
 
 jobs:
   tftest-all:
@@ -71,7 +72,7 @@ jobs:
         with:
           provider-ref: ${{ inputs.provider_ref }}
       - name: Generate dev.tfvars
-        run: just dev-vars-azure "${MONGODB_ATLAS_ORG_ID}" "${ARM_SUBSCRIPTION_ID}"
+        run: just dev-vars-azure
       - name: Apply examples
         env:
           INCLUDE_EXAMPLES: ${{ inputs.include_examples }}

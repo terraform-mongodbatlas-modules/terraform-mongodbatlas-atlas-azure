@@ -1,7 +1,7 @@
 <!-- path-sync copy -n sdlc -->
 # Contributing Guides
 
-This directory contains guides for contributors to the terraform-mongodbatlas-atlas-azue module.
+This directory contains guides for contributors to the terraform-mongodbatlas-atlas-azure module.
 
 ## Available Guides
 
