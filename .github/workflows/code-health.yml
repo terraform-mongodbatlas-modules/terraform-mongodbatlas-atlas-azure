@@ -66,6 +66,7 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
       AZURE_SERVICE_PRINCIPAL_ID: ${{ secrets.AZURE_SERVICE_PRINCIPAL_ID }}
       AZURE_STORAGE_ACCOUNT_NAME: "dummyaccount" # only runs plan
+      MONGODB_ATLAS_PROJECT_ID: "dummy" # only to make project_id known in regression tests
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: ./.github/actions/setup

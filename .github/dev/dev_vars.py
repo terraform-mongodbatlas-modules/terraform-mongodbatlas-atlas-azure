@@ -29,6 +29,17 @@ def org(org_id: str) -> None:
     typer.echo(f"Generated {DEV_TFVARS}")
 
 
+_project_ids = """\
+project_ids = {
+  backup_export            = "PROJECT_ID"
+  encryption               = "PROJECT_ID"
+  privatelink              = "PROJECT_ID"
+  privatelink_byoe         = "PROJECT_ID"
+  privatelink_multi_region = "PROJECT_ID"
+}
+"""
+
+
 @app.command()
 def azure(
     org_id: str = typer.Option(..., envvar="MONGODB_ATLAS_ORG_ID"),
@@ -38,6 +49,11 @@ def azure(
     atlas_azure_app_id: str = typer.Option(DEFAULT_ATLAS_AZURE_APP_ID, envvar="ATLAS_AZURE_APP_ID"),
     azure_location: str = typer.Option(DEFAULT_AZURE_LOCATION, envvar="AZURE_LOCATION"),
     storage_account_name: str = typer.Option("", envvar="AZURE_STORAGE_ACCOUNT_NAME"),
+    project_id: str = typer.Option(
+        "",
+        envvar="MONGODB_ATLAS_PROJECT_ID",
+        help="Use the same project ID for all examples(for plan snapshot tests not for apply)",
+    ),
 ) -> None:
     """Generate dev.tfvars from environment variables."""
     WORKSPACE_DIR.mkdir(parents=True, exist_ok=True)
@@ -68,6 +84,10 @@ def azure(
         lines.append(f'storage_account_name = "{storage_account_name}"')
     else:
         typer.secho("AZURE_STORAGE_ACCOUNT_NAME not set, will auto-generate", fg="yellow")
+    if project_id:
+        lines.append(_project_ids.replace("PROJECT_ID", project_id))
+    else:
+        typer.secho("MONGODB_ATLAS_PROJECT_ID not set, will create new projects", fg="yellow")
     content = "\n".join(lines) + "\n"
     DEV_TFVARS.write_text(content)
     typer.echo(f"Generated {DEV_TFVARS}")
