@@ -56,6 +56,11 @@ variable "azure_location" {
   default = "eastus2"
 }
 
+variable "storage_account_name" {
+  type    = string
+  default = ""
+}
+
 variable "project_ids" {
   type = object({
     backup_export            = optional(string)
@@ -130,8 +135,8 @@ module "vnet_multi_region_westus2" {
   subnet_prefix       = "10.1.1.0/24"
 }
 
-# Random suffix for key vault name
-resource "random_string" "kv_suffix" {
+# Random suffix for resource names (key vault, storage account)
+resource "random_string" "suffix" {
   length  = 6
   special = false
   upper   = false
@@ -166,7 +171,10 @@ locals {
 
   # Encryption locals
   # tflint-ignore: terraform_unused_declarations
-  key_vault_name = "kv-atlas-${random_string.kv_suffix.id}"
+  key_vault_name = "kv-atlas-${random_string.suffix.id}"
+  # Backup export locals
+  # tflint-ignore: terraform_unused_declarations
+  storage_account_name = var.storage_account_name != "" ? var.storage_account_name : "saatlas${random_string.suffix.id}"
   # tflint-ignore: terraform_unused_declarations
   existing_encryption_client_secret = {
     enabled = var.existing_encryption_client_secret.enabled

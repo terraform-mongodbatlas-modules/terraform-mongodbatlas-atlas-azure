@@ -230,3 +230,6 @@ sdlc-validate:
   uvx path-sync validate-no-changes -b main
 # === OK_EDIT: path-sync standard ===
 # Module-specific recipes below (not synced)
+
+dev-vars-azure:
+    {{py}} dev.dev_vars azure

@@ -16,11 +16,10 @@ is_hns_enabled: false
 local_user_enabled: true
 location: eastus2
 min_tls_version: TLS1_2
-name: apixespenatlasmodule
+name: <name>
 nfsv3_enabled: false
 public_network_access_enabled: true
 queue_encryption_key_type: Service
-resource_group_name: <resource_group_name>
 sas_policy: []
 sftp_enabled: false
 shared_access_key_enabled: true

@@ -1,10 +1,11 @@
 <!-- path-sync copy -n sdlc -->
 # Contributing Guides
 
-This directory contains guides for contributors to the terraform-mongodbatlas-atlas-azue module.
+This directory contains guides for contributors to the terraform-mongodbatlas-atlas-azure module.
 
 ## Available Guides
 
+- **[Test Guide](test-guide.md)** - Running tests locally and in CI
 <!-- === DO_NOT_EDIT: path-sync default === -->
 - **[Documentation Guide](documentation-guide.md)** - Working with auto-generated documentation
 - **[Changelog Guide](changelog-process.md)** - Creating changelog entries and understanding the changelog workflow
