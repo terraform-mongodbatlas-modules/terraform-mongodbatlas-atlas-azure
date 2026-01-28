@@ -37,6 +37,7 @@ def azure(
     service_principal_id: str = typer.Option("", envvar="AZURE_SERVICE_PRINCIPAL_ID"),
     atlas_azure_app_id: str = typer.Option(DEFAULT_ATLAS_AZURE_APP_ID, envvar="ATLAS_AZURE_APP_ID"),
     azure_location: str = typer.Option(DEFAULT_AZURE_LOCATION, envvar="AZURE_LOCATION"),
+    storage_account_name: str = typer.Option("", envvar="AZURE_STORAGE_ACCOUNT_NAME"),
 ) -> None:
     """Generate dev.tfvars from environment variables."""
     WORKSPACE_DIR.mkdir(parents=True, exist_ok=True)
@@ -63,6 +64,10 @@ def azure(
             f"AZURE_LOCATION not set, using default {DEFAULT_AZURE_LOCATION}",
             fg="yellow",
         )
+    if storage_account_name:
+        lines.append(f'storage_account_name = "{storage_account_name}"')
+    else:
+        typer.secho("AZURE_STORAGE_ACCOUNT_NAME not set, will auto-generate", fg="yellow")
     content = "\n".join(lines) + "\n"
     DEV_TFVARS.write_text(content)
     typer.echo(f"Generated {DEV_TFVARS}")
