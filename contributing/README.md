@@ -9,6 +9,7 @@ This directory contains guides for contributors to the terraform-mongodbatlas-at
 - **[Documentation Guide](documentation-guide.md)** - Working with auto-generated documentation
 - **[Changelog Guide](changelog-process.md)** - Creating changelog entries and understanding the changelog workflow
 - **[SDLC Sync Guide](sdlc-sync.md)** - How tooling is shared between Terraform modules
+- **[Test Guide](test-guide.md)** - Running tests locally and in CI
 
 ## Quick Start
 

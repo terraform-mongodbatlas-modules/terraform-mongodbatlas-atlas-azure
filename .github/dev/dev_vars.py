@@ -9,6 +9,9 @@ app = typer.Typer()
 WORKSPACE_DIR = Path(__file__).parent.parent.parent / "tests" / "workspace_azure_examples"
 DEV_TFVARS = WORKSPACE_DIR / "dev.tfvars"
 
+DEFAULT_ATLAS_AZURE_APP_ID = "9f2deb0d-be22-4524-a403-df531868bac0"
+DEFAULT_AZURE_LOCATION = "eastus2"
+
 
 @app.command()
 def project(project_id: str) -> None:
@@ -22,6 +25,34 @@ def project(project_id: str) -> None:
 def org(org_id: str) -> None:
     WORKSPACE_DIR.mkdir(parents=True, exist_ok=True)
     content = f'org_id = "{org_id}"\n'
+    DEV_TFVARS.write_text(content)
+    typer.echo(f"Generated {DEV_TFVARS}")
+
+
+@app.command()
+def azure(
+    org_id: str,
+    subscription_id: str,
+    resource_group_name: str = typer.Option("", help="Azure resource group name"),
+    service_principal_id: str = typer.Option("", help="Azure service principal ID"),
+    atlas_azure_app_id: str = typer.Option(DEFAULT_ATLAS_AZURE_APP_ID, help="Atlas Azure App ID"),
+    azure_location: str = typer.Option(DEFAULT_AZURE_LOCATION, help="Azure location"),
+) -> None:
+    """Generate dev.tfvars with all Azure-specific variables."""
+    WORKSPACE_DIR.mkdir(parents=True, exist_ok=True)
+    lines = [
+        f'org_id = "{org_id}"',
+        f'subscription_id = "{subscription_id}"',
+    ]
+    if resource_group_name:
+        lines.append(f'resource_group_name = "{resource_group_name}"')
+    if service_principal_id:
+        lines.append(f'service_principal_id = "{service_principal_id}"')
+    if atlas_azure_app_id != DEFAULT_ATLAS_AZURE_APP_ID:
+        lines.append(f'atlas_azure_app_id = "{atlas_azure_app_id}"')
+    if azure_location != DEFAULT_AZURE_LOCATION:
+        lines.append(f'azure_location = "{azure_location}"')
+    content = "\n".join(lines) + "\n"
     DEV_TFVARS.write_text(content)
     typer.echo(f"Generated {DEV_TFVARS}")
 

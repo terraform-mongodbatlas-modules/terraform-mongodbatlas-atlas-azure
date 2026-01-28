@@ -230,3 +230,11 @@ sdlc-validate:
   uvx path-sync validate-no-changes -b main
 # === OK_EDIT: path-sync standard ===
 # Module-specific recipes below (not synced)
+
+dev-vars-azure org_id subscription_id resource_group_name="" service_principal_id="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    args=({{org_id}} {{subscription_id}})
+    [[ -n "{{resource_group_name}}" ]] && args+=(--resource-group-name "{{resource_group_name}}")
+    [[ -n "{{service_principal_id}}" ]] && args+=(--service-principal-id "{{service_principal_id}}")
+    {{py}} dev.dev_vars azure "${args[@]}"
