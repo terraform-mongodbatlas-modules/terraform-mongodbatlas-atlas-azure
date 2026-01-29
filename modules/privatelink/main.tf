@@ -88,3 +88,12 @@ resource "mongodbatlas_privatelink_endpoint_service" "this" {
     }
   }
 }
+
+data "mongodbatlas_privatelink_endpoint_service" "this" {
+  project_id          = var.project_id
+  private_link_id     = local.private_link_id
+  endpoint_service_id = mongodbatlas_privatelink_endpoint_service.this.endpoint_service_id
+  provider_name       = "AZURE"
+
+  depends_on = [mongodbatlas_privatelink_endpoint_service.this]
+}

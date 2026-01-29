@@ -1,15 +1,8 @@
 module "atlas_azure" {
   source = "../../"
 
-  project_id = var.project_id
-
-  # Key is used as azure_location when azure_location is not specified
-  privatelink_endpoints = {
-    for loc, config in var.subnet_ids : loc => {
-      subnet_id = config.subnet_id
-      name      = config.name
-    }
-  }
+  project_id            = var.project_id
+  privatelink_endpoints = var.privatelink_endpoints
 }
 
 output "privatelink" {

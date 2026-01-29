@@ -91,7 +91,7 @@ resource "mongodbatlas_privatelink_endpoint" "this" {
 
 }
 
-# Privatelink module - one per user key (BYOE or module-managed, not location_only)
+# Privatelink module - one per user key (BYOE or module-managed)
 module "privatelink" {
   source   = "./modules/privatelink"
   for_each = local.privatelink_key_location
@@ -104,10 +104,10 @@ module "privatelink" {
   private_link_service_resource_id = mongodbatlas_privatelink_endpoint.this[each.key].private_link_service_resource_id
 
   # Module-managed
-  create_azure_private_endpoint = contains(keys(var.privatelink_endpoints), each.key)
-  subnet_id                     = try(var.privatelink_endpoints[each.key].subnet_id, null)
-  azure_private_endpoint_name   = contains(local.privatelinks_module_managed, each.key) ? coalesce(var.privatelink_endpoints[each.key].name, "pe-atlas-${each.key}") : null
-  azure_private_endpoint_tags   = try(var.privatelink_endpoints[each.key].tags, {})
+  create_azure_private_endpoint = contains(local.privatelinks_module_managed_keys, each.key)
+  subnet_id                     = try(local.privatelink_module_managed[each.key].subnet_id, null)
+  azure_private_endpoint_name   = contains(local.privatelinks_module_managed_keys, each.key) ? coalesce(local.privatelink_module_managed[each.key].name, "pe-atlas-${each.key}") : null
+  azure_private_endpoint_tags   = try(local.privatelink_module_managed[each.key].tags, {})
 
   # BYOE
   azure_private_endpoint_id         = try(var.privatelink_byoe[each.key].azure_private_endpoint_id, null)

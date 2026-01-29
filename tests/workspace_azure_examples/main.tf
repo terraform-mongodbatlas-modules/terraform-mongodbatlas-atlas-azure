@@ -187,10 +187,10 @@ locals {
   # tflint-ignore: terraform_unused_declarations
   static_ip_eastus2 = module.vnet_eastus2.first_usable_ip
   # tflint-ignore: terraform_unused_declarations
-  subnet_ids_multi_region = {
-    eastus2 = { subnet_id = module.vnet_multi_region_eastus2.subnet_id, name = "pe-atlas-multi-eastus2" }
-    westus2 = { subnet_id = module.vnet_multi_region_westus2.subnet_id }
-  }
+  privatelink_endpoints_multi_region = [
+    { azure_location = "eastus2", subnet_id = module.vnet_multi_region_eastus2.subnet_id, name = "pe-atlas-multi-eastus2" },
+    { azure_location = "westus2", subnet_id = module.vnet_multi_region_westus2.subnet_id }
+  ]
 }
 
 # Example module calls are generated in modules.generated.tf

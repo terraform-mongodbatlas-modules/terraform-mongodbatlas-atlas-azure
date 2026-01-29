@@ -9,10 +9,12 @@ variable "subscription_id" {
   default     = ""
 }
 
-variable "subnet_ids" {
-  type = map(object({
-    subnet_id = string
-    name      = optional(string)
+variable "privatelink_endpoints" {
+  type = list(object({
+    azure_location = string
+    subnet_id      = string
+    name           = optional(string)
+    tags           = optional(map(string), {})
   }))
-  description = "Map of Azure location to PrivateLink endpoint config (e.g., {eastus2 = {subnet_id = '/subscriptions/.../subnets/...', name = 'pe-my-eastus2'}})"
+  description = "PrivateLink endpoints. Each requires azure_location and subnet_id."
 }

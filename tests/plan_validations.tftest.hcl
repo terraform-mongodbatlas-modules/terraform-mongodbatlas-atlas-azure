@@ -91,9 +91,9 @@ run "dynamic_skip_cloud_provider_access_privatelink_only" {
   variables {
     project_id = var.project_id
     # Only privatelink configured - cloud_provider_access should be automatically skipped
-    privatelink_endpoints = {
-      eastus2 = { subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" }
-    }
+    privatelink_endpoints = [
+      { azure_location = "eastus2", subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" }
+    ]
   }
 
   assert {

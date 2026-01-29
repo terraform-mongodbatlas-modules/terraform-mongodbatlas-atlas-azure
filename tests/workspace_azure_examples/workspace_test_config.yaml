@@ -143,6 +143,6 @@ var_groups:
     - name: subscription_id
       expose_in_workspace: false
       module_value: var.subscription_id
-    - name: subnet_ids
+    - name: privatelink_endpoints
       expose_in_workspace: false
-      module_value: local.subnet_ids_multi_region
+      module_value: local.privatelink_endpoints_multi_region

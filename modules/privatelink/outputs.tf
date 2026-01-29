@@ -3,8 +3,8 @@ output "atlas_private_link_id" {
   value       = local.private_link_id
 }
 
-output "atlas_private_link_service_name" {
-  description = "Name of the Azure Private Link Service that Atlas manages"
+output "atlas_endpoint_service_name" {
+  description = "Atlas endpoint service name"
   value       = local.private_link_service_name
 }
 
@@ -26,11 +26,11 @@ output "azure_private_endpoint_ip_address" {
 }
 
 output "status" {
-  description = "Status of the PrivateLink connection"
-  value       = mongodbatlas_privatelink_endpoint_service.this.azure_status
+  description = "PrivateLink connection status"
+  value       = data.mongodbatlas_privatelink_endpoint_service.this.azure_status
 }
 
 output "error_message" {
   description = "Error message if connection failed"
-  value       = mongodbatlas_privatelink_endpoint_service.this.error_message
+  value       = data.mongodbatlas_privatelink_endpoint_service.this.error_message
 }

@@ -128,17 +128,17 @@ variable "encryption_client_secret" {
   }
 }
 
-variable "privatelink_byoe_locations" {
+variable "privatelink_byoe_regions" {
   type        = map(string)
   default     = {}
   description = "Atlas-side PrivateLink endpoints for BYOE. Key is user identifier, value is Azure location."
   validation {
-    condition     = alltrue([for loc in values(var.privatelink_byoe_locations) : can(regex("^[a-z][a-z0-9]+$", loc))])
+    condition     = alltrue([for loc in values(var.privatelink_byoe_regions) : can(regex("^[a-z][a-z0-9]+$", loc))])
     error_message = "All values must use Azure location format (lowercase, no separators). Examples: eastus2, westeurope"
   }
   validation {
-    condition     = length(setintersection(keys(var.privatelink_byoe_locations), keys(var.privatelink_endpoints))) == 0
-    error_message = "Keys in privatelink_byoe_locations must not overlap with keys in privatelink_endpoints."
+    condition     = length(setintersection(keys(var.privatelink_byoe_regions), [for ep in var.privatelink_endpoints : ep.azure_location])) == 0
+    error_message = "Keys in privatelink_byoe_regions must not overlap with azure_location values in privatelink_endpoints."
   }
 }
 
@@ -148,27 +148,52 @@ variable "privatelink_byoe" {
     azure_private_endpoint_ip_address = string
   }))
   default     = {}
-  description = "BYOE endpoint details. Key must exist in `privatelink_byoe_locations`."
+  description = "BYOE endpoint details. Key must exist in `privatelink_byoe_regions`."
   validation {
-    condition     = alltrue([for k in keys(var.privatelink_byoe) : contains(keys(var.privatelink_byoe_locations), k)])
-    error_message = "All keys in privatelink_byoe must exist in privatelink_byoe_locations."
+    condition     = alltrue([for k in keys(var.privatelink_byoe) : contains(keys(var.privatelink_byoe_regions), k)])
+    error_message = "All keys in privatelink_byoe must exist in privatelink_byoe_regions."
   }
 }
 
 variable "privatelink_endpoints" {
-  type = map(object({
-    azure_location = optional(string)
+  type = list(object({
+    azure_location = string
     subnet_id      = string
     name           = optional(string)
     tags           = optional(map(string), {})
   }))
-  default     = {}
-  description = "Module-managed PrivateLink endpoints. Key is user identifier (or Azure location if `azure_location` is omitted)."
+  default     = []
+  description = "Multi-region PrivateLink endpoints. All azure_locations must be UNIQUE. Use privatelink_endpoints_single_region for multiple endpoints in the same region."
   validation {
-    condition = alltrue([
-      for k, v in var.privatelink_endpoints : can(regex("^[a-z][a-z0-9]+$", coalesce(v.azure_location, k)))
-    ])
-    error_message = "azure_location (or key as fallback) must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
+    condition     = alltrue([for ep in var.privatelink_endpoints : can(regex("^[a-z][a-z0-9]+$", ep.azure_location))])
+    error_message = "azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
+  }
+  validation {
+    condition     = length(var.privatelink_endpoints) == length(distinct([for ep in var.privatelink_endpoints : ep.azure_location]))
+    error_message = "All azure_locations in privatelink_endpoints must be unique. Use privatelink_endpoints_single_region for multiple endpoints in the same region."
+  }
+}
+
+variable "privatelink_endpoints_single_region" {
+  type = list(object({
+    azure_location = string
+    subnet_id      = string
+    name           = optional(string)
+    tags           = optional(map(string), {})
+  }))
+  default     = []
+  description = "Single-region multi-endpoint pattern. All azure_locations must MATCH (Atlas constraint)."
+  validation {
+    condition     = alltrue([for ep in var.privatelink_endpoints_single_region : can(regex("^[a-z][a-z0-9]+$", ep.azure_location))])
+    error_message = "azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
+  }
+  validation {
+    condition     = length(var.privatelink_endpoints_single_region) == 0 || length(distinct([for ep in var.privatelink_endpoints_single_region : ep.azure_location])) == 1
+    error_message = "All azure_locations in privatelink_endpoints_single_region must match (same region)."
+  }
+  validation {
+    condition     = length(var.privatelink_endpoints_single_region) == 0 || length(var.privatelink_endpoints) == 0
+    error_message = "Cannot use both privatelink_endpoints and privatelink_endpoints_single_region."
   }
 }
 
