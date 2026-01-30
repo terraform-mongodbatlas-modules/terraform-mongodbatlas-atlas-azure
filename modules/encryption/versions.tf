@@ -15,4 +15,9 @@ terraform {
       version = ">= 2.53"
     }
   }
+
+  provider_meta "mongodbatlas" {
+    module_name    = "atlas-azure"
+    module_version = "local"
+  }
 }
