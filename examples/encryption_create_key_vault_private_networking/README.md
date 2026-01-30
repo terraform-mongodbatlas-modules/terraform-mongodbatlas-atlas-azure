@@ -60,7 +60,8 @@ data "azurerm_resource_group" "main" {
 }
 
 # Create client secret for encryption (only if not provided)
-# TODO: Replace with roleId when CLOUDP-369548 is implemented
+# NOTE: In v1, this will be replaced with secretless role_id-based authentication
+# once the mongodbatlas provider adds support for Azure encryption without client_secret.
 resource "azuread_service_principal_password" "encryption" {
   count                = var.existing_encryption_client_secret.enabled ? 0 : 1
   service_principal_id = "/servicePrincipals/${var.service_principal_id}"

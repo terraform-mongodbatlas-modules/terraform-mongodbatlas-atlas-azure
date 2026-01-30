@@ -282,7 +282,7 @@ Azure AD application client secret for encryption. This value is required when u
 
 **IMPORTANT:** Azure limits the client secret lifetime to two years. When the secret expires, Atlas loses CMK access, causing cluster unavailability. Rotate secrets before expiration.
 
-Future provider enhancements may support `roleId`-based authentication, eliminating the need for `client_secret`.
+**v1 Roadmap:** This variable will become optional once the mongodbatlas provider adds secretless `role_id`-based authentication for Azure encryption (expected in v1). The module will then support both methods with secretless as the recommended approach.
 
 Type: `string`
 
@@ -478,4 +478,4 @@ User-Agent: terraform-provider-mongodbatlas/2.1.0 Terraform/1.13.1 module_name/a
 
 Azure limits Client Secret lifetime for CMKs to two years maximum. When the secret expires, Atlas loses access to your encryption key, causing cluster unavailability. Rotate secrets before expiration.
 
-**Future enhancement:** The Terraform provider will support `role_id`-based authentication soon, eliminating the need for client secrets.
+**v1 Roadmap:** The mongodbatlas provider will add secretless `role_id`-based authentication for Azure encryption. Once available, the module will support both methods with secretless as the recommended approach, making `encryption_client_secret` optional.

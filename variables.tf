@@ -114,7 +114,7 @@ variable "encryption_client_secret" {
 
     **IMPORTANT:** Azure limits the client secret lifetime to two years. When the secret expires, Atlas loses CMK access, causing cluster unavailability. Rotate secrets before expiration.
 
-    Future provider enhancements may support `roleId`-based authentication, eliminating the need for `client_secret`.
+    **v1 Roadmap:** This variable will become optional once the mongodbatlas provider adds secretless `role_id`-based authentication for Azure encryption (expected in v1). The module will then support both methods with secretless as the recommended approach.
   EOT
 
   validation {
