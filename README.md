@@ -124,10 +124,8 @@ Take the following steps to configure access to your Atlas-Azure:
 
 4. Verify outputs. After apply, note:
   
-    - [role_id](#output_role_id)
-    - [authorized_date](#output_authorized_date)
-    - [service_principal_id](#output_service_principal_id)
-    - [service_principal_resource_id](#output_service_principal_resource_id)
+    - [role_id](#output_role_id) - Atlas role ID for cross-feature use
+    - [cloud_provider_access](#output_cloud_provider_access) - Bundled CPA configuration
 
 You now have access.
 

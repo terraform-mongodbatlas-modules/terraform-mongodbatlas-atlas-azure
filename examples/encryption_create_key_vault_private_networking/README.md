@@ -126,7 +126,7 @@ output "key_identifier" {
 }
 
 output "private_endpoints" {
-  description = "Private endpoint status (empty if require_private_networking = false)"
+  description = "Private endpoint status (empty if private_endpoint_regions not set)"
   value       = module.atlas_azure.encryption.private_endpoints
 }
 ```
