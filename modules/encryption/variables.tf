@@ -49,3 +49,9 @@ variable "require_private_networking" {
   default     = false
   description = "Enable private networking to Key Vault"
 }
+
+variable "tags" {
+  type        = map(string)
+  default     = {}
+  description = "Tags to apply to Azure resources."
+}

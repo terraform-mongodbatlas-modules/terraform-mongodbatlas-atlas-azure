@@ -43,3 +43,9 @@ variable "create_storage_account" {
   default     = null
   description = "Create module-managed Storage Account. Mutually exclusive with storage_account_id."
 }
+
+variable "tags" {
+  type        = map(string)
+  default     = {}
+  description = "Tags to apply to Azure resources."
+}

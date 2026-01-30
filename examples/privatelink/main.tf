@@ -4,7 +4,7 @@ module "atlas_azure" {
   project_id = var.project_id
 
   privatelink_endpoints = [
-    { azure_location = var.azure_location, subnet_id = var.subnet_id }
+    { region = var.region, subnet_id = var.subnet_id }
   ]
 }
 

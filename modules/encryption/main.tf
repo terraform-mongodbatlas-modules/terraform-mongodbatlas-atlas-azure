@@ -31,6 +31,7 @@ resource "azurerm_key_vault" "atlas" {
   purge_protection_enabled   = var.create_key_vault.purge_protection_enabled
   soft_delete_retention_days = var.create_key_vault.soft_delete_retention_days
   rbac_authorization_enabled = true
+  tags                       = var.tags
 }
 
 resource "azurerm_role_assignment" "terraform_key_vault_admin" {

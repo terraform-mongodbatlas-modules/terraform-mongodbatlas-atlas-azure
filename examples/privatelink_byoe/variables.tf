@@ -8,9 +8,9 @@ variable "subscription_id" {
   description = "Azure subscription ID"
 }
 
-variable "azure_location" {
+variable "region" {
   type        = string
-  description = "Azure region in lowercase format (e.g., eastus2)"
+  description = "Region in Atlas (US_EAST_2) or Azure (eastus2) format"
 }
 
 variable "subnet_id" {

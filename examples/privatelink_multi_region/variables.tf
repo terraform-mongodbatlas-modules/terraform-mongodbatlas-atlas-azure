@@ -11,10 +11,10 @@ variable "subscription_id" {
 
 variable "privatelink_endpoints" {
   type = list(object({
-    azure_location = string
-    subnet_id      = string
-    name           = optional(string)
-    tags           = optional(map(string), {})
+    region    = string
+    subnet_id = string
+    name      = optional(string)
+    tags      = optional(map(string), {})
   }))
-  description = "PrivateLink endpoints. Each requires azure_location and subnet_id."
+  description = "PrivateLink endpoints. Region accepts Atlas (US_EAST_2) or Azure (eastus2) format."
 }

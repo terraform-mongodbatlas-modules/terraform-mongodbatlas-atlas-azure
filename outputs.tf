@@ -3,24 +3,14 @@ output "role_id" {
   value       = !local.skip_cloud_provider_access ? mongodbatlas_cloud_provider_access_authorization.this[0].role_id : null
 }
 
-output "service_principal_id" {
-  description = "Service principal object ID used for Atlas-Azure integration."
-  value       = !local.skip_cloud_provider_access ? local.service_principal_id : null
-}
-
-output "service_principal_resource_id" {
-  description = "Service principal full resource ID for creating passwords/credentials."
-  value       = !local.skip_cloud_provider_access ? local.service_principal_resource_id : null
-}
-
-output "authorized_date" {
-  description = "Date when the cloud provider access was authorized."
-  value       = !local.skip_cloud_provider_access ? mongodbatlas_cloud_provider_access_authorization.this[0].authorized_date : null
-}
-
-output "feature_usages" {
-  description = "List of features using this cloud provider access role."
-  value       = !local.skip_cloud_provider_access ? mongodbatlas_cloud_provider_access_authorization.this[0].feature_usages : null
+output "cloud_provider_access" {
+  description = "Cloud provider access configuration for Atlas-Azure integration."
+  value = !local.skip_cloud_provider_access ? {
+    role_id                       = mongodbatlas_cloud_provider_access_authorization.this[0].role_id
+    service_principal_id          = local.service_principal_id
+    service_principal_resource_id = local.service_principal_resource_id
+    authorized_date               = mongodbatlas_cloud_provider_access_authorization.this[0].authorized_date
+  } : null
 }
 
 output "encryption" {
@@ -31,7 +21,7 @@ output "encryption" {
     key_vault_id                = module.encryption[0].key_vault_id
     key_vault_uri               = module.encryption[0].key_vault_uri
     key_identifier              = module.encryption[0].key_identifier
-    private_endpoints = var.encryption.require_private_networking ? {
+    private_endpoints = local.encryption_require_private_networking ? {
       for region, pe in module.encryption_private_endpoint : region => {
         id                               = pe.id
         status                           = pe.status
@@ -51,7 +41,7 @@ output "privatelink" {
   description = "PrivateLink status per user key (both module-managed and BYOE)."
   value = {
     for key, pl in module.privatelink : key => {
-      azure_location                         = local.privatelink_key_location[key]
+      region                                 = local.privatelink_key_azure_location[key]
       atlas_private_link_id                  = pl.atlas_private_link_id
       atlas_endpoint_service_name            = pl.atlas_endpoint_service_name
       atlas_private_link_service_resource_id = pl.atlas_private_link_service_resource_id
@@ -67,11 +57,22 @@ output "privatelink_service_info" {
   description = "Atlas PrivateLink service info per user key (for BYOE - create your Azure PE using these values)"
   value = {
     for key, atlas_endpoint in mongodbatlas_privatelink_endpoint.this : key => {
-      azure_location                         = atlas_endpoint.region
+      region                                 = local.privatelink_key_azure_location[key]
       atlas_private_link_id                  = atlas_endpoint.private_link_id
       atlas_endpoint_service_name            = atlas_endpoint.private_link_service_name
       atlas_private_link_service_resource_id = atlas_endpoint.private_link_service_resource_id
     }
+  }
+}
+
+output "resource_ids" {
+  description = "Azure resource IDs for data source lookups."
+  value = {
+    role_id              = !local.skip_cloud_provider_access ? mongodbatlas_cloud_provider_access_authorization.this[0].role_id : null
+    service_principal_id = local.service_principal_id
+    key_vault_id         = try(module.encryption[0].key_vault_id, null)
+    key_identifier       = try(module.encryption[0].key_identifier, null)
+    storage_account_id   = try(module.backup_export[0].storage_account_id, null)
   }
 }
 

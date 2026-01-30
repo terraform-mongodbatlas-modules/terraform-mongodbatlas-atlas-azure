@@ -33,13 +33,12 @@ module "atlas_azure" {
       purge_protection_enabled   = var.purge_protection_enabled
       soft_delete_retention_days = var.soft_delete_retention_days
     }
-    require_private_networking = var.require_private_networking
-    private_endpoint_regions   = var.private_endpoint_regions
+    private_endpoint_regions = var.private_endpoint_regions
   }
 }
 
 resource "azapi_update_resource" "approval" {
-  for_each = var.require_private_networking ? module.atlas_azure.encryption.private_endpoints : {}
+  for_each = length(var.private_endpoint_regions) > 0 ? module.atlas_azure.encryption.private_endpoints : {}
 
   type      = "Microsoft.KeyVault/Vaults/PrivateEndpointConnections@2023-07-01"
   name      = each.value.private_endpoint_connection_name

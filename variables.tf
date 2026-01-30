@@ -31,6 +31,12 @@ variable "service_principal_id" {
   }
 }
 
+variable "azure_tags" {
+  type        = map(string)
+  default     = {}
+  description = "Tags to apply to all Azure resources (Key Vault, Storage Account, Private Endpoints)."
+}
+
 variable "encryption" {
   type = object({
     enabled        = optional(bool, false)
@@ -49,8 +55,7 @@ variable "encryption" {
         notify_before_expiry = optional(string, "P30D")
       }), {})
     }))
-    require_private_networking = optional(bool, false)
-    private_endpoint_regions   = optional(set(string), [])
+    private_endpoint_regions = optional(set(string), [])
   })
   default     = {}
   description = <<-EOT
@@ -60,7 +65,7 @@ variable "encryption" {
     - `key_vault_id` + `key_identifier` (for user-provided Key Vault)
     - `create_key_vault.enabled` = true (for module-managed Key Vault)
 
-    **NOTE:** `private_endpoint_regions` uses the Atlas region format (e.g., `US_EAST_2`, `EUROPE_WEST`), not Azure format (e.g., `eastus2`, `westeurope`). See [Availability Zones and Supported Regions](https://www.mongodb.com/docs/atlas/reference/microsoft-azure/#availability-zones-and-supported-regions) for a comprehensive list of equivalencies between Atlas and Azure regions.  
+    **NOTE:** `private_endpoint_regions` accepts both Atlas format (e.g., `US_EAST_2`) and Azure format (e.g., `eastus2`).
   EOT
 
   validation {
@@ -98,16 +103,6 @@ variable "encryption" {
     ))
     error_message = "create_key_vault.azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
   }
-
-  validation {
-    condition     = !var.encryption.require_private_networking || var.encryption.enabled
-    error_message = "require_private_networking=true requires encryption.enabled=true."
-  }
-
-  validation {
-    condition     = !var.encryption.require_private_networking || length(var.encryption.private_endpoint_regions) > 0
-    error_message = "When require_private_networking=true, private_endpoint_regions must specify at least one Atlas region."
-  }
 }
 
 variable "encryption_client_secret" {
@@ -135,24 +130,16 @@ variable "privatelink_byoe_regions" {
     Atlas-side PrivateLink endpoints for BYOE (Bring Your Own Endpoint).
     
     Key: A unique identifier you choose to reference this endpoint (e.g., "pe1", "primary", "my-endpoint").
-    Value: Azure location where the endpoint will be created (e.g., "eastus2", "westeurope").
+    Value: Region in Atlas format (e.g., "US_EAST_2") or Azure format (e.g., "eastus2").
     
     Example:
     ```hcl
     privatelink_byoe_regions = {
       "primary"   = "eastus2"
-      "secondary" = "westeurope"
+      "secondary" = "EUROPE_WEST"
     }
     ```
   EOT
-  validation {
-    condition     = alltrue([for loc in values(var.privatelink_byoe_regions) : can(regex("^[a-z][a-z0-9]+$", loc))])
-    error_message = "All values must use Azure location format (lowercase, no separators). Examples: eastus2, westeurope"
-  }
-  validation {
-    condition     = length(setintersection(values(var.privatelink_byoe_regions), [for ep in var.privatelink_endpoints : ep.azure_location])) == 0
-    error_message = "Azure locations in privatelink_byoe_regions must not overlap with azure_location values in privatelink_endpoints."
-  }
 }
 
 variable "privatelink_byoe" {
@@ -170,52 +157,42 @@ variable "privatelink_byoe" {
 
 variable "privatelink_endpoints" {
   type = list(object({
-    azure_location = string
-    subnet_id      = string
-    name           = optional(string)
-    tags           = optional(map(string), {})
+    region    = string
+    subnet_id = string
+    name      = optional(string)
+    tags      = optional(map(string), {})
   }))
   default     = []
-  description = "Multi-region PrivateLink endpoints. All azure_locations must be UNIQUE. Use privatelink_endpoints_single_region for multiple endpoints in the same region."
+  description = "Multi-region PrivateLink endpoints. Region accepts Atlas format (US_EAST_2) or Azure format (eastus2). All regions must be UNIQUE."
   validation {
-    condition     = alltrue([for ep in var.privatelink_endpoints : can(regex("^[a-z][a-z0-9]+$", ep.azure_location))])
-    error_message = "azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
-  }
-  validation {
-    condition     = length(var.privatelink_endpoints) == length(distinct([for ep in var.privatelink_endpoints : ep.azure_location]))
-    error_message = "All azure_locations in privatelink_endpoints must be unique. Use privatelink_endpoints_single_region for multiple endpoints in the same region."
+    condition     = length(var.privatelink_endpoints) == length(distinct([for ep in var.privatelink_endpoints : ep.region]))
+    error_message = "All regions in privatelink_endpoints must be unique. Use privatelink_endpoints_single_region for multiple endpoints in the same region."
   }
 }
 
 variable "privatelink_endpoints_single_region" {
   type = list(object({
-    azure_location = string
-    subnet_id      = string
-    name           = optional(string)
-    tags           = optional(map(string), {})
+    region    = string
+    subnet_id = string
+    name      = optional(string)
+    tags      = optional(map(string), {})
   }))
   default     = []
   description = <<-EOT
-    Single-region multi-endpoint pattern for connecting multiple subnets to their own Atlas PrivateLink service.
-    
-    **Atlas Constraint:** All endpoints MUST be in the same Azure region because Atlas only allows one region with multiple PrivateLink services.
-    Use `privatelink_endpoints` for multi-region deployments.
+    Single-region multi-endpoint pattern. Region accepts Atlas format (US_EAST_2) or Azure format (eastus2).
+    All endpoints MUST be in the same region.
     
     Example:
     ```hcl
     privatelink_endpoints_single_region = [
-      { azure_location = "eastus2", subnet_id = "/subscriptions/.../subnets/app1" },
-      { azure_location = "eastus2", subnet_id = "/subscriptions/.../subnets/app2" },
+      { region = "eastus2", subnet_id = "/subscriptions/.../subnets/app1" },
+      { region = "eastus2", subnet_id = "/subscriptions/.../subnets/app2" },
     ]
     ```
   EOT
   validation {
-    condition     = alltrue([for ep in var.privatelink_endpoints_single_region : can(regex("^[a-z][a-z0-9]+$", ep.azure_location))])
-    error_message = "azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
-  }
-  validation {
-    condition     = length(var.privatelink_endpoints_single_region) <= 1 || length(distinct([for ep in var.privatelink_endpoints_single_region : ep.azure_location])) == 1
-    error_message = "All azure_locations in privatelink_endpoints_single_region must match (same region)."
+    condition     = length(var.privatelink_endpoints_single_region) <= 1 || length(distinct([for ep in var.privatelink_endpoints_single_region : ep.region])) == 1
+    error_message = "All regions in privatelink_endpoints_single_region must match (same region)."
   }
   validation {
     condition     = length(var.privatelink_endpoints_single_region) == 0 || length(var.privatelink_endpoints) == 0

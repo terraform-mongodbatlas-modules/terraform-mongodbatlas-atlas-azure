@@ -52,16 +52,17 @@ module "encryption" {
   key_vault_id     = var.encryption.key_vault_id
   key_identifier   = var.encryption.key_identifier
   create_key_vault = var.encryption.create_key_vault
+  tags             = var.azure_tags
 
   client_secret              = var.encryption_client_secret
-  require_private_networking = var.encryption.require_private_networking
+  require_private_networking = local.encryption_require_private_networking
 
   depends_on = [mongodbatlas_cloud_provider_access_authorization.this]
 }
 
 module "encryption_private_endpoint" {
   source   = "./modules/encryption_private_endpoint"
-  for_each = var.encryption.enabled && var.encryption.require_private_networking ? var.encryption.private_endpoint_regions : toset([])
+  for_each = var.encryption.enabled && local.encryption_require_private_networking ? toset([for r in var.encryption.private_endpoint_regions : lookup(local._normalize_to_atlas, r, r)]) : toset([])
 
   project_id  = var.project_id
   region_name = each.key
@@ -81,20 +82,18 @@ resource "mongodbatlas_private_endpoint_regional_mode" "this" {
 }
 
 # Atlas-side PrivateLink endpoint - created at root level to avoid cycles
-# This only depends on location keys, not BYOE values
 resource "mongodbatlas_privatelink_endpoint" "this" {
-  for_each = local.privatelink_key_location
+  for_each = local.privatelink_key_azure_location
 
   project_id    = var.project_id
   provider_name = "AZURE"
   region        = each.value
-
 }
 
 # Privatelink module - one per user key (BYOE or module-managed)
 module "privatelink" {
   source   = "./modules/privatelink"
-  for_each = local.privatelink_key_location
+  for_each = local.privatelink_key_azure_location
 
   project_id                       = var.project_id
   azure_location                   = each.value
@@ -107,7 +106,7 @@ module "privatelink" {
   create_azure_private_endpoint = contains(local.privatelinks_module_managed_keys, each.key)
   subnet_id                     = try(local.privatelink_module_managed[each.key].subnet_id, null)
   azure_private_endpoint_name   = contains(local.privatelinks_module_managed_keys, each.key) ? coalesce(local.privatelink_module_managed[each.key].name, "pe-atlas-${each.key}") : null
-  azure_private_endpoint_tags   = try(local.privatelink_module_managed[each.key].tags, {})
+  azure_private_endpoint_tags   = merge(var.azure_tags, try(local.privatelink_module_managed[each.key].tags, {}))
 
   # BYOE
   azure_private_endpoint_id         = try(var.privatelink_byoe[each.key].azure_private_endpoint_id, null)
@@ -125,6 +124,7 @@ module "backup_export" {
   project_id           = var.project_id
   role_id              = mongodbatlas_cloud_provider_access_authorization.this[0].role_id
   service_principal_id = local.service_principal_id
+  tags                 = var.azure_tags
 
   container_name         = var.backup_export.container_name
   storage_account_id     = var.backup_export.storage_account_id
@@ -132,4 +132,29 @@ module "backup_export" {
   create_storage_account = var.backup_export.create_storage_account
 
   depends_on = [mongodbatlas_cloud_provider_access_authorization.this]
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Region Validation
+# ─────────────────────────────────────────────────────────────────────────────
+
+check "valid_privatelink_regions" {
+  assert {
+    condition     = length(local._invalid_privatelink_regions) == 0
+    error_message = "Invalid region(s) in privatelink_endpoints: ${join(", ", local._invalid_privatelink_regions)}. Use Atlas format (US_EAST_2) or Azure format (eastus2)."
+  }
+}
+
+check "valid_byoe_regions" {
+  assert {
+    condition     = length(local._invalid_byoe_regions) == 0
+    error_message = "Invalid region(s) in privatelink_byoe_regions: ${join(", ", local._invalid_byoe_regions)}. Use Atlas format (US_EAST_2) or Azure format (eastus2)."
+  }
+}
+
+check "valid_encryption_regions" {
+  assert {
+    condition     = length(local._invalid_encryption_regions) == 0
+    error_message = "Invalid region(s) in encryption.private_endpoint_regions: ${join(", ", local._invalid_encryption_regions)}. Use Atlas format (US_EAST_2) or Azure format (eastus2)."
+  }
 }

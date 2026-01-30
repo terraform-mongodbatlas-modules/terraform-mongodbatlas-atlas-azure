@@ -22,6 +22,7 @@ resource "azurerm_storage_account" "atlas" {
   account_replication_type        = var.create_storage_account.replication_type
   min_tls_version                 = var.create_storage_account.min_tls_version
   allow_nested_items_to_be_public = false
+  tags                            = var.tags
 }
 
 resource "azurerm_storage_container" "atlas" {

@@ -31,16 +31,10 @@ variable "soft_delete_retention_days" {
   description = "Soft delete retention days (7-90). Use 7 for dev/test."
 }
 
-variable "require_private_networking" {
-  type        = bool
-  default     = false
-  description = "Enable private networking to Key Vault."
-}
-
 variable "private_endpoint_regions" {
   type        = set(string)
   default     = []
-  description = "Atlas regions for private endpoints (Atlas format: US_EAST_2, EUROPE_WEST). Required when require_private_networking = true."
+  description = "Regions for private endpoints. Accepts Atlas (US_EAST_2) or Azure (eastus2) format. Set to enable private networking."
 }
 
 variable "atlas_azure_app_id" {
