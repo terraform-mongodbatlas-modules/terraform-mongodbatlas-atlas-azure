@@ -366,7 +366,18 @@ Default: `{}`
 
 ### privatelink_byoe_regions
 
-Atlas-side PrivateLink endpoints for BYOE. Key is user identifier, value is Azure location.
+Atlas-side PrivateLink endpoints for BYOE (Bring Your Own Endpoint).
+
+Key: A unique identifier you choose to reference this endpoint (e.g., "pe1", "primary", "my-endpoint").
+Value: Azure location where the endpoint will be created (e.g., "eastus2", "westeurope").
+
+Example:
+```hcl
+privatelink_byoe_regions = {
+  "primary"   = "eastus2"
+  "secondary" = "westeurope"
+}
+```
 
 Type: `map(string)`
 
@@ -374,7 +385,18 @@ Default: `{}`
 
 ### privatelink_endpoints_single_region
 
-Single-region multi-endpoint pattern. All azure_locations must MATCH (Atlas constraint).
+Single-region multi-endpoint pattern for connecting multiple subnets to their own Atlas PrivateLink service.
+
+**Atlas Constraint:** All endpoints MUST be in the same Azure region because Atlas only allows one region with multiple PrivateLink services.
+Use `privatelink_endpoints` for multi-region deployments.
+
+Example:
+```hcl
+privatelink_endpoints_single_region = [
+  { azure_location = "eastus2", subnet_id = "/subscriptions/.../subnets/app1" },
+  { azure_location = "eastus2", subnet_id = "/subscriptions/.../subnets/app2" },
+]
+```
 
 Type:
 

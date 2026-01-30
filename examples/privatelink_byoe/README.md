@@ -57,11 +57,15 @@ Copy and use this code to get started quickly:
 ```hcl
 # BYOE (Bring Your Own Endpoint) pattern
 # 
-# For BYOE, we use a two-step approach:
-# Step 1: Root module creates Atlas-side PrivateLink endpoint and exposes service info
-# Step 2: User-managed Azure Private Endpoint references the Atlas service info (see below)
+# Use BYOE when you need custom Azure Private Endpoint configuration (e.g., static IP addresses,
+# custom naming, or integration with existing networking infrastructure).
 #
-# Note: Step 2 (azurerm_private_endpoint.custom) depends on Step 1 output (privatelink_service_info)
+# Single `terraform apply` approach:
+# 1: Create Atlas-side PrivateLink using `privatelink_byoe_regions` to get service connection info
+# 2: Create your own Azure Private Endpoint using the output `privatelink_service_info`
+# 3: Register your endpoint with Atlas using `privatelink_byoe` to complete the connection
+#
+# Note: azurerm_private_endpoint.custom depends on Step 1 output (module.atlas_azure.privatelink_service_info)
 
 locals {
   pe1 = "pe1"

@@ -131,14 +131,27 @@ variable "encryption_client_secret" {
 variable "privatelink_byoe_regions" {
   type        = map(string)
   default     = {}
-  description = "Atlas-side PrivateLink endpoints for BYOE. Key is user identifier, value is Azure location."
+  description = <<-EOT
+    Atlas-side PrivateLink endpoints for BYOE (Bring Your Own Endpoint).
+    
+    Key: A unique identifier you choose to reference this endpoint (e.g., "pe1", "primary", "my-endpoint").
+    Value: Azure location where the endpoint will be created (e.g., "eastus2", "westeurope").
+    
+    Example:
+    ```hcl
+    privatelink_byoe_regions = {
+      "primary"   = "eastus2"
+      "secondary" = "westeurope"
+    }
+    ```
+  EOT
   validation {
     condition     = alltrue([for loc in values(var.privatelink_byoe_regions) : can(regex("^[a-z][a-z0-9]+$", loc))])
     error_message = "All values must use Azure location format (lowercase, no separators). Examples: eastus2, westeurope"
   }
   validation {
-    condition     = length(setintersection(keys(var.privatelink_byoe_regions), [for ep in var.privatelink_endpoints : ep.azure_location])) == 0
-    error_message = "Keys in privatelink_byoe_regions must not overlap with azure_location values in privatelink_endpoints."
+    condition     = length(setintersection(values(var.privatelink_byoe_regions), [for ep in var.privatelink_endpoints : ep.azure_location])) == 0
+    error_message = "Azure locations in privatelink_byoe_regions must not overlap with azure_location values in privatelink_endpoints."
   }
 }
 
@@ -182,13 +195,26 @@ variable "privatelink_endpoints_single_region" {
     tags           = optional(map(string), {})
   }))
   default     = []
-  description = "Single-region multi-endpoint pattern. All azure_locations must MATCH (Atlas constraint)."
+  description = <<-EOT
+    Single-region multi-endpoint pattern for connecting multiple subnets to their own Atlas PrivateLink service.
+    
+    **Atlas Constraint:** All endpoints MUST be in the same Azure region because Atlas only allows one region with multiple PrivateLink services.
+    Use `privatelink_endpoints` for multi-region deployments.
+    
+    Example:
+    ```hcl
+    privatelink_endpoints_single_region = [
+      { azure_location = "eastus2", subnet_id = "/subscriptions/.../subnets/app1" },
+      { azure_location = "eastus2", subnet_id = "/subscriptions/.../subnets/app2" },
+    ]
+    ```
+  EOT
   validation {
     condition     = alltrue([for ep in var.privatelink_endpoints_single_region : can(regex("^[a-z][a-z0-9]+$", ep.azure_location))])
     error_message = "azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
   }
   validation {
-    condition     = length(var.privatelink_endpoints_single_region) == 0 || length(distinct([for ep in var.privatelink_endpoints_single_region : ep.azure_location])) == 1
+    condition     = length(var.privatelink_endpoints_single_region) <= 1 || length(distinct([for ep in var.privatelink_endpoints_single_region : ep.azure_location])) == 1
     error_message = "All azure_locations in privatelink_endpoints_single_region must match (same region)."
   }
   validation {
