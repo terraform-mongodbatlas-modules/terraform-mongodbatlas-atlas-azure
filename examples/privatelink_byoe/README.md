@@ -83,13 +83,13 @@ module "atlas_azure" {
       azure_private_endpoint_ip_address = azurerm_private_endpoint.custom.private_service_connection[0].private_ip_address
     }
   }
-  privatelink_byoe_regions = { (local.pe1) = var.azure_location }
+  privatelink_byoe_regions = { (local.pe1) = var.region }
 }
 
 # User-managed Azure Private Endpoint with custom configuration
 resource "azurerm_private_endpoint" "custom" {
   name                = "pe-atlas-static-ip"
-  location            = var.azure_location
+  location            = module.atlas_azure.privatelink_service_info[local.pe1].region
   resource_group_name = var.resource_group_name
   subnet_id           = var.subnet_id
 

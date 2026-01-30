@@ -250,7 +250,7 @@ Provide EITHER:
 - `key_vault_id` + `key_identifier` (for user-provided Key Vault)
 - `create_key_vault.enabled` = true (for module-managed Key Vault)
 
-**NOTE:** `private_endpoint_regions` uses the Atlas region format (e.g., `US_EAST_2`, `EUROPE_WEST`), not Azure format (e.g., `eastus2`, `westeurope`). See [Availability Zones and Supported Regions](https://www.mongodb.com/docs/atlas/reference/microsoft-azure/#availability-zones-and-supported-regions) for a comprehensive list of equivalencies between Atlas and Azure regions.
+**NOTE:** `private_endpoint_regions` accepts both Atlas format (e.g., `US_EAST_2`) and Azure format (e.g., `eastus2`).
 
 Type:
 
@@ -272,8 +272,7 @@ object({
       notify_before_expiry = optional(string, "P30D")
     }), {})
   }))
-  require_private_networking = optional(bool, false)
-  private_endpoint_regions   = optional(set(string), [])
+  private_endpoint_regions = optional(set(string), [])
 })
 ```
 
@@ -298,16 +297,16 @@ Configure Azure Private Link endpoints for secure connectivity. See the [Azure P
 
 ### privatelink_endpoints
 
-Multi-region PrivateLink endpoints. All azure_locations must be UNIQUE. Use privatelink_endpoints_single_region for multiple endpoints in the same region.
+Multi-region PrivateLink endpoints. Region accepts Atlas format (US_EAST_2) or Azure format (eastus2). All regions must be UNIQUE.
 
 Type:
 
 ```hcl
 list(object({
-  azure_location = string
-  subnet_id      = string
-  name           = optional(string)
-  tags           = optional(map(string), {})
+  region    = string
+  subnet_id = string
+  name      = optional(string)
+  tags      = optional(map(string), {})
 }))
 ```
 
@@ -364,18 +363,26 @@ Default: `{}`
 
 ## Optional Variables
 
+### azure_tags
+
+Tags to apply to all Azure resources (Key Vault, Storage Account, Private Endpoints).
+
+Type: `map(string)`
+
+Default: `{}`
+
 ### privatelink_byoe_regions
 
 Atlas-side PrivateLink endpoints for BYOE (Bring Your Own Endpoint).
 
 Key: A unique identifier you choose to reference this endpoint (e.g., "pe1", "primary", "my-endpoint").
-Value: Azure location where the endpoint will be created (e.g., "eastus2", "westeurope").
+Value: Region in Atlas format (e.g., "US_EAST_2") or Azure format (e.g., "eastus2").
 
 Example:
 ```hcl
 privatelink_byoe_regions = {
   "primary"   = "eastus2"
-  "secondary" = "westeurope"
+  "secondary" = "EUROPE_WEST"
 }
 ```
 
@@ -385,16 +392,14 @@ Default: `{}`
 
 ### privatelink_endpoints_single_region
 
-Single-region multi-endpoint pattern for connecting multiple subnets to their own Atlas PrivateLink service.
-
-**Atlas Constraint:** All endpoints MUST be in the same Azure region because Atlas only allows one region with multiple PrivateLink services.
-Use `privatelink_endpoints` for multi-region deployments.
+Single-region multi-endpoint pattern. Region accepts Atlas format (US_EAST_2) or Azure format (eastus2).
+All endpoints MUST be in the same region.
 
 Example:
 ```hcl
 privatelink_endpoints_single_region = [
-  { azure_location = "eastus2", subnet_id = "/subscriptions/.../subnets/app1" },
-  { azure_location = "eastus2", subnet_id = "/subscriptions/.../subnets/app2" },
+  { region = "eastus2", subnet_id = "/subscriptions/.../subnets/app1" },
+  { region = "eastus2", subnet_id = "/subscriptions/.../subnets/app2" },
 ]
 ```
 
@@ -402,10 +407,10 @@ Type:
 
 ```hcl
 list(object({
-  azure_location = string
-  subnet_id      = string
-  name           = optional(string)
-  tags           = optional(map(string), {})
+  region    = string
+  subnet_id = string
+  name      = optional(string)
+  tags      = optional(map(string), {})
 }))
 ```
 
@@ -417,13 +422,13 @@ Default: `[]`
 
 The following outputs are exported:
 
-### <a name="output_authorized_date"></a> [authorized\_date](#output\_authorized\_date)
-
-Description: Date when the cloud provider access was authorized.
-
 ### <a name="output_backup_export"></a> [backup\_export](#output\_backup\_export)
 
 Description: Backup export configuration status
+
+### <a name="output_cloud_provider_access"></a> [cloud\_provider\_access](#output\_cloud\_provider\_access)
+
+Description: Cloud provider access configuration for Atlas-Azure integration.
 
 ### <a name="output_encryption"></a> [encryption](#output\_encryption)
 
@@ -437,10 +442,6 @@ Description: Value for cluster's encryption\_at\_rest\_provider attribute
 
 Description: Export bucket ID for backup schedule auto\_export\_enabled
 
-### <a name="output_feature_usages"></a> [feature\_usages](#output\_feature\_usages)
-
-Description: List of features using this cloud provider access role.
-
 ### <a name="output_privatelink"></a> [privatelink](#output\_privatelink)
 
 Description: PrivateLink status per user key (both module-managed and BYOE).
@@ -453,17 +454,13 @@ Description: Atlas PrivateLink service info per user key (for BYOE - create your
 
 Description: Whether private endpoint regional mode is enabled (auto-enabled for multi-region)
 
+### <a name="output_resource_ids"></a> [resource\_ids](#output\_resource\_ids)
+
+Description: Azure resource IDs for data source lookups.
+
 ### <a name="output_role_id"></a> [role\_id](#output\_role\_id)
 
 Description: Atlas role ID for reuse with other Atlas-Azure features.
-
-### <a name="output_service_principal_id"></a> [service\_principal\_id](#output\_service\_principal\_id)
-
-Description: Service principal object ID used for Atlas-Azure integration.
-
-### <a name="output_service_principal_resource_id"></a> [service\_principal\_resource\_id](#output\_service\_principal\_resource\_id)
-
-Description: Service principal full resource ID for creating passwords/credentials.
 <!-- END_TF_DOCS -->
 
 ## FAQ

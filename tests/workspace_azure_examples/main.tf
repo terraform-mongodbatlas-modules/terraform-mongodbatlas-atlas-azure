@@ -187,9 +187,11 @@ locals {
   # tflint-ignore: terraform_unused_declarations
   static_ip_eastus2 = module.vnet_eastus2.first_usable_ip
   # tflint-ignore: terraform_unused_declarations
+  region_eastus2 = "eastus2"
+  # tflint-ignore: terraform_unused_declarations
   privatelink_endpoints_multi_region = [
-    { azure_location = "eastus2", subnet_id = module.vnet_multi_region_eastus2.subnet_id, name = "pe-atlas-multi-eastus2" },
-    { azure_location = "westus2", subnet_id = module.vnet_multi_region_westus2.subnet_id }
+    { region = "eastus2", subnet_id = module.vnet_multi_region_eastus2.subnet_id, name = "pe-atlas-multi-eastus2" },
+    { region = "westus2", subnet_id = module.vnet_multi_region_westus2.subnet_id }
   ]
 }
 

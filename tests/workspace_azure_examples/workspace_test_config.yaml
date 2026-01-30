@@ -66,9 +66,6 @@ var_groups:
     - name: create_service_principal
       expose_in_workspace: false
       module_value: "false"
-    - name: azure_location
-      expose_in_workspace: false
-      module_value: var.azure_location
     - name: storage_account_name
       expose_in_workspace: false
       module_value: local.storage_account_name
@@ -109,9 +106,9 @@ var_groups:
     - name: subscription_id
       expose_in_workspace: false
       module_value: var.subscription_id
-    - name: azure_location
+    - name: region
       expose_in_workspace: false
-      module_value: var.azure_location
+      module_value: local.region_eastus2
     - name: subnet_id
       expose_in_workspace: false
       module_value: local.subnet_id_eastus2
@@ -126,9 +123,9 @@ var_groups:
     - name: resource_group_name
       expose_in_workspace: false
       module_value: local.resource_group_name
-    - name: azure_location
+    - name: region
       expose_in_workspace: false
-      module_value: var.azure_location
+      module_value: local.region_eastus2
     - name: subnet_id
       expose_in_workspace: false
       module_value: local.subnet_id_eastus2
