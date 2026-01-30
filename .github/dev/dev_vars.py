@@ -39,6 +39,13 @@ project_ids = {
 }
 """
 
+_existing_encryption_client_secret = """\
+existing_encryption_client_secret = {
+  enabled = true
+  value   = "EXISTING_ENCRYPTION_CLIENT_SECRET"
+}
+"""
+
 
 @app.command()
 def azure(
@@ -53,6 +60,9 @@ def azure(
         "",
         envvar="MONGODB_ATLAS_PROJECT_ID",
         help="Use the same project ID for all examples(for plan snapshot tests not for apply)",
+    ),
+    existing_encryption_client_secret: str = typer.Option(
+        "", envvar="EXISTING_ENCRYPTION_CLIENT_SECRET"
     ),
 ) -> None:
     """Generate dev.tfvars from environment variables."""
@@ -88,6 +98,14 @@ def azure(
         lines.append(_project_ids.replace("PROJECT_ID", project_id))
     else:
         typer.secho("MONGODB_ATLAS_PROJECT_ID not set, will create new projects", fg="yellow")
+    if existing_encryption_client_secret:
+        lines.append(
+            _existing_encryption_client_secret.replace(
+                "EXISTING_ENCRYPTION_CLIENT_SECRET", existing_encryption_client_secret
+            )
+        )
+    else:
+        typer.secho("EXISTING_ENCRYPTION_CLIENT_SECRET not set, will create new", fg="yellow")
     content = "\n".join(lines) + "\n"
     DEV_TFVARS.write_text(content)
     typer.echo(f"Generated {DEV_TFVARS}")
