@@ -21,7 +21,7 @@ locals {
   encryption_require_private_networking = length(var.encryption.private_endpoint_regions) > 0
 
   # Region normalization helpers - accepts both Atlas (US_EAST_2) and Azure (eastus2) formats
-  _all_region_keys    = concat(keys(local.atlas_region_to_azure), keys(local.azure_region_to_atlas))
+  _all_region_keys    = setunion(keys(local.atlas_region_to_azure), keys(local.azure_region_to_atlas))
   _normalize_to_atlas = { for r in local._all_region_keys : r => try(local.azure_region_to_atlas[r], r) }
   _normalize_to_azure = { for r in local._all_region_keys : r => try(local.atlas_region_to_azure[r], r) }
 
