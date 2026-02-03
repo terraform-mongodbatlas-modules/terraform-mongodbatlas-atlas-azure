@@ -146,7 +146,7 @@ resource "random_string" "suffix" {
 resource "azuread_service_principal_password" "encryption" {
   count                = var.existing_encryption_client_secret.enabled ? 0 : 1
   service_principal_id = "/servicePrincipals/${local.service_principal_id}"
-  display_name         = "MongoDB Atlas - Encryption Test"
+  display_name         = "MongoDB Atlas - Encryption Test Workspace Test"
 }
 
 locals {
