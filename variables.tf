@@ -163,7 +163,7 @@ variable "privatelink_endpoints" {
     tags      = optional(map(string), {})
   }))
   default     = []
-  description = "Multi-region PrivateLink endpoints. Region accepts Atlas format (US_EAST_2) or Azure format (eastus2). All regions must be UNIQUE."
+  description = "Multi-region PrivateLink endpoints. `region` accepts Atlas format (US_EAST_2) or Azure format (eastus2). All regions must be UNIQUE."
   validation {
     condition     = length(var.privatelink_endpoints) == length(distinct([for ep in var.privatelink_endpoints : ep.region]))
     error_message = "All regions in privatelink_endpoints must be unique. Use privatelink_endpoints_single_region for multiple endpoints in the same region."

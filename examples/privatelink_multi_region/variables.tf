@@ -16,5 +16,5 @@ variable "privatelink_endpoints" {
     name      = optional(string)
     tags      = optional(map(string), {})
   }))
-  description = "PrivateLink endpoints. Region accepts Atlas (US_EAST_2) or Azure (eastus2) format."
+  description = "PrivateLink endpoints. `region` accepts Atlas (US_EAST_2) or Azure (eastus2) format."
 }
