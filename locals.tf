@@ -48,4 +48,7 @@ locals {
   _invalid_privatelink_regions = [for ep in var.privatelink_endpoints : ep.region if !contains(local._all_region_keys, ep.region)]
   _invalid_byoe_regions        = [for k, v in var.privatelink_byoe_regions : v if !contains(local._all_region_keys, v)]
   _invalid_encryption_regions  = [for r in var.encryption.private_endpoint_regions : r if !contains(local._all_region_keys, r)]
+
+  # Sorted display string for error messages
+  _supported_regions_display = join(", ", sort([for k, v in local.atlas_region_to_azure : "${k} (${v})"]))
 }

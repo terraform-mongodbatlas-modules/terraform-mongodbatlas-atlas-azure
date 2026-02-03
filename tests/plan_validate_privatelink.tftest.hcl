@@ -153,3 +153,31 @@ run "invalid_both_privatelink_variables" {
   }
   expect_failures = [var.privatelink_endpoints_single_region]
 }
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Region Validation Check Block Tests
+# ─────────────────────────────────────────────────────────────────────────────
+
+run "invalid_privatelink_region_format" {
+  command = plan
+  variables {
+    privatelink_endpoints = [
+      { region = "invalid-region-xyz", subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" }
+    ]
+  }
+  expect_failures = [check.valid_privatelink_regions]
+}
+
+run "invalid_byoe_region_format" {
+  command = plan
+  variables {
+    privatelink_byoe_regions = { pe1 = "not_a_real_region" }
+    privatelink_byoe = {
+      pe1 = {
+        azure_private_endpoint_id         = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/privateEndpoints/pe-atlas"
+        azure_private_endpoint_ip_address = "10.0.1.100"
+      }
+    }
+  }
+  expect_failures = [check.valid_byoe_regions]
+}

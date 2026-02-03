@@ -141,20 +141,29 @@ module "backup_export" {
 check "valid_privatelink_regions" {
   assert {
     condition     = length(local._invalid_privatelink_regions) == 0
-    error_message = "Invalid region(s) in privatelink_endpoints: ${join(", ", local._invalid_privatelink_regions)}. Use Atlas format (US_EAST_2) or Azure format (eastus2)."
+    error_message = <<-EOT
+      Invalid region(s) in privatelink_endpoints: ${join(", ", local._invalid_privatelink_regions)}.
+      Supported values (Atlas format or Azure format): ${local._supported_regions_display}
+    EOT
   }
 }
 
 check "valid_byoe_regions" {
   assert {
     condition     = length(local._invalid_byoe_regions) == 0
-    error_message = "Invalid region(s) in privatelink_byoe_regions: ${join(", ", local._invalid_byoe_regions)}. Use Atlas format (US_EAST_2) or Azure format (eastus2)."
+    error_message = <<-EOT
+      Invalid region(s) in privatelink_byoe_regions: ${join(", ", local._invalid_byoe_regions)}.
+      Supported values (Atlas format or Azure format): ${local._supported_regions_display}
+    EOT
   }
 }
 
 check "valid_encryption_regions" {
   assert {
     condition     = length(local._invalid_encryption_regions) == 0
-    error_message = "Invalid region(s) in encryption.private_endpoint_regions: ${join(", ", local._invalid_encryption_regions)}. Use Atlas format (US_EAST_2) or Azure format (eastus2)."
+    error_message = <<-EOT
+      Invalid region(s) in encryption.private_endpoint_regions: ${join(", ", local._invalid_encryption_regions)}.
+      Supported values (Atlas format or Azure format): ${local._supported_regions_display}
+    EOT
   }
 }
