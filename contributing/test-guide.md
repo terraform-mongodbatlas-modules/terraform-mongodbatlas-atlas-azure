@@ -25,9 +25,6 @@ See [MongoDB Atlas Provider Authentication](https://registry.terraform.io/provid
 ```bash
 # Plan-only tests (no resources created)
 just unit-plan-tests
-
-# All terraform tests (plan + apply)
-just tftest-all
 ```
 
 ## Version Compatibility Testing
@@ -51,27 +48,25 @@ The `dev-vars-azure` command reads from environment variables (see Authenticatio
 just dev-vars-azure
 ```
 
-Optional env vars for pre-existing resources:
+Optional env vars:
+- `MONGODB_ATLAS_PROJECT_ID` - Use same project ID for all examples (plan snapshot tests)
 - `AZURE_RESOURCE_GROUP_NAME` - Use existing resource group
-- `AZURE_SERVICE_PRINCIPAL_ID` - Use existing service principal
+- `AZURE_SERVICE_PRINCIPAL_ID` - Use existing service principal (see note below)
+- `EXISTING_ENCRYPTION_CLIENT_SECRET` - Use existing encryption client secret (skips creation)
 
-### Workspace Commands
+**Service Principal Note**: CI uses a shared service principal for Atlas-Azure integration. Do not delete or recreate it. If you need the client secret value for local testing, retrieve it from your team's secret manager.
+
+### Running Tests
 
 ```bash
-# Plan and compare against baselines
-just ws-run -m plan-snapshot-test -v dev.tfvars
-
-# Create/update baselines after intentional changes
-just ws-run -m plan-snapshot-test -v dev.tfvars --force-regen
-
-# Plan specific examples only
-just ws-run -m plan-only -e backup_export,encryption -v dev.tfvars
+# Run plan snapshot tests (requires full path to var file)
+just plan-snapshot-test --var-file $(pwd)/tests/workspace_azure_examples/dev.tfvars
 
 # Apply examples (creates real resources)
-just ws-run -m apply -v dev.tfvars --auto-approve
+just apply-examples --var-file $(pwd)/tests/workspace_azure_examples/dev.tfvars --auto-approve
 
 # Destroy resources after testing
-just ws-run -m destroy --auto-approve
+just destroy-examples --auto-approve
 ```
 
 ### Snapshot Configuration

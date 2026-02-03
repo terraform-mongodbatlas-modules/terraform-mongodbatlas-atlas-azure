@@ -3,8 +3,11 @@
 
 This directory contains guides for contributors to the terraform-mongodbatlas-atlas-azure module.
 
+Start with the [Development Guide](development-guide.md) to set up your environment.
+
 ## Available Guides
 
+- **[Development Guide](development-guide.md)** - Quick start, development workflow, and release process
 - **[Test Guide](test-guide.md)** - Running tests locally and in CI
 <!-- === DO_NOT_EDIT: path-sync default === -->
 - **[Documentation Guide](documentation-guide.md)** - Working with auto-generated documentation
