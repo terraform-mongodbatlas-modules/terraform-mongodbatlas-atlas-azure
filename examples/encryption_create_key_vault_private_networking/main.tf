@@ -2,7 +2,7 @@ data "azurerm_resource_group" "main" {
   name = var.resource_group_name
 }
 
-# Create client secret for encryption (only if not provided)
+# Create client secret for encryption (only if not provided).
 # NOTE: In v1, this will be replaced with secretless role_id-based authentication
 # once the mongodbatlas provider adds support for Azure encryption without client_secret.
 resource "azuread_service_principal_password" "encryption" {
