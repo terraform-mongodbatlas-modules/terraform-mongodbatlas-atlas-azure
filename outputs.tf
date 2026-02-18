@@ -21,6 +21,7 @@ output "encryption" {
     key_vault_id                = module.encryption[0].key_vault_id
     key_vault_uri               = module.encryption[0].key_vault_uri
     key_identifier              = module.encryption[0].key_identifier
+    enabled_for_search_nodes    = module.encryption[0].enabled_for_search_nodes
     private_endpoints = local.encryption_require_private_networking ? {
       for region, pe in module.encryption_private_endpoint : region => {
         id                               = pe.id

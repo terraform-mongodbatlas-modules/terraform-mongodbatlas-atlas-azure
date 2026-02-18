@@ -27,3 +27,8 @@ output "key_identifier" {
   description = "Key Vault key identifier (full URL including version)"
   value       = local.key_identifier
 }
+
+output "enabled_for_search_nodes" {
+  description = "Whether encryption at rest is enabled for dedicated search nodes"
+  value       = mongodbatlas_encryption_at_rest.this.enabled_for_search_nodes
+}

@@ -3,6 +3,6 @@ azure_key_vault_config:
 - azure_environment: AZURE
   enabled: true
   require_private_networking: false
-enabled_for_search_nodes: false
+enabled_for_search_nodes: true
 google_cloud_kms_config: []
 project_id: <project_id>

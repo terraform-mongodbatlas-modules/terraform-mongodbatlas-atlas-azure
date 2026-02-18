@@ -87,7 +87,8 @@ resource "azurerm_role_assignment" "key_vault_reader" {
 # ─────────────────────────────────────────────────────────────────────────────
 
 resource "mongodbatlas_encryption_at_rest" "this" {
-  project_id = var.project_id
+  project_id               = var.project_id
+  enabled_for_search_nodes = var.enabled_for_search_nodes
 
   azure_key_vault_config {
     enabled                    = true

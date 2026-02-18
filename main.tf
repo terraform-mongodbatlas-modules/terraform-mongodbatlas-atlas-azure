@@ -56,6 +56,7 @@ module "encryption" {
 
   client_secret              = var.encryption_client_secret
   require_private_networking = local.encryption_require_private_networking
+  enabled_for_search_nodes   = var.encryption.enabled_for_search_nodes
 
   depends_on = [mongodbatlas_cloud_provider_access_authorization.this]
 }

@@ -55,6 +55,7 @@ variable "encryption" {
         notify_before_expiry = optional(string, "P30D")
       }), {})
     }))
+    enabled_for_search_nodes = optional(bool, true)
     private_endpoint_regions = optional(set(string), [])
   })
   default     = {}
@@ -64,6 +65,9 @@ variable "encryption" {
 
     - `key_vault_id` + `key_identifier` (for user-provided Key Vault)
     - `create_key_vault.enabled` = true (for module-managed Key Vault)
+
+    **Search Node Encryption:**
+    `enabled_for_search_nodes` (default: `true`) controls whether BYOK encryption applies to dedicated search nodes. The module defaults to `true` (provider default is `false`) for a secure-by-default experience. Flipping from `false` to `true` on a deployment with dedicated search nodes triggers reprovisioning and index rebuild.
 
     **NOTE:** `private_endpoint_regions` accepts both Atlas format (e.g., `US_EAST_2`) and Azure format (e.g., `eastus2`).
   EOT

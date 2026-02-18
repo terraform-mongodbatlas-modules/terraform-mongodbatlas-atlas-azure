@@ -55,3 +55,9 @@ variable "tags" {
   default     = {}
   description = "Tags to apply to Azure resources."
 }
+
+variable "enabled_for_search_nodes" {
+  type        = bool
+  default     = true
+  description = "Whether BYOK encryption at rest applies to dedicated search nodes. Module defaults to true (provider default is false) for secure-by-default."
+}

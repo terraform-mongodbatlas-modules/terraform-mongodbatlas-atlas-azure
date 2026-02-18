@@ -182,6 +182,45 @@ run "encryption_user_provided_key_vault" {
   }
 }
 
+run "encryption_enabled_for_search_nodes_default_true" {
+  command = plan
+
+  variables {
+    project_id               = var.project_id
+    encryption_client_secret = "test-secret-value"
+    encryption = {
+      enabled        = true
+      key_vault_id   = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.KeyVault/vaults/kv"
+      key_identifier = "https://kv.vault.azure.net/keys/my-key"
+    }
+  }
+
+  assert {
+    condition     = output.encryption.enabled_for_search_nodes == true
+    error_message = "Expected enabled_for_search_nodes to default to true"
+  }
+}
+
+run "encryption_enabled_for_search_nodes_explicit_false" {
+  command = plan
+
+  variables {
+    project_id               = var.project_id
+    encryption_client_secret = "test-secret-value"
+    encryption = {
+      enabled                  = true
+      key_vault_id             = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.KeyVault/vaults/kv"
+      key_identifier           = "https://kv.vault.azure.net/keys/my-key"
+      enabled_for_search_nodes = false
+    }
+  }
+
+  assert {
+    condition     = output.encryption.enabled_for_search_nodes == false
+    error_message = "Expected enabled_for_search_nodes to be false when explicitly set"
+  }
+}
+
 run "encryption_module_managed_key_vault" {
   command = plan
 
