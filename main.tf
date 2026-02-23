@@ -146,6 +146,10 @@ resource "terraform_data" "region_validations" {
       error_message = "Invalid region(s) in privatelink_endpoints: [${join(", ", local._invalid_privatelink_regions)}]. Supported values (Atlas or Azure format): ${local._supported_regions_display}"
     }
     precondition {
+      condition     = length(local._invalid_single_region_regions) == 0
+      error_message = "Invalid region(s) in privatelink_endpoints_single_region: [${join(", ", local._invalid_single_region_regions)}]. Supported values (Atlas or Azure format): ${local._supported_regions_display}"
+    }
+    precondition {
       condition     = length(local._invalid_byoe_regions) == 0
       error_message = "Invalid region(s) in privatelink_byoe_regions: [${join(", ", local._invalid_byoe_regions)}]. Supported values (Atlas or Azure format): ${local._supported_regions_display}"
     }

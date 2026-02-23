@@ -193,6 +193,23 @@ run "region_unknown_privatelink_rejected" {
   expect_failures = [terraform_data.region_validations]
 }
 
+run "region_unknown_single_region_rejected" {
+  command = plan
+
+  module {
+    source = "./"
+  }
+
+  variables {
+    project_id = var.project_id
+    privatelink_endpoints_single_region = [
+      { region = "invalid-region", subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" }
+    ]
+  }
+
+  expect_failures = [terraform_data.region_validations]
+}
+
 run "region_unknown_byoe_rejected" {
   command = plan
 
@@ -267,4 +284,52 @@ run "region_azure_format_accepted" {
     condition     = length(mongodbatlas_privatelink_endpoint.this) == 1
     error_message = "Expected one privatelink endpoint with Azure format region"
   }
+}
+
+run "region_custom_mapping_override" {
+  command = plan
+
+  module {
+    source = "./"
+  }
+
+  variables {
+    project_id = var.project_id
+    atlas_to_azure_region = {
+      US_EAST_2 = "eastus2"
+    }
+    privatelink_endpoints = [
+      { region = "eastus2", subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" }
+    ]
+  }
+
+  assert {
+    condition     = length(mongodbatlas_privatelink_endpoint.this) == 1
+    error_message = "Expected one privatelink endpoint with custom mapping"
+  }
+
+  assert {
+    condition     = mongodbatlas_privatelink_endpoint.this["eastus2"].region == "eastus2"
+    error_message = "Expected privatelink endpoint region to be the normalized Azure location from custom mapping"
+  }
+}
+
+run "region_custom_mapping_rejects_unmapped" {
+  command = plan
+
+  module {
+    source = "./"
+  }
+
+  variables {
+    project_id = var.project_id
+    atlas_to_azure_region = {
+      US_EAST_2 = "eastus2"
+    }
+    privatelink_endpoints = [
+      { region = "westus2", subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" }
+    ]
+  }
+
+  expect_failures = [terraform_data.region_validations]
 }
