@@ -165,7 +165,7 @@ run "invalid_privatelink_region_format" {
       { region = "invalid-region-xyz", subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" }
     ]
   }
-  expect_failures = [check.valid_privatelink_regions]
+  expect_failures = [terraform_data.region_validations]
 }
 
 run "invalid_byoe_region_format" {
@@ -179,5 +179,5 @@ run "invalid_byoe_region_format" {
       }
     }
   }
-  expect_failures = [check.valid_byoe_regions]
+  expect_failures = [terraform_data.region_validations]
 }

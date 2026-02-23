@@ -324,7 +324,7 @@ run "invalid_encryption_region_format" {
     }
   }
 
-  expect_failures = [check.valid_encryption_regions]
+  expect_failures = [terraform_data.region_validations]
 }
 
 run "invalid_encryption_multiple_bad_regions" {
@@ -345,5 +345,5 @@ run "invalid_encryption_multiple_bad_regions" {
     }
   }
 
-  expect_failures = [check.valid_encryption_regions]
+  expect_failures = [terraform_data.region_validations]
 }
