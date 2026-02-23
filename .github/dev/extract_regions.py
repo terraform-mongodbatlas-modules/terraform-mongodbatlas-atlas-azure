@@ -496,11 +496,9 @@ def generate_terraform_variable(
             lines.append(f'    # {atlas_region} = "{provider_region}"  # Not found in provider')
 
     lines.append("  }")
-    display_name = _provider_display_name(provider)
+    p = provider.upper()
     lines.append("  description = <<-EOT")
-    lines.append(
-        f"    Atlas to {display_name} region mapping. Keys = Atlas format, values = {display_name} format."  # noqa: E501
-    )
+    lines.append(f"    Atlas to {p} region mapping. Keys = Atlas format, values = {p} format.")
     lines.append(
         "    The module accepts either format in all region inputs and normalizes internally."
     )
@@ -515,13 +513,6 @@ def generate_terraform_variable(
 
     _run_terraform_fmt(output_file)
     return output_file
-
-
-_PROVIDER_DISPLAY_NAMES = {"AWS": "AWS", "AZURE": "Azure", "GCP": "GCP"}
-
-
-def _provider_display_name(provider: str) -> str:
-    return _PROVIDER_DISPLAY_NAMES.get(provider.upper(), provider)
 
 
 def _run_terraform_fmt(file_path: Path) -> None:
