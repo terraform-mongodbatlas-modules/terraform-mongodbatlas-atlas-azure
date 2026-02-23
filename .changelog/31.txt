@@ -1,0 +1,7 @@
+```release-note:enhancement
+variable/atlas_to_azure_region: Exposes region mapping as an overridable variable instead of hardcoded locals, allowing users to restrict or customize allowed regions
+```
+
+```release-note:breaking-change
+module: Replaces check blocks (plan-time warnings) with terraform_data preconditions (plan-time errors) for region validation. Configurations with invalid regions that previously produced warnings will now fail during plan
+```
