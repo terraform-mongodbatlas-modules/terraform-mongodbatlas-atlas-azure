@@ -162,25 +162,25 @@ Run 'just docs' to regenerate.
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9)
+- <a name="requirement_terraform"></a> [terraform](https://developer.hashicorp.com/terraform/install) (>= 1.9)
 
-- <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) (>= 2.53)
+- <a name="requirement_azuread"></a> [azuread](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs) (>= 2.53)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.0)
+- <a name="requirement_azurerm"></a> [azurerm](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs) (>= 3.0)
 
-- <a name="requirement_mongodbatlas"></a> [mongodbatlas](#requirement\_mongodbatlas) (>= 2.0)
+- <a name="requirement_mongodbatlas"></a> [mongodbatlas](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs) (>= 2.0)
 
 ## Providers
 
 The following providers are used by this module:
 
-- <a name="provider_azuread"></a> [azuread](#provider\_azuread) (>= 2.53)
+- <a name="provider_azuread"></a> [azuread](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs) (>= 2.53)
 
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (>= 3.0)
+- <a name="provider_azurerm"></a> [azurerm](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs) (>= 3.0)
 
-- <a name="provider_mongodbatlas"></a> [mongodbatlas](#provider\_mongodbatlas) (>= 2.0)
+- <a name="provider_mongodbatlas"></a> [mongodbatlas](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs) (>= 2.0)
 
-- <a name="provider_terraform"></a> [terraform](#provider\_terraform)
+- <a name="provider_terraform"></a> [terraform](https://developer.hashicorp.com/terraform/language/resources/terraform-data)
 
 ## Resources
 
@@ -191,7 +191,7 @@ The following resources are used by this module:
 - [mongodbatlas_cloud_provider_access_setup.this](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/cloud_provider_access_setup) (resource)
 - [mongodbatlas_private_endpoint_regional_mode.this](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/private_endpoint_regional_mode) (resource)
 - [mongodbatlas_privatelink_endpoint.this](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/privatelink_endpoint) (resource)
-- [terraform_data.region_validations](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) (resource)
+- [terraform_data.region_validations](https://developer.hashicorp.com/terraform/language/resources/terraform-data) (resource)
 - [azuread_service_principal.existing](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/service_principal) (data source)
 - [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 
