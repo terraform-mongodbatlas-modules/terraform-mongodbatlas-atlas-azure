@@ -59,7 +59,7 @@ variable "atlas_to_azure_region" {
     US_WEST_CENTRAL      = "westcentralus"
   }
   description = <<-EOT
-    Atlas to AZURE region mapping. Keys = Atlas format, values = AZURE format.
+    Atlas to Azure region mapping. Keys = Atlas format, values = Azure format.
     The module accepts either format in all region inputs and normalizes internally.
     Override to restrict allowed regions or add custom mappings.
   EOT
