@@ -20,6 +20,10 @@ locals {
   # Encryption: derive require_private_networking from private_endpoint_regions presence
   encryption_require_private_networking = length(var.encryption.private_endpoint_regions) > 0
 
+  # Region maps derived from variable (allows user override)
+  atlas_region_to_azure = var.atlas_to_azure_region
+  azure_region_to_atlas = { for k, v in var.atlas_to_azure_region : v => k }
+
   # Region normalization helpers - accepts both Atlas (US_EAST_2) and Azure (eastus2) formats
   _all_region_keys    = setunion(keys(local.atlas_region_to_azure), keys(local.azure_region_to_atlas))
   _normalize_to_atlas = { for r in local._all_region_keys : r => try(local.azure_region_to_atlas[r], r) }
@@ -44,7 +48,7 @@ locals {
   # Enable regional mode only for multi-region pattern
   enable_regional_mode = length(local.privatelink_azure_locations) > 1
 
-  # Invalid region inputs (for check blocks)
+  # Invalid region inputs (for precondition validation)
   _invalid_privatelink_regions = [for ep in var.privatelink_endpoints : ep.region if !contains(local._all_region_keys, ep.region)]
   _invalid_byoe_regions        = [for k, v in var.privatelink_byoe_regions : v if !contains(local._all_region_keys, v)]
   _invalid_encryption_regions  = [for r in var.encryption.private_endpoint_regions : r if !contains(local._all_region_keys, r)]

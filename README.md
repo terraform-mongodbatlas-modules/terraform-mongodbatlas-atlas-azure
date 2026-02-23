@@ -180,6 +180,8 @@ The following providers are used by this module:
 
 - <a name="provider_mongodbatlas"></a> [mongodbatlas](#provider\_mongodbatlas) (>= 2.0)
 
+- <a name="provider_terraform"></a> [terraform](#provider\_terraform)
+
 ## Resources
 
 The following resources are used by this module:
@@ -189,6 +191,7 @@ The following resources are used by this module:
 - [mongodbatlas_cloud_provider_access_setup.this](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/cloud_provider_access_setup) (resource)
 - [mongodbatlas_private_endpoint_regional_mode.this](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/private_endpoint_regional_mode) (resource)
 - [mongodbatlas_privatelink_endpoint.this](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/privatelink_endpoint) (resource)
+- [terraform_data.region_validations](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) (resource)
 - [azuread_service_principal.existing](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/service_principal) (data source)
 - [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 
@@ -364,6 +367,76 @@ Default: `{}`
 
 
 ## Optional Variables
+
+### atlas_to_azure_region
+
+Atlas to AZURE region mapping. Keys = Atlas format, values = AZURE format.
+The module accepts either format in all region inputs and normalizes internally.
+Override to restrict allowed regions or add custom mappings.
+
+Type: `map(string)`
+
+Default:
+
+```json
+{
+  "ASIA_EAST": "eastasia",
+  "ASIA_SOUTH_EAST": "southeastasia",
+  "AUSTRALIA_CENTRAL": "australiacentral",
+  "AUSTRALIA_CENTRAL_2": "australiacentral2",
+  "AUSTRALIA_EAST": "australiaeast",
+  "AUSTRALIA_SOUTH_EAST": "australiasoutheast",
+  "BRAZIL_SOUTH": "brazilsouth",
+  "BRAZIL_SOUTHEAST": "brazilsoutheast",
+  "CANADA_CENTRAL": "canadacentral",
+  "CANADA_EAST": "canadaeast",
+  "CHILE_CENTRAL": "chilecentral",
+  "EUROPE_NORTH": "northeurope",
+  "EUROPE_WEST": "westeurope",
+  "FRANCE_CENTRAL": "francecentral",
+  "FRANCE_SOUTH": "francesouth",
+  "GERMANY_NORTH": "germanynorth",
+  "GERMANY_WEST_CENTRAL": "germanywestcentral",
+  "INDIA_CENTRAL": "centralindia",
+  "INDIA_SOUTH": "southindia",
+  "INDIA_WEST": "westindia",
+  "INDONESIA_CENTRAL": "indonesiacentral",
+  "ISRAEL_CENTRAL": "israelcentral",
+  "ITALY_NORTH": "italynorth",
+  "JAPAN_EAST": "japaneast",
+  "JAPAN_WEST": "japanwest",
+  "KOREA_CENTRAL": "koreacentral",
+  "KOREA_SOUTH": "koreasouth",
+  "MALAYSIA_WEST": "malaysiawest",
+  "MEXICO_CENTRAL": "mexicocentral",
+  "NEW_ZEALAND_NORTH": "newzealandnorth",
+  "NORWAY_EAST": "norwayeast",
+  "NORWAY_WEST": "norwaywest",
+  "POLAND_CENTRAL": "polandcentral",
+  "QATAR_CENTRAL": "qatarcentral",
+  "SOUTH_AFRICA_NORTH": "southafricanorth",
+  "SOUTH_AFRICA_WEST": "southafricawest",
+  "SPAIN_CENTRAL": "spaincentral",
+  "SWEDEN_CENTRAL": "swedencentral",
+  "SWEDEN_SOUTH": "swedensouth",
+  "SWITZERLAND_NORTH": "switzerlandnorth",
+  "SWITZERLAND_WEST": "switzerlandwest",
+  "UAE_CENTRAL": "uaecentral",
+  "UAE_NORTH": "uaenorth",
+  "UK_SOUTH": "uksouth",
+  "UK_WEST": "ukwest",
+  "US_CENTRAL": "centralus",
+  "US_EAST": "eastus",
+  "US_EAST_2": "eastus2",
+  "US_EAST_2_EUAP": "eastus2euap",
+  "US_NORTH_CENTRAL": "northcentralus",
+  "US_SOUTH_CENTRAL": "southcentralus",
+  "US_WEST": "westus",
+  "US_WEST_2": "westus2",
+  "US_WEST_3": "westus3",
+  "US_WEST_CENTRAL": "westcentralus"
+}
+```
 
 ### azure_tags
 

@@ -253,5 +253,8 @@ sdlc-validate:
 # === OK_EDIT: path-sync sdlc-validate ===
 # Module-specific recipes below (not synced)
 
+validate-regions-azure:
+    just validate-regions azure --output-format variable
+
 dev-vars-azure:
     {{py}} dev.dev_vars azure
