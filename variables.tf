@@ -288,7 +288,27 @@ variable "log_integration" {
     tags = optional(map(string), {})
   })
   default     = {}
-  description = "Log integration for exporting Atlas logs to Azure Blob Storage via AZURE_LOG_EXPORT. Provide EITHER `storage_account_id` (user-provided) OR `create_storage_account.enabled = true` (module-managed). Each `integrations` entry creates one `mongodbatlas_log_integration` resource."
+  description = <<-EOT
+    Log integration for exporting Atlas logs to Azure Blob Storage (`AZURE_LOG_EXPORT`).
+    Log exports run at 1-minute intervals.
+
+    **Storage Strategy (same pattern as `backup_export`):**
+    - `storage_account_id` — user-provided Storage Account, default for all integrations
+    - `create_storage_account.enabled = true` — module-managed Storage Account with secure defaults (TLS 1.2, public access blocked)
+    - Per-integration `storage_account_name` + `container_name` override for BYO storage (e.g., audit logs to a separate account)
+
+    **Integrations:**
+    Each entry in `integrations` creates one `mongodbatlas_log_integration` resource.
+    `prefix_path` is required by the Atlas API; use it to isolate log types within a shared container.
+    Valid `log_types`: MONGOD, MONGOS, MONGOD_AUDIT, MONGOS_AUDIT (not validated by the module — Atlas API is authoritative).
+
+    **Lifecycle Management:**
+    `create_storage_account.expiration_days` (default 90, 0 to disable) adds an `azurerm_storage_management_policy` that auto-deletes blobs after the specified number of days.
+
+    **Index Stability:**
+    Removing an integration from the middle of the list causes subsequent entries to be destroyed and recreated (index shift).
+    This is acceptable: log integrations are stateless config, the brief delivery gap (~1 min) causes no data loss.
+  EOT
 
   validation {
     condition     = !var.log_integration.enabled || length(var.log_integration.integrations) > 0

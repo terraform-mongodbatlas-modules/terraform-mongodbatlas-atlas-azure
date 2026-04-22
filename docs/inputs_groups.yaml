@@ -47,6 +47,17 @@ sections:
       names:
         - backup_export
 
+  - id: log_integration
+    title: "Log Integration"
+    level: 2
+    description: |
+      Log integration exports Atlas operational and audit logs to Azure Blob Storage at 1-minute intervals, feeding existing security monitoring and observability pipelines without polling the Atlas API. The module supports BYO storage account (`storage_account_id`) or module-managed storage account (`create_storage_account.enabled = true`), with optional per-integration storage account overrides.
+
+      See the [log export documentation](https://www.mongodb.com/docs/atlas/export-logs-azure/) for details.
+    match:
+      names:
+        - log_integration
+
   - id: optional
     title: "Optional Variables"
     level: 2
