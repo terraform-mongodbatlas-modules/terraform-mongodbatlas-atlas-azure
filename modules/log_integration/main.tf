@@ -1,10 +1,15 @@
 locals {
-  create_storage_account    = var.create_storage_account != null && var.create_storage_account.enabled
-  storage_account_id        = local.create_storage_account ? azurerm_storage_account.atlas[0].id : var.storage_account_id
-  storage_account_name      = local.create_storage_account ? azurerm_storage_account.atlas[0].name : element(split("/", var.storage_account_id), 8)
-  create_container          = local.create_storage_account || var.create_container
-  expiration_days           = local.create_storage_account ? var.create_storage_account.expiration_days : 0
-  byo_storage_account_names = distinct(compact([for i in var.integrations : i.storage_account_name]))
+  create_storage_account = var.create_storage_account != null && var.create_storage_account.enabled
+  storage_account_id     = local.create_storage_account ? azurerm_storage_account.atlas[0].id : var.storage_account_id
+  storage_account_name   = local.create_storage_account ? azurerm_storage_account.atlas[0].name : element(split("/", var.storage_account_id), 8)
+  create_container       = local.create_storage_account || var.create_container
+  expiration_days        = local.create_storage_account ? var.create_storage_account.expiration_days : 0
+  root_resource_group    = var.storage_account_id != null ? element(split("/", var.storage_account_id), 4) : null
+
+  byo_integration_accounts = {
+    for i in var.integrations : i.storage_account_name => coalesce(i.resource_group_name, local.root_resource_group)
+    if i.storage_account_name != null
+  }
 }
 
 data "azurerm_storage_account" "existing" {
@@ -66,7 +71,7 @@ resource "azurerm_role_assignment" "log_export" {
 }
 
 resource "azurerm_role_assignment" "integration_byo" {
-  for_each = !var.skip_role_assignments ? toset(local.byo_storage_account_names) : toset([])
+  for_each = !var.skip_role_assignments ? local.byo_integration_accounts : {}
 
   principal_id         = var.service_principal_id
   role_definition_name = "Storage Blob Data Contributor"
@@ -74,10 +79,10 @@ resource "azurerm_role_assignment" "integration_byo" {
 }
 
 data "azurerm_storage_account" "integration_byo" {
-  for_each = toset(local.byo_storage_account_names)
+  for_each = !var.skip_role_assignments ? local.byo_integration_accounts : {}
 
   name                = each.key
-  resource_group_name = element(split("/", var.storage_account_id), 4)
+  resource_group_name = each.value
 }
 
 resource "mongodbatlas_log_integration" "this" {

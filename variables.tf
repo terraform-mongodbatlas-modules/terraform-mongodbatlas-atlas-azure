@@ -270,6 +270,7 @@ variable "log_integration" {
       prefix_path          = string
       storage_account_name = optional(string)
       container_name       = optional(string)
+      resource_group_name  = optional(string)
     })), [])
     storage_account_id = optional(string)
     container_name     = optional(string)

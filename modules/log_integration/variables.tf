@@ -57,8 +57,9 @@ variable "integrations" {
     prefix_path          = string
     storage_account_name = optional(string)
     container_name       = optional(string)
+    resource_group_name  = optional(string)
   }))
-  description = "List of log integration configurations. Each entry creates one mongodbatlas_log_integration resource."
+  description = "List of log integration configurations. Each entry creates one mongodbatlas_log_integration resource. Per-integration BYO: set storage_account_name and optionally resource_group_name (defaults to resource group inferred from storage_account_id)."
 }
 
 variable "tags" {
