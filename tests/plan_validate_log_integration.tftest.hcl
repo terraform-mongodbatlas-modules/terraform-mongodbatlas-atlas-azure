@@ -113,6 +113,30 @@ run "log_integration_invalid_storage_account_id_format" {
   ]
 }
 
+run "log_integration_create_container_false_without_storage_account_id" {
+  command = plan
+
+  variables {
+    project_id = var.project_id
+    log_integration = {
+      enabled          = true
+      container_name   = "atlas-logs"
+      create_container = false
+      create_storage_account = {
+        enabled             = true
+        name                = "teststorage"
+        resource_group_name = "rg"
+        azure_location      = "eastus2"
+      }
+      integrations = [{ log_types = ["MONGOD"], prefix_path = "mongod/" }]
+    }
+  }
+
+  expect_failures = [
+    var.log_integration
+  ]
+}
+
 run "log_integration_invalid_azure_location_format" {
   command = plan
 
@@ -218,6 +242,53 @@ run "log_integration_multiple_integrations" {
       integrations = [
         { log_types = ["MONGOD"], prefix_path = "mongod/" },
         { log_types = ["MONGOD_AUDIT"], prefix_path = "audit/" },
+      ]
+    }
+  }
+
+  assert {
+    condition     = length(module.log_integration) == 1
+    error_message = "Expected log_integration module to be created"
+  }
+}
+
+run "log_integration_user_provided_storage_no_container_create" {
+  command = plan
+
+  variables {
+    project_id = var.project_id
+    log_integration = {
+      enabled            = true
+      container_name     = "atlas-logs"
+      storage_account_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.Storage/storageAccounts/existingstorage"
+      create_container   = false
+      integrations       = [{ log_types = ["MONGOD"], prefix_path = "mongod/" }]
+    }
+  }
+
+  assert {
+    condition     = length(module.log_integration) == 1
+    error_message = "Expected log_integration module to be created"
+  }
+}
+
+run "log_integration_per_integration_byo_storage" {
+  command = plan
+
+  variables {
+    project_id = var.project_id
+    log_integration = {
+      enabled        = true
+      container_name = "atlas-logs"
+      create_storage_account = {
+        enabled             = true
+        name                = "atlaslogsstorage"
+        resource_group_name = "rg"
+        azure_location      = "eastus2"
+      }
+      integrations = [
+        { log_types = ["MONGOD"], prefix_path = "mongod/" },
+        { log_types = ["MONGOD_AUDIT"], prefix_path = "audit/", storage_account_name = "auditstorage", container_name = "audit-logs", resource_group_name = "rg" },
       ]
     }
   }

@@ -331,6 +331,11 @@ variable "log_integration" {
   }
 
   validation {
+    condition     = var.log_integration.create_container != false || var.log_integration.storage_account_id != null
+    error_message = "create_container=false only valid with storage_account_id (user-provided storage)."
+  }
+
+  validation {
     condition = var.log_integration.storage_account_id == null || can(regex(
       "^/subscriptions/[0-9a-f-]+/resourceGroups/[^/]+/providers/Microsoft\\.Storage/storageAccounts/[a-z0-9]+$",
       var.log_integration.storage_account_id
