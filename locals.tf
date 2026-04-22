@@ -4,6 +4,7 @@ locals {
   skip_cloud_provider_access = (
     !var.encryption.enabled &&
     !var.backup_export.enabled &&
+    !var.log_integration.enabled &&
     local.privatelink_configured
   )
 

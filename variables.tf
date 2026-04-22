@@ -261,3 +261,67 @@ variable "backup_export" {
     error_message = "create_storage_account.azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
   }
 }
+
+variable "log_integration" {
+  type = object({
+    enabled = optional(bool, false)
+    integrations = optional(list(object({
+      log_types            = list(string)
+      prefix_path          = string
+      storage_account_name = optional(string)
+      container_name       = optional(string)
+    })), [])
+    storage_account_id = optional(string)
+    container_name     = optional(string)
+    create_container   = optional(bool, true)
+    create_storage_account = optional(object({
+      enabled             = bool
+      name                = string
+      resource_group_name = string
+      azure_location      = string
+      replication_type    = optional(string, "LRS")
+      account_tier        = optional(string, "Standard")
+      min_tls_version     = optional(string, "TLS1_2")
+      expiration_days     = optional(number, 90)
+    }))
+    tags = optional(map(string), {})
+  })
+  default     = {}
+  description = "Log integration for exporting Atlas logs to Azure Blob Storage via AZURE_LOG_EXPORT. Provide EITHER `storage_account_id` (user-provided) OR `create_storage_account.enabled = true` (module-managed). Each `integrations` entry creates one `mongodbatlas_log_integration` resource."
+
+  validation {
+    condition     = !var.log_integration.enabled || length(var.log_integration.integrations) > 0
+    error_message = "log_integration.enabled = true requires at least one entry in integrations."
+  }
+
+  validation {
+    condition     = !var.log_integration.enabled || (var.log_integration.storage_account_id != null || try(var.log_integration.create_storage_account.enabled, false))
+    error_message = "log_integration.enabled = true requires storage_account_id OR create_storage_account.enabled = true."
+  }
+
+  validation {
+    condition     = !(var.log_integration.storage_account_id != null && try(var.log_integration.create_storage_account.enabled, false))
+    error_message = "Cannot use both storage_account_id (user-provided) and create_storage_account.enabled = true (module-managed)."
+  }
+
+  validation {
+    condition     = !var.log_integration.enabled || var.log_integration.container_name != null
+    error_message = "log_integration.enabled = true requires container_name."
+  }
+
+  validation {
+    condition = var.log_integration.storage_account_id == null || can(regex(
+      "^/subscriptions/[0-9a-f-]+/resourceGroups/[^/]+/providers/Microsoft\\.Storage/storageAccounts/[a-z0-9]+$",
+      var.log_integration.storage_account_id
+    ))
+    error_message = "storage_account_id must be a valid Azure Storage Account resource ID."
+  }
+
+  validation {
+    condition = var.log_integration.create_storage_account == null || can(regex(
+      "^[a-z][a-z0-9]+$",
+      var.log_integration.create_storage_account.azure_location
+    ))
+    error_message = "create_storage_account.azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
+  }
+}

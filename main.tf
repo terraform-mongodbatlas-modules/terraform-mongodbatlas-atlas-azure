@@ -136,6 +136,29 @@ module "backup_export" {
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Log Integration (AZURE_LOG_EXPORT)
+# ─────────────────────────────────────────────────────────────────────────────
+
+module "log_integration" {
+  count  = var.log_integration.enabled ? 1 : 0
+  source = "./modules/log_integration"
+
+  project_id            = var.project_id
+  role_id               = mongodbatlas_cloud_provider_access_authorization.this[0].role_id
+  service_principal_id  = local.service_principal_id
+  skip_role_assignments = false
+  tags                  = merge(var.azure_tags, var.log_integration.tags)
+
+  container_name         = var.log_integration.container_name
+  storage_account_id     = var.log_integration.storage_account_id
+  create_container       = var.log_integration.create_container
+  create_storage_account = var.log_integration.create_storage_account
+  integrations           = var.log_integration.integrations
+
+  depends_on = [mongodbatlas_cloud_provider_access_authorization.this]
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Region Validations (format-aware, post-normalization)
 # ─────────────────────────────────────────────────────────────────────────────
 
