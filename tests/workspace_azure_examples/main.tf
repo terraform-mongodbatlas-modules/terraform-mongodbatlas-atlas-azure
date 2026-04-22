@@ -65,6 +65,8 @@ variable "project_ids" {
   type = object({
     backup_export            = optional(string)
     encryption               = optional(string)
+    log_integration          = optional(string)
+    log_integration_byo      = optional(string)
     privatelink              = optional(string)
     privatelink_byoe         = optional(string)
     privatelink_multi_region = optional(string)
@@ -161,6 +163,10 @@ locals {
   # tflint-ignore: terraform_unused_declarations
   project_id_backup_export = local.project_ids.backup_export
   # tflint-ignore: terraform_unused_declarations
+  project_id_log_integration = local.project_ids.log_integration
+  # tflint-ignore: terraform_unused_declarations
+  project_id_log_integration_byo = local.project_ids.log_integration_byo
+  # tflint-ignore: terraform_unused_declarations
   project_id_encryption = local.project_ids.encryption
   # tflint-ignore: terraform_unused_declarations
   project_id_privatelink = local.project_ids.privatelink
@@ -172,9 +178,13 @@ locals {
   # Encryption locals
   # tflint-ignore: terraform_unused_declarations
   key_vault_name = "kv-atlas-${random_string.suffix.id}"
-  # Backup export locals
+  # tflint-ignore: terraform_unused_declarations
+  azure_location = var.azure_location
+  # Backup/log export locals
   # tflint-ignore: terraform_unused_declarations
   storage_account_name = var.storage_account_name != "" ? var.storage_account_name : "saatlas${random_string.suffix.id}"
+  # tflint-ignore: terraform_unused_declarations
+  storage_account_name_byo_log = "sabyolog${random_string.suffix.id}"
   # tflint-ignore: terraform_unused_declarations
   existing_encryption_client_secret = {
     enabled = var.existing_encryption_client_secret.enabled
