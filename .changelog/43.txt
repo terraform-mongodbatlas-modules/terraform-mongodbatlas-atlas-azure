@@ -11,5 +11,5 @@ variable/privatelink_byo_service: Renames `privatelink_byoe` to `privatelink_byo
 ```
 
 ```release-note:breaking-change
-output/encryption.private_endpoints: `module.encryption_private_endpoint` and `encryption` output map keys use normalized Azure location strings`
+output/encryption.private_endpoints: `module.encryption_private_endpoint` and `encryption` output map keys use normalized Azure location strings
 ```
