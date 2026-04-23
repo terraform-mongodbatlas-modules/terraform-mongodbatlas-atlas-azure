@@ -130,7 +130,8 @@ resource "random_string" "suffix" {
 }
 
 locals {
-  resource_group_name  = var.resource_group_name != "" ? var.resource_group_name : module.rg[0].name
+  resource_group_name = var.resource_group_name != "" ? var.resource_group_name : module.rg[0].name
+  # tflint-ignore: terraform_unused_declarations
   service_principal_id = var.service_principal_id != "" ? var.service_principal_id : module.sp[0].service_principal_id
   # tflint-ignore: terraform_unused_declarations
   atlas_azure_app_id = var.atlas_azure_app_id
