@@ -72,19 +72,6 @@ variable "project_ids" {
   default = {}
 }
 
-variable "existing_encryption_client_secret" {
-  type = object({
-    enabled = bool
-    value   = string
-  })
-  sensitive   = true
-  description = "Existing client secret for encryption. If not provided, example creates one automatically."
-  default = {
-    enabled = false
-    value   = null
-  }
-}
-
 # Shared resource group
 module "rg" {
   count    = var.resource_group_name == "" ? 1 : 0
