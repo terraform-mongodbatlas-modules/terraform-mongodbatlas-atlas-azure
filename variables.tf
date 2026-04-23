@@ -261,3 +261,33 @@ variable "backup_export" {
     error_message = "create_storage_account.azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
   }
 }
+
+variable "timeouts" {
+  type = object({
+    create = optional(string, "30m")
+    update = optional(string, "30m")
+    delete = optional(string, "30m")
+  })
+  default     = {}
+  nullable    = true
+  description = <<-EOT
+    Timeouts for resources that the Terraform provider exposes with a `timeouts` block or attribute. Timeout values use [Go duration](https://pkg.go.dev/time#ParseDuration) format (for example, "30m", "1h").
+
+    Set `timeouts = null` to omit all module-managed timeouts and use each provider's defaults. This avoids plan diffs when upgrading from earlier module versions or right after `terraform import`.
+
+    - `timeouts = {}` or unset: 30m for create, update, and delete.
+    - `timeouts = null`: no module-managed timeouts.
+    - `timeouts = { create = "1h" }`: custom create timeout; 30m for other operations unless you set them.
+
+    `mongodbatlas_cloud_provider_access_authorization`, `mongodbatlas_encryption_at_rest`, and `mongodbatlas_cloud_backup_snapshot_export_bucket` have no `timeouts` in the current mongodbatlas provider schema, so the module does not set timeouts for those resources.
+  EOT
+
+  validation {
+    condition = (
+      var.timeouts == null
+      ? true
+      : alltrue([for s in [var.timeouts.create, var.timeouts.update, var.timeouts.delete] : length(trimspace(s)) > 0])
+    )
+    error_message = "When timeouts is not null, create, update, and delete must be non-empty duration strings (Go duration format, for example 30m or 1h30m)."
+  }
+}

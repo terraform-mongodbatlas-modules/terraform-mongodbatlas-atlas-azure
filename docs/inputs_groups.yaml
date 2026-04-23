@@ -47,6 +47,15 @@ sections:
       names:
         - backup_export
 
+  - id: timeouts
+    title: "Timeouts"
+    level: 2
+    description: |
+      Control Terraform operation timeouts for supported resources. For upgrades from v0.2.x, see [v0.3.0 upgrade guide](docs/v0.3.0-upgrade-guide.md).
+    match:
+      names:
+        - timeouts
+
   - id: optional
     title: "Optional Variables"
     level: 2

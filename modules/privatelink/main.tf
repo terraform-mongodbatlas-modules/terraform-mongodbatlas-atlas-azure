@@ -19,6 +19,15 @@ resource "mongodbatlas_privatelink_endpoint" "this" {
   project_id    = var.project_id
   provider_name = "AZURE"
   region        = var.azure_location
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+      update = var.timeouts.update
+    }
+  }
 }
 
 resource "azurerm_private_endpoint" "atlas" {
@@ -35,6 +44,15 @@ resource "azurerm_private_endpoint" "atlas" {
     private_connection_resource_id = local.private_link_service_resource_id
     is_manual_connection           = true
     request_message                = "MongoDB Atlas PrivateLink"
+  }
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+      update = var.timeouts.update
+    }
   }
 
   lifecycle {
@@ -61,6 +79,14 @@ resource "mongodbatlas_privatelink_endpoint_service" "this" {
   private_endpoint_ip_address = var.create_azure_private_endpoint ? (
     azurerm_private_endpoint.atlas[0].private_service_connection[0].private_ip_address
   ) : var.azure_private_endpoint_ip_address
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+    }
+  }
 
   lifecycle {
     precondition {

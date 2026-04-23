@@ -339,3 +339,67 @@ run "region_custom_mapping_rejects_unmapped" {
 
   expect_failures = [terraform_data.region_validations]
 }
+
+run "timeouts_null_with_privatelink" {
+  command = plan
+
+  module {
+    source = "./"
+  }
+
+  variables {
+    project_id = var.project_id
+    timeouts   = null
+    privatelink_endpoints = [
+      { region = "eastus2", subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" }
+    ]
+  }
+
+  assert {
+    condition     = length(mongodbatlas_privatelink_endpoint.this) == 1
+    error_message = "Expected one privatelink endpoint when timeouts is null"
+  }
+}
+
+run "timeouts_empty_object_plans" {
+  command = plan
+
+  module {
+    source = "./"
+  }
+
+  variables {
+    project_id = var.project_id
+    timeouts   = {}
+    privatelink_endpoints = [
+      { region = "eastus2", subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" }
+    ]
+  }
+
+  assert {
+    condition     = length(mongodbatlas_privatelink_endpoint.this) == 1
+    error_message = "Expected one privatelink endpoint when timeouts is the empty object"
+  }
+}
+
+run "timeouts_rejects_blank_duration" {
+  command = plan
+
+  module {
+    source = "./"
+  }
+
+  variables {
+    project_id = var.project_id
+    timeouts = {
+      create = "   "
+    }
+    privatelink_endpoints = [
+      { region = "eastus2", subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" }
+    ]
+  }
+
+  expect_failures = [
+    var.timeouts
+  ]
+}

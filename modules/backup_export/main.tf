@@ -23,6 +23,15 @@ resource "azurerm_storage_account" "atlas" {
   min_tls_version                 = var.create_storage_account.min_tls_version
   allow_nested_items_to_be_public = false
   tags                            = var.tags
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+      update = var.timeouts.update
+    }
+  }
 }
 
 resource "azurerm_storage_container" "atlas" {
@@ -31,12 +40,30 @@ resource "azurerm_storage_container" "atlas" {
   name                  = var.container_name
   storage_account_id    = local.storage_account_id
   container_access_type = "private"
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+      update = var.timeouts.update
+    }
+  }
 }
 
 resource "azurerm_role_assignment" "backup_export" {
   principal_id         = var.service_principal_id
   role_definition_name = "Storage Blob Data Contributor"
   scope                = local.storage_account_id
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+      read   = var.timeouts.update
+    }
+  }
 }
 
 resource "mongodbatlas_cloud_backup_snapshot_export_bucket" "this" {
