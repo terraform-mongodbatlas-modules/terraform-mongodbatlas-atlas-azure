@@ -8,12 +8,21 @@ resource "azurerm_storage_account" "logs" {
   allow_nested_items_to_be_public = false
 }
 
-resource "azurerm_management_lock" "logs" {
-  name       = "atlas-log-storage-lock"
-  scope      = azurerm_storage_account.logs.id
-  lock_level = "CanNotDelete"
-  notes      = "Prevent accidental deletion of Atlas log storage account"
-}
+/*
+Uncomment the following resource to block accidental destruction of the log storage. CanNotDelete on the account rejects
+deletes on that scope; nested deletes (e.g. the `atlas-logs` container) can return 409 until the
+lock is removed, for example:
+  Error: deleting .../blobServices/default/containers/atlas-logs: 409 (Conflict) ScopeLocked:
+  The scope '.../containers/atlas-logs' cannot perform delete operation because following scope(s)
+  are locked: '.../storageAccounts/<name>'. Please remove the lock and try again.
+*/
+
+# resource "azurerm_management_lock" "logs" {
+#   name       = "atlas-log-storage-lock"
+#   scope      = azurerm_storage_account.logs.id
+#   lock_level = "CanNotDelete"
+#   notes      = "Prevent accidental deletion of Atlas log storage account"
+# }
 
 module "atlas_azure" {
   source     = "../../"
