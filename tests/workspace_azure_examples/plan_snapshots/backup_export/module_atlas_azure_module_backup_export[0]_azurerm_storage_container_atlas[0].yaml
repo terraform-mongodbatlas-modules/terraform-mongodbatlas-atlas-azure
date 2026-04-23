@@ -2,3 +2,7 @@ container_access_type: private
 encryption_scope_override_enabled: true
 name: atlas-backup-exports
 storage_account_name: <storage_account_name>
+timeouts:
+  create: 30m
+  delete: 30m
+  update: 30m

@@ -1,2 +1,6 @@
 principal_id: 48f1d2a6-d0e9-482a-83a4-b8dd7dddc5c1
 role_definition_name: Key Vault Reader
+timeouts:
+  create: 30m
+  delete: 30m
+  read: 30m

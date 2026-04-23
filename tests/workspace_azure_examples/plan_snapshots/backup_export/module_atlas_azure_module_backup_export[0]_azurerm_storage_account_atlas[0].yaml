@@ -24,3 +24,7 @@ sas_policy: []
 sftp_enabled: false
 shared_access_key_enabled: true
 table_encryption_key_type: Service
+timeouts:
+  create: 30m
+  delete: 30m
+  update: 30m

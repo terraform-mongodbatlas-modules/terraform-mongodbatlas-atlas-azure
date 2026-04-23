@@ -1,2 +1,5 @@
 project_id: <project_id>
 provider_name: AZURE
+timeouts:
+  create: 30m
+  delete: 30m
