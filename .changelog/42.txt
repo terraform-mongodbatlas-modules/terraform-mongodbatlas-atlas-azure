@@ -3,5 +3,5 @@ submodule/encryption: Uses Cloud Provider Access role_id for Azure Key Vault enc
 ```
 
 ```release-note:note
-variable/encryption_client_secret: Is deprecated in favor of the secretless authorization based on the Cloud Provider Access role_id
+variable/encryption_client_secret: Deprecates this variable in favor of secretless authorization based on the Cloud Provider Access `role_id`
 ```
