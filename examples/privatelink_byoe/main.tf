@@ -19,14 +19,13 @@ module "atlas_azure" {
 
   project_id = var.project_id
 
-  # BYOE: provide your own Azure Private Endpoint details
-  privatelink_byoe = {
+  privatelink_byo_service = {
     (local.pe1) = {
       azure_private_endpoint_id         = azurerm_private_endpoint.custom.id
       azure_private_endpoint_ip_address = azurerm_private_endpoint.custom.private_service_connection[0].private_ip_address
     }
   }
-  privatelink_byoe_regions = { (local.pe1) = var.region }
+  privatelink_byo_endpoint = { (local.pe1) = { region = var.region } }
 }
 
 # User-managed Azure Private Endpoint with custom configuration

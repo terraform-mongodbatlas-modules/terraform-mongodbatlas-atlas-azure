@@ -276,6 +276,11 @@ run "encryption_with_private_networking" {
     condition     = length(module.encryption_private_endpoint) == 2
     error_message = "Expected 2 private endpoints to be created"
   }
+
+  assert {
+    condition     = contains(keys(module.encryption_private_endpoint), "eastus2") && contains(keys(module.encryption_private_endpoint), "westeurope")
+    error_message = "Expected encryption private endpoint module keys to use Azure location format"
+  }
 }
 
 run "encryption_private_networking_azure_format" {

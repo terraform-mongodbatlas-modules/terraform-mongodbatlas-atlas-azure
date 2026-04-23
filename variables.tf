@@ -69,7 +69,7 @@ variable "encryption" {
     **Search Node Encryption:**
     `enabled_for_search_nodes` (default: `true`) controls whether BYOK encryption applies to dedicated search nodes. The module defaults to `true` (provider default is `false`) for a secure-by-default experience. Flipping from `false` to `true` on a deployment with dedicated search nodes triggers reprovisioning and index rebuild.
 
-    **NOTE:** `private_endpoint_regions` accepts both Atlas format (e.g., `US_EAST_2`) and Azure format (e.g., `eastus2`).
+    **NOTE:** `private_endpoint_regions` accepts both Atlas format (e.g., `US_EAST_2`) and Azure format (e.g., `eastus2`). Child module instances and `encryption` output map keys use normalized Azure location strings.
   EOT
 
   validation {
@@ -127,35 +127,37 @@ variable "encryption_client_secret" {
   }
 }
 
-variable "privatelink_byoe_regions" {
-  type        = map(string)
+variable "privatelink_byo_endpoint" {
+  type = map(object({
+    region = string
+  }))
   default     = {}
   description = <<-EOT
-    Atlas-side PrivateLink endpoints for BYOE (Bring Your Own Endpoint).
-    
-    Key: A unique identifier you choose to reference this endpoint (e.g., "pe1", "primary", "my-endpoint").
-    Value: Region in Atlas format (e.g., "US_EAST_2") or Azure format (e.g., "eastus2").
-    
-    Example:
-    ```hcl
-    privatelink_byoe_regions = {
-      "primary"   = "eastus2"
-      "secondary" = "EUROPE_WEST"
-    }
-    ```
+    BYOE Phase 1: Atlas PrivateLink endpoint services. Key is a user-defined identifier; `region` accepts Atlas or Azure format.
+    After normalizing to Azure location, values must not duplicate a region already used in `privatelink_endpoints`.
   EOT
+
+  validation {
+    condition = length(setintersection(
+      toset([for k, cfg in var.privatelink_byo_endpoint : lookup(var.atlas_to_azure_region, cfg.region, cfg.region)]),
+      toset([for ep in var.privatelink_endpoints : lookup(var.atlas_to_azure_region, ep.region, ep.region)])
+    )) == 0
+    error_message = "Regions in privatelink_byo_endpoint must not overlap with regions in privatelink_endpoints (after normalizing to Azure location)."
+  }
 }
 
-variable "privatelink_byoe" {
+variable "privatelink_byo_service" {
   type = map(object({
     azure_private_endpoint_id         = string
     azure_private_endpoint_ip_address = string
   }))
   default     = {}
-  description = "BYOE endpoint details. Key must exist in `privatelink_byoe_regions`."
+  description = <<-EOT
+    BYOE Phase 2: User-managed Azure Private Endpoints linked to Atlas. Each key must exist in `privatelink_byo_endpoint`.
+  EOT
   validation {
-    condition     = alltrue([for k in keys(var.privatelink_byoe) : contains(keys(var.privatelink_byoe_regions), k)])
-    error_message = "All keys in privatelink_byoe must exist in privatelink_byoe_regions."
+    condition     = alltrue([for k in keys(var.privatelink_byo_service) : contains(keys(var.privatelink_byo_endpoint), k)])
+    error_message = "Each privatelink_byo_service key must exist in privatelink_byo_endpoint."
   }
 }
 

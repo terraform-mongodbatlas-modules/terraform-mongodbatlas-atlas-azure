@@ -71,8 +71,8 @@ run "valid_custom_name_and_tags" {
 run "valid_byoe" {
   command = plan
   variables {
-    privatelink_byoe_regions = { pe_byoe = "eastus2" }
-    privatelink_byoe = {
+    privatelink_byo_endpoint = { pe_byoe = { region = "eastus2" } }
+    privatelink_byo_service = {
       pe_byoe = {
         azure_private_endpoint_id         = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/privateEndpoints/pe-atlas"
         azure_private_endpoint_ip_address = "10.0.1.100"
@@ -88,15 +88,26 @@ run "valid_byoe" {
 run "invalid_byoe_key_not_in_regions" {
   command = plan
   variables {
-    privatelink_byoe_regions = { mykey = "eastus2" }
-    privatelink_byoe = {
+    privatelink_byo_endpoint = { mykey = { region = "eastus2" } }
+    privatelink_byo_service = {
       wrong_key = {
         azure_private_endpoint_id         = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/privateEndpoints/pe-atlas"
         azure_private_endpoint_ip_address = "10.0.1.100"
       }
     }
   }
-  expect_failures = [var.privatelink_byoe]
+  expect_failures = [var.privatelink_byo_service]
+}
+
+run "invalid_byoe_region_overlaps_privatelink_endpoints" {
+  command = plan
+  variables {
+    privatelink_endpoints = [
+      { region = "eastus2", subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" }
+    ]
+    privatelink_byo_endpoint = { pe1 = { region = "eastus2" } }
+  }
+  expect_failures = [var.privatelink_byo_endpoint]
 }
 
 run "invalid_duplicate_regions" {
@@ -171,8 +182,8 @@ run "invalid_privatelink_region_format" {
 run "invalid_byoe_region_format" {
   command = plan
   variables {
-    privatelink_byoe_regions = { pe1 = "not_a_real_region" }
-    privatelink_byoe = {
+    privatelink_byo_endpoint = { pe1 = { region = "not_a_real_region" } }
+    privatelink_byo_service = {
       pe1 = {
         azure_private_endpoint_id         = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/privateEndpoints/pe-atlas"
         azure_private_endpoint_ip_address = "10.0.1.100"

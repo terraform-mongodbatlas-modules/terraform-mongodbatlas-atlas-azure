@@ -254,7 +254,7 @@ Provide EITHER:
 **Search Node Encryption:**
 `enabled_for_search_nodes` (default: `true`) controls whether BYOK encryption applies to dedicated search nodes. The module defaults to `true` (provider default is `false`) for a secure-by-default experience. Flipping from `false` to `true` on a deployment with dedicated search nodes triggers reprovisioning and index rebuild.
 
-**NOTE:** `private_endpoint_regions` accepts both Atlas format (e.g., `US_EAST_2`) and Azure format (e.g., `eastus2`).
+**NOTE:** `private_endpoint_regions` accepts both Atlas format (e.g., `US_EAST_2`) and Azure format (e.g., `eastus2`). Child module instances and `encryption` output map keys use normalized Azure location strings.
 
 Type:
 
@@ -317,9 +317,50 @@ list(object({
 
 Default: `[]`
 
-### privatelink_byoe
+### privatelink_endpoints_single_region
 
-BYOE endpoint details. Key must exist in `privatelink_byoe_regions`.
+Single-region multi-endpoint pattern. Region accepts Atlas format (US_EAST_2) or Azure format (eastus2).
+All endpoints MUST be in the same region.
+
+Example:
+```hcl
+privatelink_endpoints_single_region = [
+  { region = "eastus2", subnet_id = "/subscriptions/.../subnets/app1" },
+  { region = "eastus2", subnet_id = "/subscriptions/.../subnets/app2" },
+]
+```
+
+Type:
+
+```hcl
+list(object({
+  region    = string
+  subnet_id = string
+  name      = optional(string)
+  tags      = optional(map(string), {})
+}))
+```
+
+Default: `[]`
+
+### privatelink_byo_endpoint
+
+BYOE Phase 1: Atlas PrivateLink endpoint services. Key is a user-defined identifier; `region` accepts Atlas or Azure format.
+After normalizing to Azure location, values must not duplicate a region already used in `privatelink_endpoints`.
+
+Type:
+
+```hcl
+map(object({
+  region = string
+}))
+```
+
+Default: `{}`
+
+### privatelink_byo_service
+
+BYOE Phase 2: User-managed Azure Private Endpoints linked to Atlas. Each key must exist in `privatelink_byo_endpoint`.
 
 Type:
 
@@ -445,51 +486,6 @@ Tags to apply to all Azure resources (Key Vault, Storage Account, Private Endpoi
 Type: `map(string)`
 
 Default: `{}`
-
-### privatelink_byoe_regions
-
-Atlas-side PrivateLink endpoints for BYOE (Bring Your Own Endpoint).
-
-Key: A unique identifier you choose to reference this endpoint (e.g., "pe1", "primary", "my-endpoint").
-Value: Region in Atlas format (e.g., "US_EAST_2") or Azure format (e.g., "eastus2").
-
-Example:
-```hcl
-privatelink_byoe_regions = {
-  "primary"   = "eastus2"
-  "secondary" = "EUROPE_WEST"
-}
-```
-
-Type: `map(string)`
-
-Default: `{}`
-
-### privatelink_endpoints_single_region
-
-Single-region multi-endpoint pattern. Region accepts Atlas format (US_EAST_2) or Azure format (eastus2).
-All endpoints MUST be in the same region.
-
-Example:
-```hcl
-privatelink_endpoints_single_region = [
-  { region = "eastus2", subnet_id = "/subscriptions/.../subnets/app1" },
-  { region = "eastus2", subnet_id = "/subscriptions/.../subnets/app2" },
-]
-```
-
-Type:
-
-```hcl
-list(object({
-  region    = string
-  subnet_id = string
-  name      = optional(string)
-  tags      = optional(map(string), {})
-}))
-```
-
-Default: `[]`
 
 <!-- END_TF_INPUTS_RAW -->
 

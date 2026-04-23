@@ -219,8 +219,8 @@ run "region_unknown_byoe_rejected" {
 
   variables {
     project_id               = var.project_id
-    privatelink_byoe_regions = { primary = "invalid-region" }
-    privatelink_byoe = {
+    privatelink_byo_endpoint = { primary = { region = "invalid-region" } }
+    privatelink_byo_service = {
       primary = {
         azure_private_endpoint_id         = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/privateEndpoints/pe"
         azure_private_endpoint_ip_address = "10.0.0.1"

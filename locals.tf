@@ -1,6 +1,6 @@
 locals {
   # Dynamic derivation: skip cloud_provider_access when only privatelink is configured
-  privatelink_configured = length(var.privatelink_endpoints) > 0 || length(var.privatelink_endpoints_single_region) > 0 || length(var.privatelink_byoe_regions) > 0
+  privatelink_configured = length(var.privatelink_endpoints) > 0 || length(var.privatelink_endpoints_single_region) > 0 || length(var.privatelink_byo_endpoint) > 0
   skip_cloud_provider_access = (
     !var.encryption.enabled &&
     !var.backup_export.enabled &&
@@ -39,7 +39,7 @@ locals {
 
   # user key -> azure location (BYOE uses user-defined keys, module-managed uses key from above)
   privatelink_key_azure_location = merge(
-    { for k, v in var.privatelink_byoe_regions : k => lookup(local._normalize_to_azure, v, v) },
+    { for k, cfg in var.privatelink_byo_endpoint : k => lookup(local._normalize_to_azure, cfg.region, cfg.region) },
     { for k, ep in local.privatelink_module_managed : k => lookup(local._normalize_to_azure, ep.region, ep.region) }
   )
   privatelinks_module_managed_keys = toset(keys(local.privatelink_module_managed))
@@ -51,7 +51,7 @@ locals {
   # Invalid region inputs (for precondition validation)
   _invalid_privatelink_regions   = [for ep in var.privatelink_endpoints : ep.region if !contains(local._all_region_keys, ep.region)]
   _invalid_single_region_regions = [for ep in var.privatelink_endpoints_single_region : ep.region if !contains(local._all_region_keys, ep.region)]
-  _invalid_byoe_regions          = [for k, v in var.privatelink_byoe_regions : v if !contains(local._all_region_keys, v)]
+  _invalid_byoe_regions          = [for k, cfg in var.privatelink_byo_endpoint : cfg.region if !contains(local._all_region_keys, cfg.region)]
   _invalid_encryption_regions    = [for r in var.encryption.private_endpoint_regions : r if !contains(local._all_region_keys, r)]
 
   # Sorted display string for error messages

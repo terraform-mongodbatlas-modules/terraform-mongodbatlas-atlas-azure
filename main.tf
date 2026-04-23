@@ -62,11 +62,14 @@ module "encryption" {
 }
 
 module "encryption_private_endpoint" {
-  source   = "./modules/encryption_private_endpoint"
-  for_each = var.encryption.enabled && local.encryption_require_private_networking ? toset([for r in var.encryption.private_endpoint_regions : lookup(local._normalize_to_atlas, r, r)]) : toset([])
+  source = "./modules/encryption_private_endpoint"
+  for_each = var.encryption.enabled && local.encryption_require_private_networking ? toset([
+    for r in var.encryption.private_endpoint_regions :
+    lookup(local._normalize_to_azure, r, r)
+  ]) : toset([])
 
   project_id  = var.project_id
-  region_name = each.key
+  region_name = lookup(local._normalize_to_atlas, each.key, each.key)
 
   depends_on = [module.encryption]
 }
@@ -110,8 +113,8 @@ module "privatelink" {
   azure_private_endpoint_tags   = merge(var.azure_tags, try(local.privatelink_module_managed[each.key].tags, {}))
 
   # BYOE
-  azure_private_endpoint_id         = try(var.privatelink_byoe[each.key].azure_private_endpoint_id, null)
-  azure_private_endpoint_ip_address = try(var.privatelink_byoe[each.key].azure_private_endpoint_ip_address, null)
+  azure_private_endpoint_id         = try(var.privatelink_byo_service[each.key].azure_private_endpoint_id, null)
+  azure_private_endpoint_ip_address = try(var.privatelink_byo_service[each.key].azure_private_endpoint_ip_address, null)
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -151,7 +154,7 @@ resource "terraform_data" "region_validations" {
     }
     precondition {
       condition     = length(local._invalid_byoe_regions) == 0
-      error_message = "Invalid region(s) in privatelink_byoe_regions: [${join(", ", local._invalid_byoe_regions)}]. Supported values (Atlas or Azure format): ${local._supported_regions_display}"
+      error_message = "Invalid region(s) in privatelink_byo_endpoint: [${join(", ", local._invalid_byoe_regions)}]. Supported values (Atlas or Azure format): ${local._supported_regions_display}"
     }
     precondition {
       condition     = length(local._invalid_encryption_regions) == 0
