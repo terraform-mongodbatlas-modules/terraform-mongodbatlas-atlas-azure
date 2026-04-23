@@ -114,17 +114,10 @@ variable "encryption_client_secret" {
   default     = null
   sensitive   = true
   description = <<-EOT
-    Azure AD application client secret for encryption. This value is required when using module-managed encryption (`encryption.enabled = true`).
+    Deprecated: Azure AD application client secret for encryption. The module now uses CPA `role_id` automatically. Remove this variable from your configuration. Will be removed at v1.0.
 
-    **IMPORTANT:** Azure limits the client secret lifetime to two years. When the secret expires, Atlas loses CMK access, causing cluster unavailability. Rotate secrets before expiration.
-
-    **v1 Roadmap:** This variable will become optional once the mongodbatlas provider adds secretless `role_id`-based authentication for Azure encryption (expected in v1). The module will then support both methods with secretless as the recommended approach.
+    When set, the module passes both `role_id` and `client_secret` for backward compatibility. When not set, the module uses `role_id` only.
   EOT
-
-  validation {
-    condition     = !var.encryption.enabled || var.encryption_client_secret != null
-    error_message = "encryption_client_secret is required when encryption.enabled = true."
-  }
 }
 
 variable "privatelink_byoe_regions" {

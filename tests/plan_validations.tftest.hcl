@@ -130,8 +130,7 @@ run "dynamic_enable_cloud_provider_access_encryption" {
   }
 
   variables {
-    project_id               = var.project_id
-    encryption_client_secret = "test-secret"
+    project_id = var.project_id
     encryption = {
       enabled        = true
       key_vault_id   = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.KeyVault/vaults/kv"
@@ -239,8 +238,7 @@ run "region_unknown_encryption_rejected" {
   }
 
   variables {
-    project_id               = var.project_id
-    encryption_client_secret = "test-secret"
+    project_id = var.project_id
     encryption = {
       enabled                  = true
       key_vault_id             = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.KeyVault/vaults/kv"

@@ -54,11 +54,19 @@ module "encryption" {
   create_key_vault = var.encryption.create_key_vault
   tags             = var.azure_tags
 
+  role_id                    = mongodbatlas_cloud_provider_access_authorization.this[0].role_id
   client_secret              = var.encryption_client_secret
   require_private_networking = local.encryption_require_private_networking
   enabled_for_search_nodes   = var.encryption.enabled_for_search_nodes
 
   depends_on = [mongodbatlas_cloud_provider_access_authorization.this]
+}
+
+check "encryption_client_secret_deprecated" {
+  assert {
+    condition     = var.encryption_client_secret == null
+    error_message = "encryption_client_secret is deprecated and will be removed at v1.0. Remove it from your configuration; the module uses CPA role_id automatically."
+  }
 }
 
 module "encryption_private_endpoint" {

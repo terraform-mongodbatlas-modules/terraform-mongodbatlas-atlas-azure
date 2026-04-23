@@ -47,16 +47,3 @@ variable "service_principal_id" {
   type        = string
   description = "Existing service principal object ID for Atlas-Azure integration"
 }
-
-variable "existing_encryption_client_secret" {
-  type = object({
-    enabled = bool
-    value   = string
-  })
-  sensitive   = true
-  description = "Existing client secret for encryption. If not provided, example creates one automatically."
-  default = {
-    enabled = false
-    value   = null
-  }
-}

@@ -90,17 +90,36 @@ resource "mongodbatlas_encryption_at_rest" "this" {
   project_id               = var.project_id
   enabled_for_search_nodes = var.enabled_for_search_nodes
 
-  azure_key_vault_config {
-    enabled                    = true
-    azure_environment          = "AZURE"
-    tenant_id                  = local.tenant_id
-    subscription_id            = local.subscription_id
-    client_id                  = data.azuread_service_principal.atlas.client_id
-    secret                     = var.client_secret
-    resource_group_name        = local.resource_group_name
-    key_vault_name             = local.key_vault_name
-    key_identifier             = local.key_identifier
-    require_private_networking = var.require_private_networking
+  /* role_id path (default): Atlas API rejects client_id/tenant_id/secret alongside role_id */
+  dynamic "azure_key_vault_config" {
+    for_each = var.client_secret == null ? ["role_id"] : []
+    content {
+      enabled                    = true
+      azure_environment          = "AZURE"
+      role_id                    = var.role_id
+      subscription_id            = local.subscription_id
+      resource_group_name        = local.resource_group_name
+      key_vault_name             = local.key_vault_name
+      key_identifier             = local.key_identifier
+      require_private_networking = var.require_private_networking
+    }
+  }
+
+  /* Legacy client_secret path (backward compat): uses credential-based auth */
+  dynamic "azure_key_vault_config" {
+    for_each = var.client_secret != null ? ["secret"] : []
+    content {
+      enabled                    = true
+      azure_environment          = "AZURE"
+      tenant_id                  = local.tenant_id
+      subscription_id            = local.subscription_id
+      client_id                  = data.azuread_service_principal.atlas.client_id
+      secret                     = var.client_secret
+      resource_group_name        = local.resource_group_name
+      key_vault_name             = local.key_vault_name
+      key_identifier             = local.key_identifier
+      require_private_networking = var.require_private_networking
+    }
   }
 
   lifecycle {
