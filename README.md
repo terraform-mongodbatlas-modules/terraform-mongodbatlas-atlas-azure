@@ -375,13 +375,11 @@ Control Terraform operation timeouts for supported resources. For upgrades from 
 
 Timeouts for resources that the Terraform provider exposes with a `timeouts` block or attribute. Timeout values use [Go duration](https://pkg.go.dev/time#ParseDuration) format (for example, "30m", "1h").
 
-Set `timeouts = null` to omit all module-managed timeouts and use each provider’s defaults. This avoids plan diffs when upgrading from earlier module versions or right after `terraform import`.
+Set `timeouts = null` to omit all module-managed timeouts and use each provider's defaults. This avoids plan diffs when upgrading from earlier module versions or right after `terraform import`.
 
 - `timeouts = {}` or unset: 30m for create, update, and delete.
 - `timeouts = null`: no module-managed timeouts.
 - `timeouts = { create = "1h" }`: custom create timeout; 30m for other operations unless you set them.
-
-The module does not expose `delete_on_create_timeout`. Atlas resources use the provider default for that field.
 
 `mongodbatlas_cloud_provider_access_authorization`, `mongodbatlas_encryption_at_rest`, and `mongodbatlas_cloud_backup_snapshot_export_bucket` have no `timeouts` in the current mongodbatlas provider schema, so the module does not set timeouts for those resources.
 
