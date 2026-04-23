@@ -64,7 +64,6 @@ examples:
           skip_lines:
             redact_attributes:
               - name
-      - address: azurerm_management_lock.logs
 
   - name: privatelink_multi_region
     var_groups: [privatelink_multi_region]

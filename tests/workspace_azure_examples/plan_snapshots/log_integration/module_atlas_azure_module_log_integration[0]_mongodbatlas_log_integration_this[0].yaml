@@ -2,5 +2,6 @@ log_types:
 - MONGOD
 prefix_path: operational
 project_id: <project_id>
+storage_account_name: <storage_account_name>
 storage_container_name: atlas-logs
 type: AZURE_LOG_EXPORT
