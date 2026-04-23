@@ -142,13 +142,6 @@ resource "random_string" "suffix" {
   upper   = false
 }
 
-# Client secret for encryption (only if not provided)
-resource "azuread_service_principal_password" "encryption" {
-  count                = var.existing_encryption_client_secret.enabled ? 0 : 1
-  service_principal_id = "/servicePrincipals/${local.service_principal_id}"
-  display_name         = "MongoDB Atlas - Encryption Test Workspace Test"
-}
-
 locals {
   resource_group_name  = var.resource_group_name != "" ? var.resource_group_name : module.rg[0].name
   service_principal_id = var.service_principal_id != "" ? var.service_principal_id : module.sp[0].service_principal_id
@@ -175,11 +168,6 @@ locals {
   # Backup export locals
   # tflint-ignore: terraform_unused_declarations
   storage_account_name = var.storage_account_name != "" ? var.storage_account_name : "saatlas${random_string.suffix.id}"
-  # tflint-ignore: terraform_unused_declarations
-  existing_encryption_client_secret = {
-    enabled = var.existing_encryption_client_secret.enabled
-    value   = var.existing_encryption_client_secret.enabled ? var.existing_encryption_client_secret.value : azuread_service_principal_password.encryption[0].value
-  }
 
   # PrivateLink locals - used by generated example modules (modules.generated.tf)
   # tflint-ignore: terraform_unused_declarations
