@@ -9,3 +9,7 @@ variable/privatelink_byo_endpoint: Changes type from `map(string)` to `map(objec
 ```release-note:breaking-change
 variable/privatelink_byo_service: Renames `privatelink_byoe` to `privatelink_byo_service` to represent the user-managed Azure private endpoint linked to Atlas
 ```
+
+```release-note:breaking-change
+output/encryption.private_endpoints: `module.encryption_private_endpoint` and `encryption` output map keys use normalized Azure location strings`
+```
