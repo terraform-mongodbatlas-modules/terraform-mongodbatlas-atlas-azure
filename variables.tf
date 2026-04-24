@@ -51,7 +51,7 @@ variable "skip_role_assignments" {
   EOT
 
   validation {
-    condition     = !var.skip_role_assignments || !try(var.encryption.create_key_vault.enabled, false)
+    condition     = !var.skip_role_assignments || !try(var.encryption.enabled, false) || !try(var.encryption.create_key_vault.enabled, false)
     error_message = "skip_role_assignments = true requires BYO Key Vault (key_vault_id). Module-managed Key Vault needs role assignments."
   }
 
