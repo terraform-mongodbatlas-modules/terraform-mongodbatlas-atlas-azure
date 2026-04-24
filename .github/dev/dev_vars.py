@@ -31,6 +31,7 @@ def org(org_id: str) -> None:
 
 _project_ids = """\
 project_ids = {
+  azure_read_only          = "PROJECT_ID"
   backup_export            = "PROJECT_ID"
   encryption               = "PROJECT_ID"
   log_integration          = "PROJECT_ID"
