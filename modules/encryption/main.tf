@@ -96,7 +96,19 @@ resource "azurerm_key_vault_key" "atlas" {
 # Role Assignments (grants Atlas service principal access to Key Vault)
 # ─────────────────────────────────────────────────────────────────────────────
 
+moved {
+  from = azurerm_role_assignment.key_vault_crypto
+  to   = azurerm_role_assignment.key_vault_crypto[0]
+}
+
+moved {
+  from = azurerm_role_assignment.key_vault_reader
+  to   = azurerm_role_assignment.key_vault_reader[0]
+}
+
 resource "azurerm_role_assignment" "key_vault_crypto" {
+  count = var.skip_role_assignments ? 0 : 1
+
   scope                = local.key_vault_id
   role_definition_name = "Key Vault Crypto User"
   principal_id         = var.service_principal_id
@@ -111,6 +123,8 @@ resource "azurerm_role_assignment" "key_vault_crypto" {
 }
 
 resource "azurerm_role_assignment" "key_vault_reader" {
+  count = var.skip_role_assignments ? 0 : 1
+
   scope                = local.key_vault_id
   role_definition_name = "Key Vault Reader"
   principal_id         = var.service_principal_id
@@ -157,6 +171,7 @@ resource "mongodbatlas_encryption_at_rest" "this" {
 
   depends_on = [
     azurerm_role_assignment.key_vault_crypto,
-    azurerm_role_assignment.key_vault_reader
+    azurerm_role_assignment.key_vault_reader,
+    azurerm_key_vault_key.atlas,
   ]
 }

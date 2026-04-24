@@ -66,6 +66,7 @@ module "encryption" {
   client_secret              = var.encryption_client_secret
   require_private_networking = local.encryption_require_private_networking
   enabled_for_search_nodes   = var.encryption.enabled_for_search_nodes
+  skip_role_assignments      = var.skip_role_assignments
 
   depends_on = [mongodbatlas_cloud_provider_access_authorization.this]
 }
@@ -172,6 +173,7 @@ module "backup_export" {
   create_container       = var.backup_export.create_container
   create_storage_account = var.backup_export.create_storage_account
   timeouts               = var.timeouts
+  skip_role_assignments  = var.skip_role_assignments
 
   depends_on = [mongodbatlas_cloud_provider_access_authorization.this]
 }
@@ -187,7 +189,7 @@ module "log_integration" {
   project_id            = var.project_id
   role_id               = mongodbatlas_cloud_provider_access_authorization.this[0].role_id
   service_principal_id  = local.service_principal_id
-  skip_role_assignments = false
+  skip_role_assignments = var.skip_role_assignments
   tags                  = merge(var.azure_tags, var.log_integration.tags)
 
   container_name         = local.log_integration_default_container_name

@@ -51,7 +51,14 @@ resource "azurerm_storage_container" "atlas" {
   }
 }
 
+moved {
+  from = azurerm_role_assignment.backup_export
+  to   = azurerm_role_assignment.backup_export[0]
+}
+
 resource "azurerm_role_assignment" "backup_export" {
+  count = var.skip_role_assignments ? 0 : 1
+
   principal_id         = var.service_principal_id
   role_definition_name = "Storage Blob Data Contributor"
   scope                = local.storage_account_id

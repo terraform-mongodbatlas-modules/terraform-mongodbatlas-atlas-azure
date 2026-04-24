@@ -1,7 +1,7 @@
 # path-sync copy -n sdlc
 
 # Module-specific configuration
-PLAN_TEST_FILES := "-filter=tests/plan_validations.tftest.hcl -filter=tests/plan_validate_backup_export.tftest.hcl -filter=tests/plan_validate_encryption.tftest.hcl -filter=tests/plan_validate_log_integration.tftest.hcl -filter=tests/plan_validate_privatelink.tftest.hcl"
+PLAN_TEST_FILES := "-filter=tests/plan_validations.tftest.hcl -filter=tests/plan_validate_backup_export.tftest.hcl -filter=tests/plan_validate_encryption.tftest.hcl -filter=tests/plan_validate_log_integration.tftest.hcl -filter=tests/plan_validate_privatelink.tftest.hcl -filter=tests/plan_validate_skip_role_assignments.tftest.hcl"
 
 # === DO_NOT_EDIT: path-sync core ===
 set dotenv-load

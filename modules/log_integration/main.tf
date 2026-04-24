@@ -144,5 +144,8 @@ resource "mongodbatlas_log_integration" "this" {
   prefix_path = trimsuffix(var.integrations[count.index].prefix_path, "/")
   log_types   = var.integrations[count.index].log_types
 
-  depends_on = [azurerm_role_assignment.log_integration, azurerm_role_assignment.integration_byo]
+  depends_on = [
+    azurerm_role_assignment.log_integration,
+    azurerm_role_assignment.integration_byo,
+  ]
 }

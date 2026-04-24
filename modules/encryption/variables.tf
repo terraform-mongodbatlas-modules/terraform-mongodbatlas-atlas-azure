@@ -78,3 +78,9 @@ variable "enabled_for_search_nodes" {
   default     = true
   description = "Whether BYOK encryption at rest applies to dedicated search nodes. Module defaults to true (provider default is false) for secure-by-default."
 }
+
+variable "skip_role_assignments" {
+  type        = bool
+  default     = false
+  description = "Omit Key Vault service principal role assignments. Pass root skip_role_assignments; operator must pre-assign Key Vault roles."
+}

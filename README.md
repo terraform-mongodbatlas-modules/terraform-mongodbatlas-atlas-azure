@@ -240,6 +240,20 @@ Type: `string`
 
 Default: `null`
 
+### skip_role_assignments
+
+Skip all Azure role assignments (azurerm_role_assignment) in encryption, backup_export, and log_integration submodules. Set true when the service principal already has the required roles pre-assigned externally.
+
+Required roles when true:
+- Key Vault: Key Vault Crypto User, Key Vault Reader on the Key Vault
+- Storage: Storage Blob Data Contributor on each target storage account
+
+Requires BYO resources: create_key_vault.enabled and create_storage_account.enabled (encryption, backup export, log integration) are disallowed when skip_role_assignments = true.
+
+Type: `bool`
+
+Default: `false`
+
 
 ## Encryption at Rest
 

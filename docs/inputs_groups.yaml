@@ -16,6 +16,7 @@ sections:
         - atlas_azure_app_id
         - create_service_principal
         - service_principal_id
+        - skip_role_assignments
 
   - id: encryption
     title: "Encryption at Rest"

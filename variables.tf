@@ -37,6 +37,40 @@ variable "azure_tags" {
   description = "Tags to apply to all Azure resources (Key Vault, Storage Account, Private Endpoints)."
 }
 
+variable "skip_role_assignments" {
+  type        = bool
+  default     = false
+  description = <<-EOT
+    Skip all Azure role assignments (azurerm_role_assignment) in encryption, backup_export, and log_integration submodules. Set true when the service principal already has the required roles pre-assigned externally.
+
+    Required roles when true:
+    - Key Vault: Key Vault Crypto User, Key Vault Reader on the Key Vault
+    - Storage: Storage Blob Data Contributor on each target storage account
+
+    Requires BYO resources: create_key_vault.enabled and create_storage_account.enabled (encryption, backup export, log integration) are disallowed when skip_role_assignments = true.
+  EOT
+
+  validation {
+    condition     = !var.skip_role_assignments || !try(var.encryption.create_key_vault.enabled, false)
+    error_message = "skip_role_assignments = true requires BYO Key Vault (key_vault_id). Module-managed Key Vault needs role assignments."
+  }
+
+  validation {
+    condition     = !var.skip_role_assignments || !try(var.backup_export.create_storage_account.enabled, false)
+    error_message = "skip_role_assignments = true requires BYO Storage Account (storage_account_id). Module-managed Storage Account needs role assignments."
+  }
+
+  validation {
+    condition     = !var.skip_role_assignments || !try(var.log_integration.create_storage_account.enabled, false)
+    error_message = "skip_role_assignments = true requires BYO Storage Account (storage_account_id). Module-managed Storage Account needs role assignments."
+  }
+
+  validation {
+    condition     = !var.skip_role_assignments || !var.create_service_principal
+    error_message = "skip_role_assignments = true requires an externally-managed service principal (create_service_principal = false). Module-created service principals need role assignments."
+  }
+}
+
 variable "encryption" {
   type = object({
     enabled        = optional(bool, false)
