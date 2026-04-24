@@ -55,7 +55,6 @@ resource "azurerm_role_assignment" "terraform_key_vault_admin" {
     content {
       create = var.timeouts.create
       delete = var.timeouts.delete
-      read   = var.timeouts.update
     }
   }
 }
@@ -107,7 +106,6 @@ resource "azurerm_role_assignment" "key_vault_crypto" {
     content {
       create = var.timeouts.create
       delete = var.timeouts.delete
-      read   = var.timeouts.update
     }
   }
 }
@@ -122,7 +120,6 @@ resource "azurerm_role_assignment" "key_vault_reader" {
     content {
       create = var.timeouts.create
       delete = var.timeouts.delete
-      read   = var.timeouts.update
     }
   }
 }

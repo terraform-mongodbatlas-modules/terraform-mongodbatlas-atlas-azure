@@ -3,4 +3,3 @@ role_definition_name: Key Vault Reader
 timeouts:
   create: 30m
   delete: 30m
-  read: 30m

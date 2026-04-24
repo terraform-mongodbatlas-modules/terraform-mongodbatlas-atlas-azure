@@ -61,7 +61,6 @@ resource "azurerm_role_assignment" "backup_export" {
     content {
       create = var.timeouts.create
       delete = var.timeouts.delete
-      read   = var.timeouts.update
     }
   }
 }
