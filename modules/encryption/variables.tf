@@ -47,7 +47,7 @@ variable "client_secret" {
   type        = string
   default     = null
   sensitive   = true
-  description = "Deprecated: Azure AD application client secret. Remove from your configuration; the module uses CPA role_id automatically. Will be removed at v1.0."
+  description = "Deprecated: Azure AD application client secret. Remove from your configuration, the module uses CPA role_id automatically. Will be removed in v1.0."
 }
 
 variable "require_private_networking" {
