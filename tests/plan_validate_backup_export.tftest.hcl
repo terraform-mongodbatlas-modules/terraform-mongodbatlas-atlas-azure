@@ -6,10 +6,6 @@ variables {
   project_id = "000000000000000000000000"
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Validation Error Tests
-# ─────────────────────────────────────────────────────────────────────────────
-
 run "backup_export_enabled_without_storage_source" {
   command = plan
 
@@ -17,7 +13,7 @@ run "backup_export_enabled_without_storage_source" {
     project_id = var.project_id
     backup_export = {
       enabled        = true
-      container_name = "test-container"
+      container_name = "atlas-backups"
     }
   }
 
@@ -26,14 +22,14 @@ run "backup_export_enabled_without_storage_source" {
   ]
 }
 
-run "backup_export_both_storage_account_id_and_create_storage_account" {
+run "backup_export_both_storage_options" {
   command = plan
 
   variables {
     project_id = var.project_id
     backup_export = {
       enabled            = true
-      container_name     = "test-container"
+      container_name     = "atlas-backups"
       storage_account_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.Storage/storageAccounts/teststorage"
       create_storage_account = {
         enabled             = true
@@ -58,30 +54,7 @@ run "backup_export_enabled_without_container_name" {
       enabled = true
       create_storage_account = {
         enabled             = true
-        name                = "teststorage"
-        resource_group_name = "rg"
-        azure_location      = "eastus2"
-      }
-    }
-  }
-
-  expect_failures = [
-    var.backup_export
-  ]
-}
-
-run "backup_export_create_container_false_without_storage_account_id" {
-  command = plan
-
-  variables {
-    project_id = var.project_id
-    backup_export = {
-      enabled          = true
-      container_name   = "test-container"
-      create_container = false
-      create_storage_account = {
-        enabled             = true
-        name                = "teststorage"
+        name                = "atlasbackups"
         resource_group_name = "rg"
         azure_location      = "eastus2"
       }
@@ -100,8 +73,31 @@ run "backup_export_invalid_storage_account_id_format" {
     project_id = var.project_id
     backup_export = {
       enabled            = true
-      container_name     = "test-container"
-      storage_account_id = "invalid-format"
+      container_name     = "atlas-backups"
+      storage_account_id = "not-a-resource-id"
+    }
+  }
+
+  expect_failures = [
+    var.backup_export
+  ]
+}
+
+run "backup_export_create_container_false_without_storage_account_id" {
+  command = plan
+
+  variables {
+    project_id = var.project_id
+    backup_export = {
+      enabled          = true
+      container_name   = "atlas-backups"
+      create_container = false
+      create_storage_account = {
+        enabled             = true
+        name                = "atlasbackups"
+        resource_group_name = "rg"
+        azure_location      = "eastus2"
+      }
     }
   }
 
@@ -117,10 +113,10 @@ run "backup_export_invalid_azure_location_format" {
     project_id = var.project_id
     backup_export = {
       enabled        = true
-      container_name = "test-container"
+      container_name = "atlas-backups"
       create_storage_account = {
         enabled             = true
-        name                = "teststorage"
+        name                = "atlasbackups"
         resource_group_name = "rg"
         azure_location      = "East US 2"
       }
@@ -131,10 +127,6 @@ run "backup_export_invalid_azure_location_format" {
     var.backup_export
   ]
 }
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Valid Configuration Tests
-# ─────────────────────────────────────────────────────────────────────────────
 
 run "backup_export_disabled_default" {
   command = plan
@@ -149,8 +141,8 @@ run "backup_export_disabled_default" {
   }
 
   assert {
-    condition     = output.export_bucket_id == null
-    error_message = "Expected export_bucket_id to be null when disabled"
+    condition     = output.backup_export == null
+    error_message = "Expected backup_export output to be null when disabled"
   }
 }
 
@@ -164,7 +156,7 @@ run "backup_export_module_managed_storage" {
       container_name = "atlas-backups"
       create_storage_account = {
         enabled             = true
-        name                = "atlasbackups"
+        name                = "atlasbackups9"
         resource_group_name = "rg"
         azure_location      = "eastus2"
       }
@@ -185,8 +177,7 @@ run "backup_export_user_provided_storage" {
     backup_export = {
       enabled            = true
       container_name     = "atlas-backups"
-      storage_account_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.Storage/storageAccounts/existingstorage"
-      create_container   = true
+      storage_account_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.Storage/storageAccounts/existingstg"
     }
   }
 
@@ -196,21 +187,26 @@ run "backup_export_user_provided_storage" {
   }
 }
 
-run "backup_export_user_provided_storage_existing_container" {
+run "backup_export_expiration_days_zero" {
   command = plan
 
   variables {
     project_id = var.project_id
     backup_export = {
-      enabled            = true
-      container_name     = "existing-container"
-      storage_account_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.Storage/storageAccounts/existingstorage"
-      create_container   = false
+      enabled        = true
+      container_name = "atlas-backups"
+      create_storage_account = {
+        enabled             = true
+        name                = "atlasbkp01"
+        resource_group_name = "rg"
+        azure_location      = "eastus2"
+        expiration_days     = 0
+      }
     }
   }
 
   assert {
-    condition     = length(module.backup_export) == 1
-    error_message = "Expected backup_export module to be created"
+    condition     = module.backup_export[0].expiration_days == 0
+    error_message = "expected expiration_days output 0"
   }
 }

@@ -1,0 +1,7 @@
+```release-note:breaking-change
+submodule/backup_export: Disables public network access on module-managed storage accounts; use private connectivity or a user-provided `storage_account_id` if a publicly reachable storage endpoint is required
+```
+
+```release-note:enhancement
+variable/backup_export: Adds `create_storage_account.expiration_days` (default 365, 0 to disable) with optional `azurerm_storage_management_policy` for export container blob retention, aligned with AWS defaults and the log integration pattern
+```
