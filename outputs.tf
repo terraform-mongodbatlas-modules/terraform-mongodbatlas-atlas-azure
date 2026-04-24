@@ -69,11 +69,12 @@ output "privatelink_service_info" {
 output "resource_ids" {
   description = "Azure resource IDs for data source lookups."
   value = {
-    role_id              = !local.skip_cloud_provider_access ? mongodbatlas_cloud_provider_access_authorization.this[0].role_id : null
-    service_principal_id = local.service_principal_id
-    key_vault_id         = try(module.encryption[0].key_vault_id, null)
-    key_identifier       = try(module.encryption[0].key_identifier, null)
-    storage_account_id   = try(module.backup_export[0].storage_account_id, null)
+    role_id                = !local.skip_cloud_provider_access ? mongodbatlas_cloud_provider_access_authorization.this[0].role_id : null
+    service_principal_id   = local.service_principal_id
+    key_vault_id           = try(module.encryption[0].key_vault_id, null)
+    key_identifier         = try(module.encryption[0].key_identifier, null)
+    storage_account_id     = try(module.backup_export[0].storage_account_id, null)
+    log_storage_account_id = try(module.log_integration[0].storage_account_id, null)
   }
 }
 
@@ -94,5 +95,16 @@ output "backup_export" {
     storage_account_id = module.backup_export[0].storage_account_id
     container_name     = module.backup_export[0].container_name
     service_url        = module.backup_export[0].service_url
+  } : null
+}
+
+output "log_integration" {
+  description = "Log integration configuration status"
+  value = var.log_integration.enabled ? {
+    storage_account_id = module.log_integration[0].storage_account_id
+    container_name     = module.log_integration[0].container_name
+    service_url        = module.log_integration[0].service_url
+    integration_ids    = module.log_integration[0].integration_ids
+    expiration_days    = module.log_integration[0].expiration_days
   } : null
 }

@@ -1,0 +1,3 @@
+```release-note:enhancement
+variable/timeouts: Adds optional nullable `timeouts` with 30m defaults for create, update, and delete, applied to supported Atlas and Azure resources. See docs/v0.3.0-upgrade-guide.md for details
+```

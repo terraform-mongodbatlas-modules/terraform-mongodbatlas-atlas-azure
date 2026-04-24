@@ -32,6 +32,15 @@ resource "azurerm_key_vault" "atlas" {
   soft_delete_retention_days = var.create_key_vault.soft_delete_retention_days
   rbac_authorization_enabled = true
   tags                       = var.tags
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+      update = var.timeouts.update
+    }
+  }
 }
 
 resource "azurerm_role_assignment" "terraform_key_vault_admin" {
@@ -40,6 +49,14 @@ resource "azurerm_role_assignment" "terraform_key_vault_admin" {
   scope                = azurerm_key_vault.atlas[0].id
   role_definition_name = "Key Vault Administrator"
   principal_id         = data.azurerm_client_config.current.object_id
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+    }
+  }
 }
 
 resource "azurerm_key_vault_key" "atlas" {
@@ -64,6 +81,15 @@ resource "azurerm_key_vault_key" "atlas" {
   lifecycle {
     ignore_changes = [expiration_date]
   }
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+      update = var.timeouts.update
+    }
+  }
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -74,12 +100,28 @@ resource "azurerm_role_assignment" "key_vault_crypto" {
   scope                = local.key_vault_id
   role_definition_name = "Key Vault Crypto User"
   principal_id         = var.service_principal_id
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+    }
+  }
 }
 
 resource "azurerm_role_assignment" "key_vault_reader" {
   scope                = local.key_vault_id
   role_definition_name = "Key Vault Reader"
   principal_id         = var.service_principal_id
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+    }
+  }
 }
 
 # ─────────────────────────────────────────────────────────────────────────────

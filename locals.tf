@@ -4,6 +4,7 @@ locals {
   skip_cloud_provider_access = (
     !var.encryption.enabled &&
     !var.backup_export.enabled &&
+    !var.log_integration.enabled &&
     local.privatelink_configured
   )
 
@@ -47,6 +48,12 @@ locals {
 
   # Enable regional mode only for multi-region pattern
   enable_regional_mode = length(local.privatelink_azure_locations) > 1
+
+  # Root `container_name` or, when omitted, the first integration’s `container_name` (root validation requires one or the other)
+  log_integration_default_container_name = var.log_integration.enabled ? coalesce(
+    var.log_integration.container_name,
+    try(var.log_integration.integrations[0].container_name, null)
+  ) : null
 
   # Invalid region inputs (for precondition validation)
   _invalid_privatelink_regions   = [for ep in var.privatelink_endpoints : ep.region if !contains(local._all_region_keys, ep.region)]
