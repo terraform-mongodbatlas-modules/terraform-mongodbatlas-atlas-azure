@@ -24,3 +24,7 @@ rule:
     prefix_match:
     - atlas-logs/
   name: atlas-log-expiration
+timeouts:
+  create: 30m
+  delete: 30m
+  update: 30m

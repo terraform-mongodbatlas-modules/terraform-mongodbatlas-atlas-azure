@@ -4,3 +4,5 @@ azure_config:
   tenant_id: <tenant_id>
 project_id: <project_id>
 provider_name: AZURE
+timeouts:
+  create: 30m

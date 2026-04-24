@@ -376,8 +376,6 @@ variable "timeouts" {
     - `timeouts = {}` or unset: 30m for create, update, and delete.
     - `timeouts = null`: no module-managed timeouts.
     - `timeouts = { create = "1h" }`: custom create timeout; 30m for other operations unless you set them.
-
-    `mongodbatlas_cloud_provider_access_authorization`, `mongodbatlas_encryption_at_rest`, and `mongodbatlas_cloud_backup_snapshot_export_bucket` have no `timeouts` in the current mongodbatlas provider schema, so the module does not set timeouts for those resources.
   EOT
 
   validation {

@@ -30,6 +30,15 @@ resource "azurerm_storage_account" "atlas" {
   allow_nested_items_to_be_public = false
   public_network_access_enabled   = false
   tags                            = var.tags
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+      update = var.timeouts.update
+    }
+  }
 }
 
 resource "azurerm_storage_container" "atlas" {
@@ -38,6 +47,15 @@ resource "azurerm_storage_container" "atlas" {
   name                  = var.container_name
   storage_account_id    = local.storage_account_id
   container_access_type = "private"
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+      update = var.timeouts.update
+    }
+  }
 }
 
 resource "azurerm_storage_management_policy" "atlas" {
@@ -61,6 +79,15 @@ resource "azurerm_storage_management_policy" "atlas" {
       }
     }
   }
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+      update = var.timeouts.update
+    }
+  }
 }
 
 resource "azurerm_role_assignment" "log_integration" {
@@ -69,6 +96,14 @@ resource "azurerm_role_assignment" "log_integration" {
   principal_id         = var.service_principal_id
   role_definition_name = "Storage Blob Data Contributor"
   scope                = local.storage_account_id
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+    }
+  }
 }
 
 resource "azurerm_role_assignment" "integration_byo" {
@@ -77,6 +112,14 @@ resource "azurerm_role_assignment" "integration_byo" {
   principal_id         = var.service_principal_id
   role_definition_name = "Storage Blob Data Contributor"
   scope                = data.azurerm_storage_account.integration_byo[each.key].id
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+    }
+  }
 }
 
 data "azurerm_storage_account" "integration_byo" {

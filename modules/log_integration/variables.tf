@@ -1,3 +1,14 @@
+variable "timeouts" {
+  type = object({
+    create = optional(string, "30m")
+    update = optional(string, "30m")
+    delete = optional(string, "30m")
+  })
+  default     = null
+  nullable    = true
+  description = "When null, the module does not set provider timeouts on supported resources. Pass the root module `timeouts` value. `mongodbatlas_log_integration` has no `timeouts` in the current mongodbatlas provider schema."
+}
+
 variable "project_id" {
   type        = string
   description = "MongoDB Atlas project ID"

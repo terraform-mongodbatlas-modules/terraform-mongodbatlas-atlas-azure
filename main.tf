@@ -184,6 +184,7 @@ module "log_integration" {
   create_container       = var.log_integration.create_container
   create_storage_account = var.log_integration.create_storage_account
   integrations           = var.log_integration.integrations
+  timeouts               = var.timeouts
 
   depends_on = [mongodbatlas_cloud_provider_access_authorization.this]
 }
