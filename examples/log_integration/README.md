@@ -3,7 +3,7 @@ WARNING: This file is auto-generated. Do not edit directly.
 Changes will be overwritten when documentation is regenerated.
 Run 'just gen-examples' to regenerate.
 -->
-# Azure Key Vault Integration (User-Provided)
+# Log Integration
 
 <!-- BEGIN_GETTING_STARTED -->
 ## Prerequisites
@@ -55,82 +55,35 @@ Copy and use this code to get started quickly:
 
 **main.tf**
 ```hcl
-data "azurerm_resource_group" "main" {
-  name = var.resource_group_name
-}
-
-data "azurerm_client_config" "current" {}
-
-# Create client secret for encryption (only if not provided)
-# NOTE: In v1, this will be replaced with secretless role_id-based authentication
-# once the mongodbatlas provider adds support for Azure encryption without client_secret.
-resource "azuread_service_principal_password" "encryption" {
-  count                = var.existing_encryption_client_secret.enabled ? 0 : 1
-  service_principal_id = "/servicePrincipals/${var.service_principal_id}"
-  display_name         = "MongoDB Atlas - Encryption Test"
-  # Azure limits Client Secret lifetime to 2 years max. Rotate before expiration.
-}
-
-locals {
-  encryption_client_secret = coalesce(var.existing_encryption_client_secret.value, try(azuread_service_principal_password.encryption[0].value, null))
-}
-
-resource "azurerm_key_vault" "atlas" {
-  name                       = var.key_vault_name
-  location                   = data.azurerm_resource_group.main.location
-  resource_group_name        = data.azurerm_resource_group.main.name
-  tenant_id                  = data.azurerm_client_config.current.tenant_id
-  sku_name                   = "standard"
-  purge_protection_enabled   = var.purge_protection_enabled
-  soft_delete_retention_days = var.soft_delete_retention_days
-  rbac_authorization_enabled = true
-}
-
-resource "azurerm_role_assignment" "terraform_key_vault_admin" {
-  scope                = azurerm_key_vault.atlas.id
-  role_definition_name = "Key Vault Administrator"
-  principal_id         = data.azurerm_client_config.current.object_id
-}
-
-resource "azurerm_key_vault_key" "atlas" {
-  name         = "atlas-encryption-key"
-  key_vault_id = azurerm_key_vault.atlas.id
-  key_type     = "RSA"
-  key_size     = 2048
-  key_opts     = ["encrypt", "decrypt", "wrapKey", "unwrapKey"]
-
-  rotation_policy {
-    automatic {
-      time_before_expiry = "P30D"
-    }
-    expire_after         = "P365D"
-    notify_before_expiry = "P30D"
-  }
-
-  depends_on = [azurerm_role_assignment.terraform_key_vault_admin]
-
-  lifecycle {
-    ignore_changes = [expiration_date]
-  }
-}
-
 module "atlas_azure" {
   source  = "terraform-mongodbatlas-modules/atlas-azure/mongodbatlas"
-  project_id               = var.project_id
-  atlas_azure_app_id       = var.atlas_azure_app_id
-  service_principal_id     = var.service_principal_id
-  create_service_principal = false
-  encryption_client_secret = local.encryption_client_secret
+  project_id = var.project_id
 
-  encryption = {
+  atlas_azure_app_id       = var.atlas_azure_app_id
+  create_service_principal = var.create_service_principal
+  service_principal_id     = var.service_principal_id
+
+  log_integration = {
     enabled        = true
-    key_vault_id   = azurerm_key_vault.atlas.id
-    key_identifier = azurerm_key_vault_key.atlas.versionless_id
+    container_name = "atlas-logs"
+    create_storage_account = {
+      enabled             = true
+      name                = var.storage_account_name
+      resource_group_name = var.resource_group_name
+      azure_location      = var.azure_location
+    }
+    integrations = [
+      { log_types = ["MONGOD"], prefix_path = "operational" },
+    ]
   }
 }
 
-output "encryption" {
-  value = module.atlas_azure.encryption
+output "log_integration" {
+  value = module.atlas_azure.log_integration
+}
+
+output "module_full" {
+  value = module.atlas_azure
 }
 ```
 
