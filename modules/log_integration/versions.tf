@@ -10,13 +10,8 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 3.0"
     }
-    azuread = {
-      source  = "hashicorp/azuread"
-      version = ">= 2.53"
-    }
   }
 
-  # These values are used in the User-Agent Header
   provider_meta "mongodbatlas" {
     module_name    = "atlas-azure"
     module_version = "local"

@@ -172,6 +172,36 @@ run "dynamic_enable_cloud_provider_access_backup_export" {
   }
 }
 
+run "dynamic_enable_cloud_provider_access_log_integration" {
+  command = plan
+
+  module {
+    source = "./"
+  }
+
+  variables {
+    project_id = var.project_id
+    log_integration = {
+      enabled        = true
+      container_name = "atlas-logs"
+      create_storage_account = {
+        enabled             = true
+        name                = "atlaslogsstorage"
+        resource_group_name = "rg"
+        azure_location      = "eastus2"
+      }
+      integrations = [
+        { log_types = ["MONGOD"], prefix_path = "mongod/" }
+      ]
+    }
+  }
+
+  assert {
+    condition     = length(mongodbatlas_cloud_provider_access_setup.this) == 1
+    error_message = "Expected cloud_provider_access when log_integration is enabled"
+  }
+}
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Region Normalization Validations (preconditions on terraform_data)
 # ─────────────────────────────────────────────────────────────────────────────

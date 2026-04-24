@@ -1,0 +1,6 @@
+azure_config:
+- atlas_azure_app_id: <atlas_azure_app_id>
+  service_principal_id: <service_principal_id>
+  tenant_id: <tenant_id>
+project_id: <project_id>
+provider_name: AZURE

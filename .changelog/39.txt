@@ -1,0 +1,15 @@
+```release-note:enhancement
+submodule/log_integration: Adds Log Integration submodule for exporting Atlas logs to Azure Blob Storage via `mongodbatlas_log_integration`
+```
+
+```release-note:enhancement
+variable/log_integration: Adds `log_integration` variable with optional module-managed Storage Account, user-supplied `storage_account_id` (BYO), container lifecycle, per-integration storage account and container overrides, and Azure role assignments to the existing CPA service principal (with `skip_role_assignments` to manage permissions outside module)
+```
+
+```release-note:enhancement
+output/log_integration: Exposes log export status with storage account id, container name, service URL, integration ids, and blob expiration_days when `log_integration` is enabled
+```
+
+```release-note:note
+provider/mongodbatlas: Requires minimum version 2.8.0 for `mongodbatlas_log_integration` resource support
+```

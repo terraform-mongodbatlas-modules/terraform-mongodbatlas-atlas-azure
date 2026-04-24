@@ -17,6 +17,7 @@ Run 'just gen-readme' to regenerate. -->
 - [Encryption at Rest](#encryption-at-rest)
 - [Private Link](#private-link)
 - [Backup Export](#backup-export)
+- [Log Integration](#log-integration)
 - [Timeouts](#timeouts)
 - [Optional Variables](#optional-variables)
 - [Outputs](#outputs)
@@ -75,7 +76,7 @@ variable "org_id" {
 }
 
 resource "mongodbatlas_project" "this" {
-  name   = "cluster-module"
+  name   = "atlas-azure"
   org_id = var.org_id
 }
 ```
@@ -169,7 +170,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azurerm"></a> [azurerm](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs) (>= 3.0)
 
-- <a name="requirement_mongodbatlas"></a> [mongodbatlas](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs) (>= 2.0)
+- <a name="requirement_mongodbatlas"></a> [mongodbatlas](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs) (>= 2.8)
 
 ## Providers
 
@@ -179,7 +180,7 @@ The following providers are used by this module:
 
 - <a name="provider_azurerm"></a> [azurerm](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs) (>= 3.0)
 
-- <a name="provider_mongodbatlas"></a> [mongodbatlas](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs) (>= 2.0)
+- <a name="provider_mongodbatlas"></a> [mongodbatlas](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs) (>= 2.8)
 
 - <a name="provider_terraform"></a> [terraform](https://developer.hashicorp.com/terraform/language/resources/terraform-data)
 
@@ -382,6 +383,36 @@ Set `timeouts = null` to omit all module-managed timeouts and use each provider'
 - `timeouts = { create = "1h" }`: custom create timeout; 30m for other operations unless you set them.
 
 `mongodbatlas_cloud_provider_access_authorization`, `mongodbatlas_encryption_at_rest`, and `mongodbatlas_cloud_backup_snapshot_export_bucket` have no `timeouts` in the current mongodbatlas provider schema, so the module does not set timeouts for those resources.
+## Log Integration
+
+Log integration exports Atlas operational and audit logs to Azure Blob Storage at 1-minute intervals, feeding existing security monitoring and observability pipelines without polling the Atlas API. The module supports BYO storage account (`storage_account_id`) or module-managed storage account (`create_storage_account.enabled = true`), with optional per-integration storage account overrides.
+
+See the [log export documentation](https://www.mongodb.com/docs/atlas/export-logs-azure/) for details.
+
+### log_integration
+
+Log integration for exporting Atlas logs to Azure Blob Storage (`AZURE_LOG_EXPORT`).
+Log exports run at 1-minute intervals.
+
+**Storage Strategy (same pattern as `backup_export`):**
+- `storage_account_id` — user-provided Storage Account, default for all integrations
+- `create_storage_account.enabled = true` — module-managed Storage Account with secure defaults (TLS 1.2, public access blocked)
+- Per-integration `storage_account_name` + `container_name` override for BYO storage (e.g., audit logs to a separate account)
+
+**Integrations:**
+Each entry in `integrations` creates one `mongodbatlas_log_integration` resource.
+`prefix_path` is required by the Atlas API; use it to isolate log types within a shared container. Atlas writes objects as `{prefix}/{relative_path}`; the module trims a trailing `/` from `prefix_path` so keys do not end up with a double slash (e.g. `mongod//file`) and plans stay stable whether or not callers include `/`.
+Valid `log_types`: MONGOD, MONGOS, MONGOD_AUDIT, MONGOS_AUDIT (not validated by the module — Atlas API is authoritative).
+
+**Container name:**
+When `log_integration` is enabled, set `container_name` at the root, or set `container_name` on every integration (per-integration values override the root default for that integration only).
+
+**Lifecycle Management:**
+`create_storage_account.expiration_days` (default 90, 0 to disable) adds an `azurerm_storage_management_policy` that auto-deletes blobs after the specified number of days.
+
+**Index Stability:**
+Removing an integration from the middle of the list causes subsequent entries to be destroyed and recreated (index shift).
+This is acceptable: log integrations are stateless config, the brief delivery gap (~1 min) causes no data loss.
 
 Type:
 
@@ -390,6 +421,28 @@ object({
   create = optional(string, "30m")
   update = optional(string, "30m")
   delete = optional(string, "30m")
+  enabled = optional(bool, false)
+  integrations = optional(list(object({
+    log_types            = list(string)
+    prefix_path          = string
+    storage_account_name = optional(string)
+    container_name       = optional(string)
+    resource_group_name  = optional(string)
+  })), [])
+  storage_account_id = optional(string)
+  container_name     = optional(string)
+  create_container   = optional(bool, true)
+  create_storage_account = optional(object({
+    enabled             = bool
+    name                = string
+    resource_group_name = string
+    azure_location      = string
+    replication_type    = optional(string, "LRS")
+    account_tier        = optional(string, "Standard")
+    min_tls_version     = optional(string, "TLS1_2")
+    expiration_days     = optional(number, 90)
+  }))
+  tags = optional(map(string), {})
 })
 ```
 
@@ -546,6 +599,10 @@ Description: Value for cluster's encryption\_at\_rest\_provider attribute
 ### <a name="output_export_bucket_id"></a> [export\_bucket\_id](#output\_export\_bucket\_id)
 
 Description: Export bucket ID for backup schedule auto\_export\_enabled
+
+### <a name="output_log_integration"></a> [log\_integration](#output\_log\_integration)
+
+Description: Log integration configuration status
 
 ### <a name="output_privatelink"></a> [privatelink](#output\_privatelink)
 
