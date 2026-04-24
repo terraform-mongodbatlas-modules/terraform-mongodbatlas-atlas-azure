@@ -4,9 +4,9 @@
 # custom naming, or integration with existing networking infrastructure).
 #
 # Single `terraform apply` approach:
-# 1: Create Atlas-side PrivateLink using `privatelink_byoe_regions` to get service connection info
+# 1: Create Atlas-side PrivateLink using `privatelink_byo_endpoint` to get service connection info
 # 2: Create your own Azure Private Endpoint using the output `privatelink_service_info`
-# 3: Register your endpoint with Atlas using `privatelink_byoe` to complete the connection
+# 3: Register your endpoint with Atlas using `privatelink_byo_service` to complete the connection
 #
 # Note: azurerm_private_endpoint.custom depends on Step 1 output (module.atlas_azure.privatelink_service_info)
 
@@ -19,17 +19,16 @@ module "atlas_azure" {
 
   project_id = var.project_id
 
-  privatelink_byo_service = {
+  privatelink_byo_endpoint = { (local.pe1) = { region = var.region } } # 1
+  privatelink_byo_service = {                                          # 3
     (local.pe1) = {
       azure_private_endpoint_id         = azurerm_private_endpoint.custom.id
       azure_private_endpoint_ip_address = azurerm_private_endpoint.custom.private_service_connection[0].private_ip_address
     }
   }
-  privatelink_byo_endpoint = { (local.pe1) = { region = var.region } }
 }
 
-# User-managed Azure Private Endpoint with custom configuration
-resource "azurerm_private_endpoint" "custom" {
+resource "azurerm_private_endpoint" "custom" { # 2
   name                = "pe-atlas-static-ip"
   location            = module.atlas_azure.privatelink_service_info[local.pe1].region
   resource_group_name = var.resource_group_name
