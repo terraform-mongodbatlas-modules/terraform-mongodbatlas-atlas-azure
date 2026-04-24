@@ -368,21 +368,6 @@ object({
 Default: `{}`
 
 
-## Timeouts
-
-Control Terraform operation timeouts for supported resources. For upgrades from v0.2.x, see [v0.3.0 upgrade guide](docs/v0.3.0-upgrade-guide.md).
-
-### timeouts
-
-Timeouts for resources that the Terraform provider exposes with a `timeouts` block or attribute. Timeout values use [Go duration](https://pkg.go.dev/time#ParseDuration) format (for example, "30m", "1h").
-
-Set `timeouts = null` to omit all module-managed timeouts and use each provider's defaults. This avoids plan diffs when upgrading from earlier module versions. It is also the usual choice right after `terraform import`: imported resources often have no module-managed timeout blocks in state, so the module’s default `"30m"` values would otherwise appear as new configuration in the next plan. Use `timeouts = null` until you are ready to adopt the module’s timeout defaults (or set partial/custom values).
-
-- `timeouts = {}` or unset: 30m for create, update, and delete.
-- `timeouts = null`: no module-managed timeouts.
-- `timeouts = { create = "1h" }`: custom create timeout; 30m for other operations unless you set them.
-
-`mongodbatlas_cloud_provider_access_authorization`, `mongodbatlas_encryption_at_rest`, and `mongodbatlas_cloud_backup_snapshot_export_bucket` have no `timeouts` in the current mongodbatlas provider schema, so the module does not set timeouts for those resources.
 ## Log Integration
 
 Log integration exports Atlas operational and audit logs to Azure Blob Storage at 1-minute intervals, feeding existing security monitoring and observability pipelines without polling the Atlas API. The module supports BYO storage account (`storage_account_id`) or module-managed storage account (`create_storage_account.enabled = true`), with optional per-integration storage account overrides.
@@ -418,9 +403,6 @@ Type:
 
 ```hcl
 object({
-  create = optional(string, "30m")
-  update = optional(string, "30m")
-  delete = optional(string, "30m")
   enabled = optional(bool, false)
   integrations = optional(list(object({
     log_types            = list(string)
@@ -443,6 +425,35 @@ object({
     expiration_days     = optional(number, 90)
   }))
   tags = optional(map(string), {})
+})
+```
+
+Default: `{}`
+
+
+## Timeouts
+
+Control Terraform operation timeouts for supported resources. For upgrades from v0.2.x, see [v0.3.0 upgrade guide](docs/v0.3.0-upgrade-guide.md).
+
+### timeouts
+
+Timeouts for resources that the Terraform provider exposes with a `timeouts` block or attribute. Timeout values use [Go duration](https://pkg.go.dev/time#ParseDuration) format (for example, "30m", "1h").
+
+Set `timeouts = null` to omit all module-managed timeouts and use each provider's defaults. This avoids plan diffs when upgrading from earlier module versions. It is also the usual choice right after `terraform import`: imported resources often have no module-managed timeout blocks in state, so the module’s default `"30m"` values would otherwise appear as new configuration in the next plan. Use `timeouts = null` until you are ready to adopt the module’s timeout defaults (or set partial/custom values).
+
+- `timeouts = {}` or unset: 30m for create, update, and delete.
+- `timeouts = null`: no module-managed timeouts.
+- `timeouts = { create = "1h" }`: custom create timeout; 30m for other operations unless you set them.
+
+`mongodbatlas_cloud_provider_access_authorization`, `mongodbatlas_encryption_at_rest`, and `mongodbatlas_cloud_backup_snapshot_export_bucket` have no `timeouts` in the current mongodbatlas provider schema, so the module does not set timeouts for those resources.
+
+Type:
+
+```hcl
+object({
+  create = optional(string, "30m")
+  update = optional(string, "30m")
+  delete = optional(string, "30m")
 })
 ```
 
