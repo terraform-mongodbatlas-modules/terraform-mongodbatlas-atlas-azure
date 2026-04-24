@@ -359,6 +359,11 @@ run "timeouts_null_with_privatelink" {
     condition     = length(mongodbatlas_privatelink_endpoint.this) == 1
     error_message = "Expected one privatelink endpoint when timeouts is null"
   }
+
+  assert {
+    condition     = try(mongodbatlas_privatelink_endpoint.this["eastus2"].timeouts, null) == null
+    error_message = "Expected module-managed timeouts to be omitted when timeouts is null"
+  }
 }
 
 run "timeouts_empty_object_plans" {

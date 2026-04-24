@@ -375,7 +375,7 @@ Control Terraform operation timeouts for supported resources. For upgrades from 
 
 Timeouts for resources that the Terraform provider exposes with a `timeouts` block or attribute. Timeout values use [Go duration](https://pkg.go.dev/time#ParseDuration) format (for example, "30m", "1h").
 
-Set `timeouts = null` to omit all module-managed timeouts and use each provider's defaults. This avoids plan diffs when upgrading from earlier module versions or right after `terraform import`.
+Set `timeouts = null` to omit all module-managed timeouts and use each provider's defaults. This avoids plan diffs when upgrading from earlier module versions. It is also the usual choice right after `terraform import`: imported resources often have no module-managed timeout blocks in state, so the module’s default `"30m"` values would otherwise appear as new configuration in the next plan. Use `timeouts = null` until you are ready to adopt the module’s timeout defaults (or set partial/custom values).
 
 - `timeouts = {}` or unset: 30m for create, update, and delete.
 - `timeouts = null`: no module-managed timeouts.
