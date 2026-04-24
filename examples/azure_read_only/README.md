@@ -3,7 +3,7 @@ WARNING: This file is auto-generated. Do not edit directly.
 Changes will be overwritten when documentation is regenerated.
 Run 'just gen-examples' to regenerate.
 -->
-# Azure Read Only
+# Read-Only Azure (BYO Key Vault, Storage, and Log Export)
 
 <!-- BEGIN_GETTING_STARTED -->
 ## Prerequisites
