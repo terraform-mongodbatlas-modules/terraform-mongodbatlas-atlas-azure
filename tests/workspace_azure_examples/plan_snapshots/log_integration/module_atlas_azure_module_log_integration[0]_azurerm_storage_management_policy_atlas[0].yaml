@@ -22,5 +22,5 @@ rule:
     - blockBlob
     match_blob_index_tag: []
     prefix_match:
-    - atlas-logs
+    - atlas-logs/
   name: atlas-log-expiration
