@@ -56,7 +56,7 @@ variable "skip_role_assignments" {
   }
 
   validation {
-    condition     = !var.skip_role_assignments || !try(var.backup_export.create_storage_account.enabled, false)
+    condition     = !var.skip_role_assignments || !try(var.backup_export.enabled, false) || !try(var.backup_export.create_storage_account.enabled, false)
     error_message = "skip_role_assignments = true requires BYO Storage Account (storage_account_id). Module-managed Storage Account needs role assignments."
   }
 
