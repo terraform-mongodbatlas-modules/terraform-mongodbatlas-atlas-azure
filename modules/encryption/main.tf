@@ -32,6 +32,15 @@ resource "azurerm_key_vault" "atlas" {
   soft_delete_retention_days = var.create_key_vault.soft_delete_retention_days
   rbac_authorization_enabled = true
   tags                       = var.tags
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+      update = var.timeouts.update
+    }
+  }
 }
 
 resource "azurerm_role_assignment" "terraform_key_vault_admin" {
@@ -40,6 +49,14 @@ resource "azurerm_role_assignment" "terraform_key_vault_admin" {
   scope                = azurerm_key_vault.atlas[0].id
   role_definition_name = "Key Vault Administrator"
   principal_id         = data.azurerm_client_config.current.object_id
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+    }
+  }
 }
 
 resource "azurerm_key_vault_key" "atlas" {
@@ -64,6 +81,15 @@ resource "azurerm_key_vault_key" "atlas" {
   lifecycle {
     ignore_changes = [expiration_date]
   }
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+      update = var.timeouts.update
+    }
+  }
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -74,12 +100,28 @@ resource "azurerm_role_assignment" "key_vault_crypto" {
   scope                = local.key_vault_id
   role_definition_name = "Key Vault Crypto User"
   principal_id         = var.service_principal_id
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+    }
+  }
 }
 
 resource "azurerm_role_assignment" "key_vault_reader" {
   scope                = local.key_vault_id
   role_definition_name = "Key Vault Reader"
   principal_id         = var.service_principal_id
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+    }
+  }
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -90,17 +132,20 @@ resource "mongodbatlas_encryption_at_rest" "this" {
   project_id               = var.project_id
   enabled_for_search_nodes = var.enabled_for_search_nodes
 
+  /* Mutually exclusive auth: role_id (default) vs tenant_id/client_id/secret (legacy); single block, conditional attrs. */
   azure_key_vault_config {
     enabled                    = true
     azure_environment          = "AZURE"
-    tenant_id                  = local.tenant_id
     subscription_id            = local.subscription_id
-    client_id                  = data.azuread_service_principal.atlas.client_id
-    secret                     = var.client_secret
     resource_group_name        = local.resource_group_name
     key_vault_name             = local.key_vault_name
     key_identifier             = local.key_identifier
     require_private_networking = var.require_private_networking
+
+    role_id   = var.client_secret == null ? var.role_id : null
+    tenant_id = var.client_secret != null ? local.tenant_id : null
+    client_id = var.client_secret != null ? data.azuread_service_principal.atlas.client_id : null
+    secret    = var.client_secret
   }
 
   lifecycle {

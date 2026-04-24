@@ -2,27 +2,12 @@ data "azurerm_resource_group" "main" {
   name = var.resource_group_name
 }
 
-# Create client secret for encryption (only if not provided).
-# NOTE: In v1, this will be replaced with secretless role_id-based authentication
-# once the mongodbatlas provider adds support for Azure encryption without client_secret.
-resource "azuread_service_principal_password" "encryption" {
-  count                = var.existing_encryption_client_secret.enabled ? 0 : 1
-  service_principal_id = "/servicePrincipals/${var.service_principal_id}"
-  display_name         = "MongoDB Atlas - Encryption Test"
-  # Azure limits Client Secret lifetime to 2 years max. Rotate before expiration.
-}
-
-locals {
-  encryption_client_secret = coalesce(var.existing_encryption_client_secret.value, try(azuread_service_principal_password.encryption[0].value, null))
-}
-
 module "atlas_azure" {
   source                   = "../../"
   project_id               = var.project_id
   service_principal_id     = var.service_principal_id
   create_service_principal = false
   atlas_azure_app_id       = var.atlas_azure_app_id
-  encryption_client_secret = local.encryption_client_secret
 
   encryption = {
     enabled = true

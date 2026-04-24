@@ -1,3 +1,14 @@
+variable "timeouts" {
+  type = object({
+    create = optional(string, "30m")
+    update = optional(string, "30m")
+    delete = optional(string, "30m")
+  })
+  default     = null
+  nullable    = true
+  description = "When null, the module does not set provider timeouts on supported resources. Pass the root module `timeouts` value."
+}
+
 variable "project_id" {
   type        = string
   description = "MongoDB Atlas project ID"
@@ -38,10 +49,16 @@ variable "create_key_vault" {
   description = "Create module-managed Key Vault. Mutually exclusive with key_vault_id. key_rotation_policy uses ISO 8601 duration format (P365D = 365 days). Azure auto-rotates keys and Atlas uses versionless key URL."
 }
 
+variable "role_id" {
+  type        = string
+  description = "Atlas cloud provider access role ID from cloud_provider_access_authorization."
+}
+
 variable "client_secret" {
   type        = string
+  default     = null
   sensitive   = true
-  description = "Azure AD application client secret for Atlas encryption."
+  description = "Deprecated: Azure AD application client secret. Remove from your configuration, the module uses CPA role_id automatically. Will be removed in v1.0."
 }
 
 variable "require_private_networking" {

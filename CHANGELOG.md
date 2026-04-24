@@ -1,5 +1,16 @@
 ## (Unreleased)
 
+NOTES:
+
+* provider/mongodbatlas: Requires minimum version 2.8.0 for `mongodbatlas_log_integration` resource support ([#39](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/pull/39))
+
+ENHANCEMENTS:
+
+* output/log_integration: Exposes log export status with storage account id, container name, service URL, integration ids, and blob expiration_days when `log_integration` is enabled ([#39](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/pull/39))
+* submodule/log_integration: Adds Log Integration submodule for exporting Atlas logs to Azure Blob Storage via `mongodbatlas_log_integration` ([#39](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/pull/39))
+* variable/log_integration: Adds `log_integration` variable with optional module-managed Storage Account, user-supplied `storage_account_id` (BYO), container lifecycle, per-integration storage account and container overrides, and Azure role assignments to the existing CPA service principal (with `skip_role_assignments` to manage permissions outside module) ([#39](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/pull/39))
+* variable/timeouts: Adds optional nullable `timeouts` with 30m defaults for create, update, and delete, applied to supported Atlas and Azure resources. See docs/v0.3.0-upgrade-guide.md for details ([#41](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/pull/41))
+
 ## 0.2.0 (February 25, 2026)
 
 BREAKING CHANGES:

@@ -130,8 +130,7 @@ run "dynamic_enable_cloud_provider_access_encryption" {
   }
 
   variables {
-    project_id               = var.project_id
-    encryption_client_secret = "test-secret"
+    project_id = var.project_id
     encryption = {
       enabled        = true
       key_vault_id   = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.KeyVault/vaults/kv"
@@ -169,6 +168,36 @@ run "dynamic_enable_cloud_provider_access_backup_export" {
   assert {
     condition     = length(mongodbatlas_cloud_provider_access_setup.this) == 1
     error_message = "Expected cloud_provider_access when backup_export is enabled"
+  }
+}
+
+run "dynamic_enable_cloud_provider_access_log_integration" {
+  command = plan
+
+  module {
+    source = "./"
+  }
+
+  variables {
+    project_id = var.project_id
+    log_integration = {
+      enabled        = true
+      container_name = "atlas-logs"
+      create_storage_account = {
+        enabled             = true
+        name                = "atlaslogsstorage"
+        resource_group_name = "rg"
+        azure_location      = "eastus2"
+      }
+      integrations = [
+        { log_types = ["MONGOD"], prefix_path = "mongod/" }
+      ]
+    }
+  }
+
+  assert {
+    condition     = length(mongodbatlas_cloud_provider_access_setup.this) == 1
+    error_message = "Expected cloud_provider_access when log_integration is enabled"
   }
 }
 
@@ -239,8 +268,7 @@ run "region_unknown_encryption_rejected" {
   }
 
   variables {
-    project_id               = var.project_id
-    encryption_client_secret = "test-secret"
+    project_id = var.project_id
     encryption = {
       enabled                  = true
       key_vault_id             = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.KeyVault/vaults/kv"
@@ -338,4 +366,73 @@ run "region_custom_mapping_rejects_unmapped" {
   }
 
   expect_failures = [terraform_data.region_validations]
+}
+
+run "timeouts_null_with_privatelink" {
+  command = plan
+
+  module {
+    source = "./"
+  }
+
+  variables {
+    project_id = var.project_id
+    timeouts   = null
+    privatelink_endpoints = [
+      { region = "eastus2", subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" }
+    ]
+  }
+
+  assert {
+    condition     = length(mongodbatlas_privatelink_endpoint.this) == 1
+    error_message = "Expected one privatelink endpoint when timeouts is null"
+  }
+
+  assert {
+    condition     = try(mongodbatlas_privatelink_endpoint.this["eastus2"].timeouts, null) == null
+    error_message = "Expected module-managed timeouts to be omitted when timeouts is null"
+  }
+}
+
+run "timeouts_empty_object_plans" {
+  command = plan
+
+  module {
+    source = "./"
+  }
+
+  variables {
+    project_id = var.project_id
+    timeouts   = {}
+    privatelink_endpoints = [
+      { region = "eastus2", subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" }
+    ]
+  }
+
+  assert {
+    condition     = length(mongodbatlas_privatelink_endpoint.this) == 1
+    error_message = "Expected one privatelink endpoint when timeouts is the empty object"
+  }
+}
+
+run "timeouts_rejects_blank_duration" {
+  command = plan
+
+  module {
+    source = "./"
+  }
+
+  variables {
+    project_id = var.project_id
+    timeouts = {
+      create = "   "
+    }
+    privatelink_endpoints = [
+      { region = "eastus2", subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" }
+    ]
+  }
+
+  expect_failures = [
+    var.timeouts
+  ]
 }

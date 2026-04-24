@@ -114,17 +114,10 @@ variable "encryption_client_secret" {
   default     = null
   sensitive   = true
   description = <<-EOT
-    Azure AD application client secret for encryption. This value is required when using module-managed encryption (`encryption.enabled = true`).
+    Deprecated: Azure AD application client secret for encryption. The module now uses CPA `role_id` automatically. Remove this variable from your configuration. Will be removed at v1.0.
 
-    **IMPORTANT:** Azure limits the client secret lifetime to two years. When the secret expires, Atlas loses CMK access, causing cluster unavailability. Rotate secrets before expiration.
-
-    **v1 Roadmap:** This variable will become optional once the mongodbatlas provider adds secretless `role_id`-based authentication for Azure encryption (expected in v1). The module will then support both methods with secretless as the recommended approach.
+    When set, the encryption submodule uses the legacy Key Vault config (tenant_id, client_id, and secret).
   EOT
-
-  validation {
-    condition     = !var.encryption.enabled || var.encryption_client_secret != null
-    error_message = "encryption_client_secret is required when encryption.enabled = true."
-  }
 }
 
 variable "privatelink_byo_endpoint" {
@@ -261,5 +254,131 @@ variable "backup_export" {
       var.backup_export.create_storage_account.azure_location
     ))
     error_message = "create_storage_account.azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
+  }
+}
+
+variable "log_integration" {
+  type = object({
+    enabled = optional(bool, false)
+    integrations = optional(list(object({
+      log_types            = list(string)
+      prefix_path          = string
+      storage_account_name = optional(string)
+      container_name       = optional(string)
+      resource_group_name  = optional(string)
+    })), [])
+    storage_account_id = optional(string)
+    container_name     = optional(string)
+    create_container   = optional(bool, true)
+    create_storage_account = optional(object({
+      enabled             = bool
+      name                = string
+      resource_group_name = string
+      azure_location      = string
+      replication_type    = optional(string, "LRS")
+      account_tier        = optional(string, "Standard")
+      min_tls_version     = optional(string, "TLS1_2")
+      expiration_days     = optional(number, 90)
+    }))
+    tags = optional(map(string), {})
+  })
+  default     = {}
+  description = <<-EOT
+    Log integration for exporting Atlas logs to Azure Blob Storage (`AZURE_LOG_EXPORT`).
+    Log exports run at 1-minute intervals.
+
+    **Storage Strategy (same pattern as `backup_export`):**
+    - `storage_account_id` — user-provided Storage Account, default for all integrations
+    - `create_storage_account.enabled = true` — module-managed Storage Account with secure defaults (TLS 1.2, public access blocked)
+    - Per-integration `storage_account_name` + `container_name` override for BYO storage (e.g., audit logs to a separate account)
+
+    **Integrations:**
+    Each entry in `integrations` creates one `mongodbatlas_log_integration` resource.
+    `prefix_path` is required by the Atlas API; use it to isolate log types within a shared container. Atlas writes objects as `{prefix}/{relative_path}`; the module trims a trailing `/` from `prefix_path` so keys do not end up with a double slash (e.g. `mongod//file`) and plans stay stable whether or not callers include `/`.
+    Valid `log_types`: MONGOD, MONGOS, MONGOD_AUDIT, MONGOS_AUDIT (not validated by the module — Atlas API is authoritative).
+
+    **Container name:**
+    When `log_integration` is enabled, set `container_name` at the root, or set `container_name` on every integration (per-integration values override the root default for that integration only).
+
+    **Lifecycle Management:**
+    `create_storage_account.expiration_days` (default 90, 0 to disable) adds an `azurerm_storage_management_policy` that auto-deletes blobs after the specified number of days.
+
+    **Index Stability:**
+    Removing an integration from the middle of the list causes subsequent entries to be destroyed and recreated (index shift).
+    This is acceptable: log integrations are stateless config, the brief delivery gap (~1 min) causes no data loss.
+  EOT
+
+  validation {
+    condition     = !var.log_integration.enabled || length(var.log_integration.integrations) > 0
+    error_message = "log_integration.enabled = true requires at least one entry in integrations."
+  }
+
+  validation {
+    condition     = !var.log_integration.enabled || (var.log_integration.storage_account_id != null || try(var.log_integration.create_storage_account.enabled, false))
+    error_message = "log_integration.enabled = true requires storage_account_id OR create_storage_account.enabled = true."
+  }
+
+  validation {
+    condition     = !(var.log_integration.storage_account_id != null && try(var.log_integration.create_storage_account.enabled, false))
+    error_message = "Cannot use both storage_account_id (user-provided) and create_storage_account.enabled = true (module-managed)."
+  }
+
+  validation {
+    condition = !var.log_integration.enabled || (
+      var.log_integration.container_name != null ||
+      alltrue([
+        for integration in var.log_integration.integrations : try(integration.container_name, null) != null
+      ])
+    )
+    error_message = "log_integration.enabled = true requires log_integration.container_name, or container_name on every entry in integrations."
+  }
+
+  validation {
+    condition     = var.log_integration.create_container != false || var.log_integration.storage_account_id != null
+    error_message = "create_container=false only valid with storage_account_id (user-provided storage)."
+  }
+
+  validation {
+    condition = var.log_integration.storage_account_id == null || can(regex(
+      "^/subscriptions/[0-9a-f-]+/resourceGroups/[^/]+/providers/Microsoft\\.Storage/storageAccounts/[a-z0-9]+$",
+      var.log_integration.storage_account_id
+    ))
+    error_message = "storage_account_id must be a valid Azure Storage Account resource ID."
+  }
+
+  validation {
+    condition = var.log_integration.create_storage_account == null || can(regex(
+      "^[a-z][a-z0-9]+$",
+      var.log_integration.create_storage_account.azure_location
+    ))
+    error_message = "create_storage_account.azure_location must use Azure format (lowercase, no separators). Examples: eastus2, westeurope"
+  }
+}
+
+variable "timeouts" {
+  type = object({
+    create = optional(string, "30m")
+    update = optional(string, "30m")
+    delete = optional(string, "30m")
+  })
+  default     = {}
+  nullable    = true
+  description = <<-EOT
+    Timeouts for resources that the Terraform provider exposes with a `timeouts` block or attribute. Timeout values use [Go duration](https://pkg.go.dev/time#ParseDuration) format (for example, "30m", "1h").
+
+    Set `timeouts = null` to omit all module-managed timeouts and use each provider's defaults. This avoids plan diffs when upgrading from earlier module versions. It is also the usual choice right after `terraform import`: imported resources often have no module-managed timeout blocks in state, so the module’s default `"30m"` values would otherwise appear as new configuration in the next plan. Use `timeouts = null` until you are ready to adopt the module’s timeout defaults (or set partial/custom values).
+
+    - `timeouts = {}` or unset: 30m for create, update, and delete.
+    - `timeouts = null`: no module-managed timeouts.
+    - `timeouts = { create = "1h" }`: custom create timeout; 30m for other operations unless you set them.
+  EOT
+
+  validation {
+    condition = (
+      var.timeouts == null
+      ? true
+      : alltrue([for s in [var.timeouts.create, var.timeouts.update, var.timeouts.delete] : length(trimspace(s)) > 0])
+    )
+    error_message = "When timeouts is not null, create, update, and delete must be non-empty duration strings (Go duration format, for example 30m or 1h30m)."
   }
 }

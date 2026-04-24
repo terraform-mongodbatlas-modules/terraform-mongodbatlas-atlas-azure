@@ -35,7 +35,6 @@ env:
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
   AZURE_SERVICE_PRINCIPAL_ID: ${{ secrets.AZURE_SERVICE_PRINCIPAL_ID }}
-  EXISTING_ENCRYPTION_CLIENT_SECRET: ${{ secrets.EXISTING_ENCRYPTION_CLIENT_SECRET }}
   # AZURE_STORAGE_ACCOUNT_NAME is not included, will be generated randomly
 jobs:
   # === DO_NOT_EDIT: path-sync job-tftest ===

@@ -29,19 +29,6 @@ variable "atlas_azure_app_id" {
   description = "MongoDB Atlas Azure application ID"
 }
 
-variable "existing_encryption_client_secret" {
-  type = object({
-    enabled = bool
-    value   = string
-  })
-  sensitive   = true
-  description = "Existing client secret for encryption. If not provided, example creates one automatically."
-  default = {
-    enabled = false
-    value   = null
-  }
-}
-
 variable "purge_protection_enabled" {
   type        = bool
   default     = true

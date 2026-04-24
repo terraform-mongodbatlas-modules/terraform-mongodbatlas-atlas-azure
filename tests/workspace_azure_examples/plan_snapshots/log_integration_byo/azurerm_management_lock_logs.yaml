@@ -1,0 +1,3 @@
+lock_level: CanNotDelete
+name: atlas-log-storage-lock
+notes: Prevent accidental deletion of Atlas log storage account

@@ -23,6 +23,13 @@ resource "mongodbatlas_cloud_provider_access_setup" "this" {
     service_principal_id = local.service_principal_id
     tenant_id            = local.tenant_id
   }
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+    }
+  }
 }
 
 resource "mongodbatlas_cloud_provider_access_authorization" "this" {
@@ -48,17 +55,26 @@ module "encryption" {
 
   project_id           = var.project_id
   service_principal_id = local.service_principal_id
+  timeouts             = var.timeouts
 
   key_vault_id     = var.encryption.key_vault_id
   key_identifier   = var.encryption.key_identifier
   create_key_vault = var.encryption.create_key_vault
   tags             = var.azure_tags
 
+  role_id                    = mongodbatlas_cloud_provider_access_authorization.this[0].role_id
   client_secret              = var.encryption_client_secret
   require_private_networking = local.encryption_require_private_networking
   enabled_for_search_nodes   = var.encryption.enabled_for_search_nodes
 
   depends_on = [mongodbatlas_cloud_provider_access_authorization.this]
+}
+
+check "encryption_client_secret_deprecated" {
+  assert {
+    condition     = var.encryption_client_secret == null
+    error_message = "encryption_client_secret is deprecated and will be removed at v1.0. Remove it from your configuration; the module uses CPA role_id automatically."
+  }
 }
 
 module "encryption_private_endpoint" {
@@ -70,6 +86,7 @@ module "encryption_private_endpoint" {
 
   project_id  = var.project_id
   region_name = lookup(local._normalize_to_atlas, each.key, each.key)
+  timeouts    = var.timeouts
 
   depends_on = [module.encryption]
 }
@@ -83,6 +100,15 @@ resource "mongodbatlas_private_endpoint_regional_mode" "this" {
 
   project_id = var.project_id
   enabled    = true
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      update = var.timeouts.update
+      delete = var.timeouts.delete
+    }
+  }
 }
 
 # Atlas-side PrivateLink endpoint - created at root level to avoid cycles
@@ -92,6 +118,15 @@ resource "mongodbatlas_privatelink_endpoint" "this" {
   project_id    = var.project_id
   provider_name = "AZURE"
   region        = each.value
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      update = var.timeouts.update
+      delete = var.timeouts.delete
+    }
+  }
 }
 
 # Privatelink module - one per user key (BYOE or module-managed)
@@ -115,6 +150,8 @@ module "privatelink" {
   # BYOE
   azure_private_endpoint_id         = try(var.privatelink_byo_service[each.key].azure_private_endpoint_id, null)
   azure_private_endpoint_ip_address = try(var.privatelink_byo_service[each.key].azure_private_endpoint_ip_address, null)
+
+  timeouts = var.timeouts
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -134,6 +171,31 @@ module "backup_export" {
   storage_account_id     = var.backup_export.storage_account_id
   create_container       = var.backup_export.create_container
   create_storage_account = var.backup_export.create_storage_account
+  timeouts               = var.timeouts
+
+  depends_on = [mongodbatlas_cloud_provider_access_authorization.this]
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Log Integration (AZURE_LOG_EXPORT)
+# ─────────────────────────────────────────────────────────────────────────────
+
+module "log_integration" {
+  count  = var.log_integration.enabled ? 1 : 0
+  source = "./modules/log_integration"
+
+  project_id            = var.project_id
+  role_id               = mongodbatlas_cloud_provider_access_authorization.this[0].role_id
+  service_principal_id  = local.service_principal_id
+  skip_role_assignments = false
+  tags                  = merge(var.azure_tags, var.log_integration.tags)
+
+  container_name         = local.log_integration_default_container_name
+  storage_account_id     = var.log_integration.storage_account_id
+  create_container       = var.log_integration.create_container
+  create_storage_account = var.log_integration.create_storage_account
+  integrations           = var.log_integration.integrations
+  timeouts               = var.timeouts
 
   depends_on = [mongodbatlas_cloud_provider_access_authorization.this]
 }

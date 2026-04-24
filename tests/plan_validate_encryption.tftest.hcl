@@ -141,7 +141,7 @@ run "encryption_disabled_default" {
   }
 }
 
-run "encryption_enabled_without_client_secret" {
+run "encryption_role_id_only" {
   command = plan
 
   variables {
@@ -153,27 +153,14 @@ run "encryption_enabled_without_client_secret" {
     }
   }
 
-  expect_failures = [
-    var.encryption_client_secret
-  ]
-}
-
-run "encryption_user_provided_key_vault" {
-  command = plan
-
-  variables {
-    project_id               = var.project_id
-    encryption_client_secret = "test-secret-value"
-    encryption = {
-      enabled        = true
-      key_vault_id   = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.KeyVault/vaults/kv"
-      key_identifier = "https://kv.vault.azure.net/keys/my-key"
-    }
+  assert {
+    condition     = length(module.encryption) == 1
+    error_message = "Expected encryption module when encryption.enabled = true"
   }
 
   assert {
-    condition     = length(module.encryption) == 1
-    error_message = "Expected encryption module to be created"
+    condition     = length(mongodbatlas_cloud_provider_access_authorization.this) == 1
+    error_message = "Expected CPA authorization for role_id"
   }
 
   assert {
@@ -182,12 +169,27 @@ run "encryption_user_provided_key_vault" {
   }
 }
 
-run "encryption_enabled_for_search_nodes_default_true" {
+run "encryption_with_deprecated_client_secret" {
   command = plan
 
   variables {
     project_id               = var.project_id
-    encryption_client_secret = "test-secret-value"
+    encryption_client_secret = "test-secret"
+    encryption = {
+      enabled        = true
+      key_vault_id   = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.KeyVault/vaults/kv"
+      key_identifier = "https://kv.vault.azure.net/keys/my-key"
+    }
+  }
+
+  expect_failures = [check.encryption_client_secret_deprecated]
+}
+
+run "encryption_enabled_for_search_nodes_default_true" {
+  command = plan
+
+  variables {
+    project_id = var.project_id
     encryption = {
       enabled        = true
       key_vault_id   = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.KeyVault/vaults/kv"
@@ -205,8 +207,7 @@ run "encryption_enabled_for_search_nodes_explicit_false" {
   command = plan
 
   variables {
-    project_id               = var.project_id
-    encryption_client_secret = "test-secret-value"
+    project_id = var.project_id
     encryption = {
       enabled                  = true
       key_vault_id             = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.KeyVault/vaults/kv"
@@ -225,8 +226,7 @@ run "encryption_module_managed_key_vault" {
   command = plan
 
   variables {
-    project_id               = var.project_id
-    encryption_client_secret = "test-secret-value"
+    project_id = var.project_id
     encryption = {
       enabled = true
       create_key_vault = {
@@ -253,8 +253,7 @@ run "encryption_with_private_networking" {
   command = plan
 
   variables {
-    project_id               = var.project_id
-    encryption_client_secret = "test-secret-value"
+    project_id = var.project_id
     encryption = {
       enabled = true
       create_key_vault = {
@@ -287,8 +286,7 @@ run "encryption_private_networking_azure_format" {
   command = plan
 
   variables {
-    project_id               = var.project_id
-    encryption_client_secret = "test-secret-value"
+    project_id = var.project_id
     encryption = {
       enabled = true
       create_key_vault = {
@@ -315,8 +313,7 @@ run "invalid_encryption_region_format" {
   command = plan
 
   variables {
-    project_id               = var.project_id
-    encryption_client_secret = "test-secret-value"
+    project_id = var.project_id
     encryption = {
       enabled = true
       create_key_vault = {
@@ -336,8 +333,7 @@ run "invalid_encryption_multiple_bad_regions" {
   command = plan
 
   variables {
-    project_id               = var.project_id
-    encryption_client_secret = "test-secret-value"
+    project_id = var.project_id
     encryption = {
       enabled = true
       create_key_vault = {

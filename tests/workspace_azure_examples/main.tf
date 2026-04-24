@@ -65,24 +65,13 @@ variable "project_ids" {
   type = object({
     backup_export            = optional(string)
     encryption               = optional(string)
+    log_integration          = optional(string)
+    log_integration_byo      = optional(string)
     privatelink              = optional(string)
     privatelink_byoe         = optional(string)
     privatelink_multi_region = optional(string)
   })
   default = {}
-}
-
-variable "existing_encryption_client_secret" {
-  type = object({
-    enabled = bool
-    value   = string
-  })
-  sensitive   = true
-  description = "Existing client secret for encryption. If not provided, example creates one automatically."
-  default = {
-    enabled = false
-    value   = null
-  }
 }
 
 # Shared resource group
@@ -142,15 +131,9 @@ resource "random_string" "suffix" {
   upper   = false
 }
 
-# Client secret for encryption (only if not provided)
-resource "azuread_service_principal_password" "encryption" {
-  count                = var.existing_encryption_client_secret.enabled ? 0 : 1
-  service_principal_id = "/servicePrincipals/${local.service_principal_id}"
-  display_name         = "MongoDB Atlas - Encryption Test Workspace Test"
-}
-
 locals {
-  resource_group_name  = var.resource_group_name != "" ? var.resource_group_name : module.rg[0].name
+  resource_group_name = var.resource_group_name != "" ? var.resource_group_name : module.rg[0].name
+  # tflint-ignore: terraform_unused_declarations
   service_principal_id = var.service_principal_id != "" ? var.service_principal_id : module.sp[0].service_principal_id
   # tflint-ignore: terraform_unused_declarations
   atlas_azure_app_id = var.atlas_azure_app_id
@@ -160,6 +143,10 @@ locals {
   project_ids         = { for k, v in var.project_ids : k => v != null ? v : module.project[k].project_id }
   # tflint-ignore: terraform_unused_declarations
   project_id_backup_export = local.project_ids.backup_export
+  # tflint-ignore: terraform_unused_declarations
+  project_id_log_integration = local.project_ids.log_integration
+  # tflint-ignore: terraform_unused_declarations
+  project_id_log_integration_byo = local.project_ids.log_integration_byo
   # tflint-ignore: terraform_unused_declarations
   project_id_encryption = local.project_ids.encryption
   # tflint-ignore: terraform_unused_declarations
@@ -172,14 +159,13 @@ locals {
   # Encryption locals
   # tflint-ignore: terraform_unused_declarations
   key_vault_name = "kv-atlas-${random_string.suffix.id}"
-  # Backup export locals
+  # tflint-ignore: terraform_unused_declarations
+  azure_location = var.azure_location
+  # Backup/log export locals
   # tflint-ignore: terraform_unused_declarations
   storage_account_name = var.storage_account_name != "" ? var.storage_account_name : "saatlas${random_string.suffix.id}"
   # tflint-ignore: terraform_unused_declarations
-  existing_encryption_client_secret = {
-    enabled = var.existing_encryption_client_secret.enabled
-    value   = var.existing_encryption_client_secret.enabled ? var.existing_encryption_client_secret.value : azuread_service_principal_password.encryption[0].value
-  }
+  storage_account_name_byo_log = "sabyolog${random_string.suffix.id}"
 
   # PrivateLink locals - used by generated example modules (modules.generated.tf)
   # tflint-ignore: terraform_unused_declarations
