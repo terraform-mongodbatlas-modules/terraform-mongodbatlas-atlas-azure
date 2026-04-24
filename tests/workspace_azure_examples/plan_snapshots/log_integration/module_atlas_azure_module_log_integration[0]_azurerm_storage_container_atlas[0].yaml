@@ -1,7 +1,6 @@
 container_access_type: private
 encryption_scope_override_enabled: true
 name: atlas-logs
-storage_account_name: <storage_account_name>
 timeouts:
   create: 30m
   delete: 30m
