@@ -1,24 +1,23 @@
 # path-sync copy -n sdlc
 # === DO_NOT_EDIT: path-sync header ===
 name: Pre-Release Tests
-run-name: "Pre-Release: examples=${{ inputs.include_examples }}, provider=${{
-  inputs.provider_ref }}${{ inputs.skip_tftest && ', skip_tftest' || '' }}"
+run-name: "Pre-Release: examples=${{ inputs.include_examples }}, provider=${{ inputs.provider_ref }}${{ inputs.skip_tftest && ', skip_tftest' || '' }}"
 
 on:
   workflow_dispatch:
     inputs:
       include_examples:
-        description: "Examples to test (all or comma-separated list)"
+        description: 'Examples to test (all or comma-separated list)'
         required: false
         type: string
-        default: "all"
+        default: 'all'
       provider_ref:
-        description: "Provider git ref (registry = published, default = default branch)"
+        description: 'Provider git ref (registry = published, default = default branch)'
         required: false
         type: string
-        default: "registry"
+        default: 'registry'
       skip_tftest:
-        description: "Skip the tftest-all job"
+        description: 'Skip the tftest-all job'
         required: false
         type: boolean
         default: false
@@ -30,7 +29,7 @@ env:
   MONGODB_ATLAS_CLIENT_ID: ${{ secrets.MONGODB_ATLAS_CLIENT_ID }}
   MONGODB_ATLAS_CLIENT_SECRET: ${{ secrets.MONGODB_ATLAS_CLIENT_SECRET }}
   MONGODB_ATLAS_BASE_URL: ${{ secrets.MONGODB_ATLAS_BASE_URL }}
-  # === OK_EDIT: path-sync env ===
+# === OK_EDIT: path-sync env ===
   ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
@@ -47,9 +46,9 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       - uses: ./.github/actions/setup
         with:
-          just: "true"
-          terraform: "true"
-          uv: "true"
+          just: 'true'
+          terraform: 'true'
+          uv: 'true'
       - name: Setup provider (default branch)
         uses: ./.github/actions/setup-provider-dev
         if: inputs.provider_ref == 'default'
@@ -69,9 +68,9 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       - uses: ./.github/actions/setup
         with:
-          just: "true"
-          uv: "true"
-          terraform: "true"
+          just: 'true'
+          uv: 'true'
+          terraform: 'true'
       - name: Setup provider (default branch)
         uses: ./.github/actions/setup-provider-dev
         if: inputs.provider_ref == 'default'
@@ -86,11 +85,9 @@ jobs:
       - name: Apply examples
         env:
           INCLUDE_EXAMPLES: ${{ inputs.include_examples }}
-        run: just apply-examples --auto-approve -e "$INCLUDE_EXAMPLES" --var-file
-          $(pwd)/tests/workspace_azure_examples/dev.tfvars
+        run: just apply-examples --auto-approve -e "$INCLUDE_EXAMPLES" --var-file $(pwd)/tests/workspace_azure_examples/dev.tfvars
       - name: Destroy examples
         if: always()
         env:
           INCLUDE_EXAMPLES: ${{ inputs.include_examples }}
-        run: just destroy-examples --auto-approve -e "$INCLUDE_EXAMPLES" --var-file
-          $(pwd)/tests/workspace_azure_examples/dev.tfvars
+        run: just destroy-examples --auto-approve -e "$INCLUDE_EXAMPLES" --var-file $(pwd)/tests/workspace_azure_examples/dev.tfvars
