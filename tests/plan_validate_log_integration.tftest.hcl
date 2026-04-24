@@ -297,4 +297,36 @@ run "log_integration_per_integration_byo_storage" {
     condition     = length(module.log_integration) == 1
     error_message = "Expected log_integration module to be created"
   }
+
+  assert {
+    condition     = length(module.log_integration[0].integration_ids) == 2
+    error_message = "Expected two mongodbatlas_log_integration instances (from integration_ids output; default account + per-integration BYO account)"
+  }
+}
+
+run "log_integration_container_name_only_on_integrations" {
+  command = plan
+
+  variables {
+    project_id = var.project_id
+    log_integration = {
+      enabled = true
+      # root container_name omitted; each integration sets container_name
+      create_storage_account = {
+        enabled             = true
+        name                = "atlaslogsstorage"
+        resource_group_name = "rg"
+        azure_location      = "eastus2"
+      }
+      integrations = [
+        { log_types = ["MONGOD"], prefix_path = "mongod/", container_name = "atlas-logs" },
+        { log_types = ["MONGOD_AUDIT"], prefix_path = "audit/", container_name = "atlas-logs" },
+      ]
+    }
+  }
+
+  assert {
+    condition     = length(module.log_integration) == 1
+    error_message = "Expected log_integration module to be created"
+  }
 }

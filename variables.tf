@@ -299,8 +299,11 @@ variable "log_integration" {
 
     **Integrations:**
     Each entry in `integrations` creates one `mongodbatlas_log_integration` resource.
-    `prefix_path` is required by the Atlas API; use it to isolate log types within a shared container.
+    `prefix_path` is required by the Atlas API; use it to isolate log types within a shared container. Atlas writes objects as `{prefix}/{relative_path}`; the module trims a trailing `/` from `prefix_path` so keys do not end up with a double slash (e.g. `mongod//file`) and plans stay stable whether or not callers include `/`.
     Valid `log_types`: MONGOD, MONGOS, MONGOD_AUDIT, MONGOS_AUDIT (not validated by the module — Atlas API is authoritative).
+
+    **Container name:**
+    When `log_integration` is enabled, set `container_name` at the root, or set `container_name` on every integration (per-integration values override the root default for that integration only).
 
     **Lifecycle Management:**
     `create_storage_account.expiration_days` (default 90, 0 to disable) adds an `azurerm_storage_management_policy` that auto-deletes blobs after the specified number of days.
@@ -326,8 +329,13 @@ variable "log_integration" {
   }
 
   validation {
-    condition     = !var.log_integration.enabled || var.log_integration.container_name != null
-    error_message = "log_integration.enabled = true requires container_name."
+    condition = !var.log_integration.enabled || (
+      var.log_integration.container_name != null ||
+      alltrue([
+        for integration in var.log_integration.integrations : try(integration.container_name, null) != null
+      ])
+    )
+    error_message = "log_integration.enabled = true requires log_integration.container_name, or container_name on every entry in integrations."
   }
 
   validation {

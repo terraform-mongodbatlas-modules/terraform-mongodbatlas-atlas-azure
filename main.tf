@@ -149,7 +149,7 @@ module "log_integration" {
   skip_role_assignments = false
   tags                  = merge(var.azure_tags, var.log_integration.tags)
 
-  container_name         = var.log_integration.container_name
+  container_name         = local.log_integration_default_container_name
   storage_account_id     = var.log_integration.storage_account_id
   create_container       = var.log_integration.create_container
   create_storage_account = var.log_integration.create_storage_account

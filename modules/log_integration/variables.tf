@@ -27,13 +27,13 @@ variable "container_name" {
 variable "storage_account_id" {
   type        = string
   default     = null
-  description = "Azure Storage Account resource ID. Required if create_storage_account is not set."
+  description = "Azure Storage Account resource ID. Required if create_storage_account is not set"
 }
 
 variable "create_container" {
   type        = bool
   default     = true
-  description = "Create the storage container. Only applies when using storage_account_id."
+  description = "Create the storage container. Only applies when using storage_account_id"
 }
 
 variable "create_storage_account" {
@@ -48,7 +48,7 @@ variable "create_storage_account" {
     expiration_days     = optional(number, 90)
   })
   default     = null
-  description = "Create module-managed Storage Account. Mutually exclusive with storage_account_id."
+  description = "Create module-managed Storage Account. Mutually exclusive with storage_account_id"
 }
 
 variable "integrations" {
@@ -65,5 +65,5 @@ variable "integrations" {
 variable "tags" {
   type        = map(string)
   default     = {}
-  description = "Tags to apply to Azure resources."
+  description = "Tags to apply to Azure resources"
 }

@@ -50,7 +50,8 @@ resource "azurerm_storage_management_policy" "atlas" {
     enabled = true
 
     filters {
-      prefix_match = [var.container_name]
+      # Scope to this container; trailing slash avoids matching a longer container name with the same prefix
+      prefix_match = ["${var.container_name}/"]
       blob_types   = ["blockBlob"]
     }
 
@@ -62,7 +63,7 @@ resource "azurerm_storage_management_policy" "atlas" {
   }
 }
 
-resource "azurerm_role_assignment" "log_export" {
+resource "azurerm_role_assignment" "log_integration" {
   count = !var.skip_role_assignments ? 1 : 0
 
   principal_id         = var.service_principal_id
@@ -94,8 +95,11 @@ resource "mongodbatlas_log_integration" "this" {
 
   storage_account_name   = coalesce(var.integrations[count.index].storage_account_name, local.storage_account_name)
   storage_container_name = coalesce(var.integrations[count.index].container_name, var.container_name)
-  prefix_path            = trimsuffix(var.integrations[count.index].prefix_path, "/")
-  log_types              = var.integrations[count.index].log_types
+  # Atlas always writes objects as {prefix}/{relative_path}; a trailing `/` on prefix is redundant for
+  # the final key layout, but if we pass it through unchanged Atlas can emit paths like
+  # `mongod//{some-test-file}`. Trimming the suffix keeps plans stable and avoids double slashes.
+  prefix_path = trimsuffix(var.integrations[count.index].prefix_path, "/")
+  log_types   = var.integrations[count.index].log_types
 
-  depends_on = [azurerm_role_assignment.log_export, azurerm_role_assignment.integration_byo]
+  depends_on = [azurerm_role_assignment.log_integration, azurerm_role_assignment.integration_byo]
 }

@@ -46,7 +46,7 @@ examples:
             redact_attributes:
               - name
       - address: module.atlas_azure.module.log_integration[0].azurerm_storage_container.atlas[0]
-      - address: module.atlas_azure.module.log_integration[0].azurerm_role_assignment.log_export[0]
+      - address: module.atlas_azure.module.log_integration[0].azurerm_role_assignment.log_integration[0]
       - address: module.atlas_azure.module.log_integration[0].azurerm_storage_management_policy.atlas[0]
       - address: module.atlas_azure.module.log_integration[0].mongodbatlas_log_integration.this[0]
 
@@ -56,7 +56,7 @@ examples:
       - address: module.atlas_azure.mongodbatlas_cloud_provider_access_setup.this[0]
       - address: module.atlas_azure.mongodbatlas_cloud_provider_access_authorization.this[0]
       - address: module.atlas_azure.module.log_integration[0].azurerm_storage_container.atlas[0]
-      - address: module.atlas_azure.module.log_integration[0].azurerm_role_assignment.log_export[0]
+      - address: module.atlas_azure.module.log_integration[0].azurerm_role_assignment.log_integration[0]
       - address: module.atlas_azure.module.log_integration[0].mongodbatlas_log_integration.this[0]
       - address: module.atlas_azure.module.log_integration[0].mongodbatlas_log_integration.this[1]
       - address: azurerm_storage_account.logs

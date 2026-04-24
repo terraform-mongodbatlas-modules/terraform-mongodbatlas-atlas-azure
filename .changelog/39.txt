@@ -1,5 +1,5 @@
 ```release-note:enhancement
-submodule/log_integration: Adds log integration submodule for exporting Atlas logs to Azure Blob Storage via `mongodbatlas_log_integration`
+submodule/log_integration: Adds Log Integration submodule for exporting Atlas logs to Azure Blob Storage via `mongodbatlas_log_integration`
 ```
 
 ```release-note:enhancement
