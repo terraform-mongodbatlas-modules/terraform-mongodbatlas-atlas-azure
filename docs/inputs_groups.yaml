@@ -40,7 +40,7 @@ sections:
     description: |
       Private Link keeps application traffic to Atlas on the Azure backbone instead of the public internet, which many security policies require. Use `privatelink_endpoints` or `privatelink_endpoints_single_region` for module-managed `azurerm_private_endpoint` resources, or the bring-your-own-endpoint maps (`privatelink_byo_endpoint` and `privatelink_byo_service`) when you create and manage private endpoints in your own resources.
 
-      See the [Private Link documentation](https://www.mongodb.com/docs/atlas/security-private-endpoint/) for product behavior. For the split between Atlas service creation and registering user endpoints, use the [privatelink_byoe example](./examples/privatelink_byoe).
+      See the [Private Link documentation](https://www.mongodb.com/docs/atlas/security-private-endpoint/?cloud-provider=azure) for product behavior. For the split between Atlas service creation and registering user endpoints, use the [privatelink_byoe example](./examples/privatelink_byoe).
 
     match:
       names:
@@ -67,7 +67,7 @@ sections:
     description: |
       Log integration exports Atlas operational and audit logs to Azure Blob Storage on a one-minute schedule so your SIEM or observability stack can ingest from storage. Provide a `storage_account_id` and container, or set `create_storage_account.enabled = true` for module-managed storage. You can override storage per integration for separate audit and operational paths.
 
-      See the [log export to Azure](https://www.mongodb.com/docs/atlas/export-logs-azure/) product documentation. Reordering entries in the `integrations` list can cause a short delivery gap while Terraform updates resources; the behavior is stateless and does not cause log loss.
+      See the [log export to Azure](https://www.mongodb.com/docs/atlas/export-logs-azure/) product documentation.
 
     match:
       names:

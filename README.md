@@ -402,7 +402,7 @@ Default: `{}`
 
 Log integration exports Atlas operational and audit logs to Azure Blob Storage on a one-minute schedule so your SIEM or observability stack can ingest from storage. Provide a `storage_account_id` and container, or set `create_storage_account.enabled = true` for module-managed storage. You can override storage per integration for separate audit and operational paths.
 
-See the [log export to Azure](https://www.mongodb.com/docs/atlas/export-logs-azure/) product documentation. Reordering entries in the `integrations` list can cause a short delivery gap while Terraform updates resources; the behavior is stateless and does not cause log loss.
+See the [log export to Azure](https://www.mongodb.com/docs/atlas/export-logs-azure/) product documentation.
 
 ### log_integration
 
