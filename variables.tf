@@ -233,7 +233,7 @@ variable "backup_export" {
 
     **Security defaults (when module-managed):**
     - `public_network_access_enabled = false` (same as `log_integration` module-managed storage)
-    - Container is private; nested blob public access is not allowed; minimum TLS 1.2
+    - Container is private, nested blob public access is not allowed, minimum TLS 1.2
 
     **Lifecycle:**
     - `create_storage_account.expiration_days` - Delete blobs in the export container after N days since last modification (default 365, 0 to disable and skip `azurerm_storage_management_policy`)
