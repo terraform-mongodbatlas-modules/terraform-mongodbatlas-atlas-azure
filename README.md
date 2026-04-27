@@ -149,6 +149,7 @@ Feature | Name
 Backup Export | [Azure Blob Storage Export](./examples/backup_export)
 Encryption at Rest | [Azure Key Vault Integration (User-Provided)](./examples/encryption)
 Encryption at Rest | [Azure Key Vault (Module-Managed with Private Networking)](./examples/encryption_create_key_vault_private_networking)
+Cloud Provider Access | [Read-Only Azure (BYO Key Vault, Storage, and Log Export)](./examples/azure_read_only)
 Private Link | [Azure Private Endpoint (Module-Managed)](./examples/privatelink)
 Private Link | [Azure Private Endpoint (Bring Your Own Endpoint)](./examples/privatelink_byoe)
 Private Link | [Multi-Region Private Endpoints](./examples/privatelink_multi_region)

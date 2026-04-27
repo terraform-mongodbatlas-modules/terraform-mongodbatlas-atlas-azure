@@ -2,7 +2,7 @@ terraform {
   required_providers {
     mongodbatlas = {
       source  = "mongodb/mongodbatlas"
-      version = "~> 2.1"
+      version = "~> 2.8"
     }
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -70,6 +70,7 @@ variable "project_ids" {
     privatelink              = optional(string)
     privatelink_byoe         = optional(string)
     privatelink_multi_region = optional(string)
+    azure_read_only          = optional(string)
   })
   default = {}
 }
@@ -155,6 +156,8 @@ locals {
   project_id_privatelink_byoe = local.project_ids.privatelink_byoe
   # tflint-ignore: terraform_unused_declarations
   project_id_privatelink_multi_region = local.project_ids.privatelink_multi_region
+  # tflint-ignore: terraform_unused_declarations
+  project_id_azure_read_only = local.project_ids.azure_read_only
 
   # Encryption locals
   # tflint-ignore: terraform_unused_declarations
@@ -179,6 +182,81 @@ locals {
     { region = "eastus2", subnet_id = module.vnet_multi_region_eastus2.subnet_id, name = "pe-atlas-multi-eastus2" },
     { region = "westus2", subnet_id = module.vnet_multi_region_westus2.subnet_id }
   ]
+}
+
+# BYO stand-ins for ex_azure_read_only: real Key Vault + key + two storage accounts (data sources in module need existing resources)
+data "azurerm_client_config" "azure_read_only" {}
+
+resource "azurerm_key_vault" "azure_read_only" {
+  name                       = "kv-aro-${random_string.suffix.id}"
+  location                   = local.azure_location
+  resource_group_name        = local.resource_group_name
+  tenant_id                  = data.azurerm_client_config.azure_read_only.tenant_id
+  sku_name                   = "standard"
+  purge_protection_enabled   = false
+  soft_delete_retention_days = 7
+  rbac_authorization_enabled = true
+}
+
+resource "azurerm_role_assignment" "azure_read_only_terraform_kv_admin" {
+  scope                = azurerm_key_vault.azure_read_only.id
+  role_definition_name = "Key Vault Administrator"
+  principal_id         = data.azurerm_client_config.azure_read_only.object_id
+}
+
+resource "azurerm_key_vault_key" "azure_read_only" {
+  name         = "atlas-aro-key"
+  key_vault_id = azurerm_key_vault.azure_read_only.id
+  key_type     = "RSA"
+  key_size     = 2048
+  key_opts     = ["encrypt", "decrypt", "wrapKey", "unwrapKey"]
+
+  rotation_policy {
+    automatic {
+      time_before_expiry = "P30D"
+    }
+    expire_after         = "P365D"
+    notify_before_expiry = "P30D"
+  }
+
+  depends_on = [azurerm_role_assignment.azure_read_only_terraform_kv_admin]
+
+  lifecycle {
+    ignore_changes = [expiration_date]
+  }
+}
+
+resource "azurerm_storage_account" "azure_read_only_backup" {
+  name                            = "sabk${random_string.suffix.id}"
+  resource_group_name             = local.resource_group_name
+  location                        = local.azure_location
+  account_tier                    = "Standard"
+  account_replication_type        = "LRS"
+  min_tls_version                 = "TLS1_2"
+  allow_nested_items_to_be_public = false
+  public_network_access_enabled   = false
+}
+
+resource "azurerm_storage_account" "azure_read_only_log" {
+  name                            = "salg${random_string.suffix.id}"
+  resource_group_name             = local.resource_group_name
+  location                        = local.azure_location
+  account_tier                    = "Standard"
+  account_replication_type        = "LRS"
+  min_tls_version                 = "TLS1_2"
+  allow_nested_items_to_be_public = false
+  public_network_access_enabled   = false
+}
+
+locals {
+  # tflint-ignore: terraform_unused_declarations
+  key_vault_id_azure_read_only = azurerm_key_vault.azure_read_only.id
+  # tflint-ignore: terraform_unused_declarations
+  key_identifier_azure_read_only = azurerm_key_vault_key.azure_read_only.versionless_id
+  # tflint-ignore: terraform_unused_declarations
+  backup_storage_account_id_azure_read_only = azurerm_storage_account.azure_read_only_backup.id
+  # tflint-ignore: terraform_unused_declarations
+  log_storage_account_id_azure_read_only = azurerm_storage_account.azure_read_only_log.id
 }
 
 # Example module calls are generated in modules.generated.tf

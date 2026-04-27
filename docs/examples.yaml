@@ -35,6 +35,9 @@ tables:
       - folder_name: encryption_create_key_vault_private_networking
         feature: Encryption at Rest
         name: Azure Key Vault (Module-Managed with Private Networking)
+      - folder_name: azure_read_only
+        feature: Cloud Provider Access
+        name: Read-Only Azure (BYO Key Vault, Storage, and Log Export)
       - folder_name: privatelink
         feature: Private Link
         name: Azure Private Endpoint (Module-Managed)
