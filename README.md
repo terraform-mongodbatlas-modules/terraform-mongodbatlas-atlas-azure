@@ -400,7 +400,11 @@ Default: `{}`
 
 ## Log Integration
 
-Log integration exports Atlas operational and audit logs to Azure Blob Storage on a one-minute schedule so your SIEM or observability stack can ingest from storage. Provide a `storage_account_id` and container, or set `create_storage_account.enabled = true` for module-managed storage. You can override storage per integration for separate audit and operational paths.
+Log integration exports Atlas operational and audit logs to Azure Blob Storage on a one-minute schedule so your security information and event management (SIEM) platform or observability stack can ingest from storage.
+
+- **User-provided storage account**: Set `storage_account_id` to the target Storage Account resource ID. You must also name the blob container. Set `container_name` on the `log_integration` object for a single default container, or set `container_name` on each entry in `integrations` when each log stream needs its own container.
+- **Module-managed storage account**: Set `create_storage_account.enabled = true` and provide the nested `create_storage_account` fields so the module can create the account and apply the same secure defaults as other module-managed storage (for example TLS 1.2 and blocked public access where the module enforces that).
+- **Per-integration destination**: On an integration, optional `storage_account_name`, `container_name`, and `resource_group_name` point that integration at a different account or container (for example separate paths for audit and operational logs).
 
 See the [log export to Azure](https://www.mongodb.com/docs/atlas/export-logs-azure/) product documentation.
 
@@ -416,8 +420,8 @@ Log exports run at 1-minute intervals.
 
 **Integrations:**
 Each entry in `integrations` creates one `mongodbatlas_log_integration` resource.
-`prefix_path` is required by the Atlas API; use it to isolate log types within a shared container. Atlas writes objects as `{prefix}/{relative_path}`; the module trims a trailing `/` from `prefix_path` so keys do not end up with a double slash (e.g. `mongod//file`) and plans stay stable whether or not callers include `/`.
-Valid `log_types`: MONGOD, MONGOS, MONGOD_AUDIT, MONGOS_AUDIT (the module does not validate these; the Atlas API is authoritative).
+`prefix_path` is required by the Atlas API. Use it to isolate log types within a shared container. Atlas writes objects as `{prefix}/{relative_path}`. The module trims a trailing `/` from `prefix_path` so keys do not end up with a double slash (e.g. `mongod//file`) and plans stay stable whether or not callers include `/`.
+Valid `log_types`: MONGOD, MONGOS, MONGOD_AUDIT, and MONGOS_AUDIT. The module does not validate these values. The Atlas API is authoritative.
 
 **Container name:**
 When `log_integration` is enabled, set `container_name` at the root, or set `container_name` on every integration (per-integration values override the root default for that integration only).
@@ -427,7 +431,7 @@ When `log_integration` is enabled, set `container_name` at the root, or set `con
 
 **Index Stability:**
 Removing an integration from the middle of the list causes subsequent entries to be destroyed and recreated (index shift).
-This is acceptable: log integrations are stateless config, the brief delivery gap (~1 min) causes no data loss.
+Log integrations are stateless configuration, and the brief delivery gap (about one minute) causes no data loss.
 
 Type:
 

@@ -65,7 +65,11 @@ sections:
     title: "Log Integration"
     level: 2
     description: |
-      Log integration exports Atlas operational and audit logs to Azure Blob Storage on a one-minute schedule so your SIEM or observability stack can ingest from storage. Provide a `storage_account_id` and container, or set `create_storage_account.enabled = true` for module-managed storage. You can override storage per integration for separate audit and operational paths.
+      Log integration exports Atlas operational and audit logs to Azure Blob Storage on a one-minute schedule so your security information and event management (SIEM) platform or observability stack can ingest from storage.
+
+      - **User-provided storage account**: Set `storage_account_id` to the target Storage Account resource ID. You must also name the blob container. Set `container_name` on the `log_integration` object for a single default container, or set `container_name` on each entry in `integrations` when each log stream needs its own container.
+      - **Module-managed storage account**: Set `create_storage_account.enabled = true` and provide the nested `create_storage_account` fields so the module can create the account and apply the same secure defaults as other module-managed storage (for example TLS 1.2 and blocked public access where the module enforces that).
+      - **Per-integration destination**: On an integration, optional `storage_account_name`, `container_name`, and `resource_group_name` point that integration at a different account or container (for example separate paths for audit and operational logs).
 
       See the [log export to Azure](https://www.mongodb.com/docs/atlas/export-logs-azure/) product documentation.
 

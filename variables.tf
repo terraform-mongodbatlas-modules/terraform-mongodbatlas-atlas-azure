@@ -350,8 +350,8 @@ variable "log_integration" {
 
     **Integrations:**
     Each entry in `integrations` creates one `mongodbatlas_log_integration` resource.
-    `prefix_path` is required by the Atlas API; use it to isolate log types within a shared container. Atlas writes objects as `{prefix}/{relative_path}`; the module trims a trailing `/` from `prefix_path` so keys do not end up with a double slash (e.g. `mongod//file`) and plans stay stable whether or not callers include `/`.
-    Valid `log_types`: MONGOD, MONGOS, MONGOD_AUDIT, MONGOS_AUDIT (the module does not validate these; the Atlas API is authoritative).
+    `prefix_path` is required by the Atlas API. Use it to isolate log types within a shared container. Atlas writes objects as `{prefix}/{relative_path}`. The module trims a trailing `/` from `prefix_path` so keys do not end up with a double slash (e.g. `mongod//file`) and plans stay stable whether or not callers include `/`.
+    Valid `log_types`: MONGOD, MONGOS, MONGOD_AUDIT, and MONGOS_AUDIT. The module does not validate these values. The Atlas API is authoritative.
 
     **Container name:**
     When `log_integration` is enabled, set `container_name` at the root, or set `container_name` on every integration (per-integration values override the root default for that integration only).
@@ -361,7 +361,7 @@ variable "log_integration" {
 
     **Index Stability:**
     Removing an integration from the middle of the list causes subsequent entries to be destroyed and recreated (index shift).
-    This is acceptable: log integrations are stateless config, the brief delivery gap (~1 min) causes no data loss.
+    Log integrations are stateless configuration, and the brief delivery gap (about one minute) causes no data loss.
   EOT
 
   validation {
