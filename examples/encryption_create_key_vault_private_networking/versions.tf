@@ -4,11 +4,11 @@ terraform {
   required_providers {
     mongodbatlas = {
       source  = "mongodb/mongodbatlas"
-      version = ">= 2.0"
+      version = ">= 2.8"
     }
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.0"
+      version = ">= 4.42"
     }
     azuread = {
       source  = "hashicorp/azuread"
