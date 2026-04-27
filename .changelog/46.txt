@@ -1,3 +1,3 @@
 ```release-note:enhancement
-examples/azure_read_only: Demonstrates module usage for azure credentials with only read access
+examples/azure_read_only: Demonstrates module usage for Azure credentials with read only access
 ```
