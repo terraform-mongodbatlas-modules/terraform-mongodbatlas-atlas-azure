@@ -1,13 +1,14 @@
-# Atlas Azure Terraform Module
+# MongoDB Atlas Azure Terraform Module
+
+Use this Terraform module to configure MongoDB Atlas integrations with Azure. The module includes recommended defaults based on MongoDB best practices. MongoDB maintains this module. For questions, open a support request or a GitHub issue.
 
 <!-- BEGIN_TOC -->
 <!-- @generated
 WARNING: This section is auto-generated. Do not edit directly.
 Changes will be overwritten when documentation is regenerated.
 Run 'just gen-readme' to regenerate. -->
-- [Public Preview Note](#public-preview-note)
-- [Disclaimer](#disclaimer)
-- [Getting Started](#getting-started)
+- [Module status](#module-status)
+- [Local setup](#local-setup)
 - [Examples](#examples)
 - [Requirements](#requirements)
 - [Providers](#providers)
@@ -24,17 +25,11 @@ Run 'just gen-readme' to regenerate. -->
 - [FAQ](#faq)
 <!-- END_TOC -->
 
-## Public Preview Note
+## Module status
 
-The MongoDB Atlas Azure Module (Public Preview) simplifies Atlas-Azure integrations and embeds MongoDB's best practices as intelligent defaults. This preview validates that these patterns meet the needs of most workloads without constant maintenance or rework. We welcome your feedback and contributions during this preview phase. MongoDB formally supports this module from its v1 release onwards.
+This module is in **public preview**: MongoDB publishes it to gather feedback and refine the design. Upgrades from v0 to v1 may not be seamless; plan for migration work when you adopt a v1 release. MongoDB formally supports this module from its v1 release onwards, including bug fixes and security patches for supported versions. Contributors and early adopters are welcome to open GitHub issues with feedback or defects.
 
-<!-- BEGIN_DISCLAIMER -->
-## Disclaimer
-
-One of this project's primary objectives is to provide durable modules that support non-breaking migration and upgrade paths. The v0 release (public preview) of the MongoDB Atlas Azure Module focuses on gathering feedback and refining the design. Upgrades from v0 to v1 may not be seamless. We plan to deliver a finalized v1 release early next year with long term upgrade support.  
-
-<!-- END_DISCLAIMER -->
-## Getting Started
+## Local setup
 
 <!-- BEGIN_GETTING_STARTED -->
 <!-- @generated
@@ -51,7 +46,7 @@ To use MongoDB Atlas with Azure through Terraform, ensure you meet the following
 2. [Sign in](https://account.mongodb.com/account/login) or [create](https://account.mongodb.com/account/register) your MongoDB Atlas Account.
 3. Configure your [authentication](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs#authentication) method.
 
-   **NOTE**: Service Accounts (SA) is the preferred authentication method. See [Grant Programmatic Access to an Organization](https://www.mongodb.com/docs/atlas/configure-api-access/#grant-programmatic-access-to-an-organization) in the MongoDB Atlas documentation for detailed instructions on configuring SA access to your project.
+   **NOTE**: Service Accounts (SA) are the preferred authentication method. See [Grant Programmatic Access to an Organization](https://www.mongodb.com/docs/atlas/configure-api-access/#grant-programmatic-access-to-an-organization) in the MongoDB Atlas documentation for detailed instructions on configuring SA access to your project.
 
 4. Use an existing [MongoDB Atlas project](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/project) or [create a new Atlas project resource](#optional-create-a-new-atlas-project-resource).
 5. Authenticate your Azure CLI (`az login`) or configure your service principal credentials.
@@ -85,64 +80,15 @@ resource "mongodbatlas_project" "this" {
 
 <!-- END_GETTING_STARTED -->
 
-### Set Up Atlas-Azure Access
-
-Take the following steps to configure access to your Atlas-Azure:  
-
-1. Prepare your `vars.tfvars` file.
-  
-    Choose whether to create a new Azure AD service principal or reuse an existing one.
-
-    The following example shows a `vars.tfvars` configuration that reuses an existing `service_principal_id`:
-
-    ```hcl
-    # vars.tfvars
-    project_id               = "YOUR_ATLAS_PROJECT_ID"
-    create_service_principal = false
-    service_principal_id     = "00000000-0000-0000-0000-000000000000" # Azure AD object ID
-    ```
-
-    The following example shows a `vars.tfvars` configuration that uses a module-managed service principal (`create_service_principal = true`):
-
-    ```hcl
-    # vars.tfvars
-    project_id              = "YOUR_ATLAS_PROJECT_ID"
-    create_service_principal = true
-    # atlas_azure_app_id has a sensible default; override only if needed
-    ```
-
-    **IMPORTANT:** Do not set `service_principal_id` when `create_service_principal = true`.
-
-2. Ensure your authentication environment variables are configured.
-
-    ```sh
-    export MONGODB_ATLAS_CLIENT_ID="your-client-id-goes-here"
-    export MONGODB_ATLAS_CLIENT_SECRET="your-client-secret-goes-here"
-    ```
-
-    See [Prerequisites](#prerequisites) for more details.
-
-3. Initialize and apply your Terraform configuration (see [Commands](#commands)).
-
-4. Verify outputs. After apply, note:
-  
-    - [role_id](#output_role_id) - Atlas role ID for cross-feature use
-    - [cloud_provider_access](#output_cloud_provider_access) - Bundled CPA configuration
-
-You now have access.
-
-See the [Examples](#examples) section for additional details of specific actions you can execute with this module.
-
-### Clean up your configuration
-
-Run `terraform destroy -var-file vars.tfvars` to undo all changes that Terraform did on your infrastructure.
-
 <!-- BEGIN_TABLES -->
 <!-- @generated
 WARNING: This section is auto-generated. Do not edit directly.
 Changes will be overwritten when documentation is regenerated.
 Run 'just gen-readme' to regenerate. -->
 ## Examples
+
+The following examples show common configurations you can copy and adapt. Start with the [encryption](./examples/encryption) example for a minimal setup, then explore other examples for Private Link, backup export, and log integration. Examples can be combined in a single module call; see the [azure_read_only](./examples/azure_read_only) example for multiple features in one configuration.
+
 
 Feature | Name
 --- | ---
@@ -153,6 +99,8 @@ Cloud Provider Access | [Read-Only Azure (BYO Key Vault, Storage, and Log Export
 Private Link | [Azure Private Endpoint (Module-Managed)](./examples/privatelink)
 Private Link | [Azure Private Endpoint (Bring Your Own Endpoint)](./examples/privatelink_byoe)
 Private Link | [Multi-Region Private Endpoints](./examples/privatelink_multi_region)
+Log Integration | [Azure Log Export](./examples/log_integration)
+Log Integration | [Azure Log Export (Bring Your Own Storage)](./examples/log_integration_byo)
 
 <!-- END_TABLES -->
 <!-- BEGIN_TF_DOCS -->
@@ -215,7 +163,11 @@ Type: `string`
 
 ## Azure Service Principal
 
-Configure the Azure AD service principal used by MongoDB Atlas.
+MongoDB Atlas uses a Microsoft Entra ID (Azure AD) [app registration and service principal](https://learn.microsoft.com/entra/identity-platform/quickstart-register-app) to access your Key Vault and storage accounts. Atlas links the service principal through Cloud Provider Access; see [Azure encryption and Key Vault access](https://www.mongodb.com/docs/atlas/security-azure-kms/) in the MongoDB Atlas documentation.
+
+Set `create_service_principal = true` (default) to let the module create the service principal and required role assignments where the feature allows. Set `create_service_principal = false` and pass `service_principal_id` when you already have a principal registered in Entra ID and want the module to use it for Atlas authorization only.
+
+Set `skip_role_assignments = true` only when your platform team pre-assigns the required Azure roles on Key Vault and storage accounts. In that case you must use user-provided Key Vault and storage (`key_vault_id`, `storage_account_id`); the module cannot create module-managed Key Vault or storage without assigning roles. `skip_role_assignments = true` also requires an external service principal (`create_service_principal = false`), because a module-created principal still needs role assignments.
 
 ### atlas_azure_app_id
 
@@ -258,7 +210,7 @@ Default: `false`
 
 ## Encryption at Rest
 
-Configure encryption at rest using Azure Key Vault. See the [Azure encryption documentation](https://www.mongodb.com/docs/atlas/security-azure-kms/) for details.
+Customer-managed keys in Azure Key Vault help you meet control and compliance requirements. Provide an existing Key Vault and key with `key_vault_id` and a versionless `key_identifier` URL, or set `create_key_vault.enabled = true` for a module-managed Key Vault. Optional `private_endpoint_regions` can use [private networking for Key Vault](https://www.mongodb.com/docs/atlas/security-azure-kms/) with supported configurations. The module wires encryption at rest to the Key Vault through Cloud Provider Access.
 
 ### encryption
 
@@ -313,7 +265,9 @@ Default: `null`
 
 ## Private Link
 
-Configure Azure Private Link endpoints for secure connectivity. See the [Azure Private Link documentation](https://www.mongodb.com/docs/atlas/security-private-endpoint/) for details.
+Private Link keeps application traffic to Atlas on the Azure backbone instead of the public internet, which many security policies require. Use `privatelink_endpoints` or `privatelink_endpoints_single_region` for module-managed `azurerm_private_endpoint` resources, or the bring-your-own-endpoint maps (`privatelink_byo_endpoint` and `privatelink_byo_service`) when you create and manage private endpoints in your own resources.
+
+See the [Private Link documentation](https://www.mongodb.com/docs/atlas/security-private-endpoint/?cloud-provider=azure) for product behavior. For the split between Atlas service creation and registering user endpoints, use the [privatelink_byoe example](./examples/privatelink_byoe).
 
 ### privatelink_endpoints
 
@@ -360,8 +314,9 @@ Default: `[]`
 
 ### privatelink_byo_endpoint
 
-BYOE Phase 1: Atlas PrivateLink endpoint services. Key is a user-defined identifier; `region` accepts Atlas or Azure format.
-After normalizing to Azure location, values must not duplicate a region already used in `privatelink_endpoints`.
+Bring-your-own-endpoint (BYOE) Atlas PrivateLink: define Atlas endpoint services for regions where you create Azure private endpoints yourself.
+Key is a user-defined identifier; `region` accepts Atlas or Azure format. After normalizing to Azure location, values must not duplicate a region already used in `privatelink_endpoints`.
+Apply this configuration (optionally with `privatelink_byo_service` in the same workspace) so Terraform creates the Atlas endpoint services, then use `privatelink_service_info` in outputs to build user-managed `azurerm_private_endpoint` resources if you manage endpoints outside the module. If `privatelink_byo_service` is empty on the first apply, run a follow-up `terraform apply` after the Azure private endpoints exist so Terraform can link them in Atlas.
 
 Type:
 
@@ -375,7 +330,7 @@ Default: `{}`
 
 ### privatelink_byo_service
 
-BYOE Phase 2: User-managed Azure Private Endpoints linked to Atlas. Each key must exist in `privatelink_byo_endpoint`.
+User-managed Azure private endpoints to register with Atlas for BYOE. Each key must match a key in `privatelink_byo_endpoint` and must supply the Azure private endpoint resource ID and private IP. Supply these values in the same apply as `privatelink_byo_endpoint` if Terraform manages the endpoints, or in a later apply after you create the endpoints. See the [privatelink_byoe](./examples/privatelink_byoe) example.
 
 Type:
 
@@ -391,7 +346,9 @@ Default: `{}`
 
 ## Backup Export
 
-Configure backup snapshot export to Azure Blob Storage.
+Backup export stores Atlas Cloud Backup snapshots in an Azure Storage container you control for retention, air-gapped recovery, and residency. Provide a `storage_account_id` and `container_name`, or set `create_storage_account.enabled = true` for module-managed storage with secure defaults (for example public network access disabled on module-managed accounts in current releases).
+
+See [export backup snapshots](https://www.mongodb.com/docs/atlas/backup/cloud-backup/export/) in the MongoDB Atlas documentation for product details.
 
 ### backup_export
 
@@ -443,9 +400,9 @@ Default: `{}`
 
 ## Log Integration
 
-Log integration exports Atlas operational and audit logs to Azure Blob Storage at 1-minute intervals, feeding existing security monitoring and observability pipelines without polling the Atlas API. The module supports BYO storage account (`storage_account_id`) or module-managed storage account (`create_storage_account.enabled = true`), with optional per-integration storage account overrides.
+Log integration exports Atlas operational and audit logs to Azure Blob Storage on a one-minute schedule so your SIEM or observability stack can ingest from storage. Provide a `storage_account_id` and container, or set `create_storage_account.enabled = true` for module-managed storage. You can override storage per integration for separate audit and operational paths.
 
-See the [log export documentation](https://www.mongodb.com/docs/atlas/export-logs-azure/) for details.
+See the [log export to Azure](https://www.mongodb.com/docs/atlas/export-logs-azure/) product documentation. Reordering entries in the `integrations` list can cause a short delivery gap while Terraform updates resources; the behavior is stateless and does not cause log loss.
 
 ### log_integration
 
@@ -453,14 +410,14 @@ Log integration for exporting Atlas logs to Azure Blob Storage (`AZURE_LOG_EXPOR
 Log exports run at 1-minute intervals.
 
 **Storage Strategy (same pattern as `backup_export`):**
-- `storage_account_id` — user-provided Storage Account, default for all integrations
-- `create_storage_account.enabled = true` — module-managed Storage Account with secure defaults (TLS 1.2, public access blocked)
-- Per-integration `storage_account_name` + `container_name` override for BYO storage (e.g., audit logs to a separate account)
+- `storage_account_id`: user-provided Storage Account, default for all integrations.
+- `create_storage_account.enabled = true`: module-managed Storage Account with secure defaults (TLS 1.2, public access blocked).
+- Per-integration `storage_account_name` and `container_name` override for BYO storage (for example audit logs to a separate account).
 
 **Integrations:**
 Each entry in `integrations` creates one `mongodbatlas_log_integration` resource.
 `prefix_path` is required by the Atlas API; use it to isolate log types within a shared container. Atlas writes objects as `{prefix}/{relative_path}`; the module trims a trailing `/` from `prefix_path` so keys do not end up with a double slash (e.g. `mongod//file`) and plans stay stable whether or not callers include `/`.
-Valid `log_types`: MONGOD, MONGOS, MONGOD_AUDIT, MONGOS_AUDIT (not validated by the module — Atlas API is authoritative).
+Valid `log_types`: MONGOD, MONGOS, MONGOD_AUDIT, MONGOS_AUDIT (the module does not validate these; the Atlas API is authoritative).
 
 **Container name:**
 When `log_integration` is enabled, set `container_name` at the root, or set `container_name` on every integration (per-integration values override the root default for that integration only).
@@ -623,7 +580,7 @@ Description: Backup export configuration status
 
 ### <a name="output_cloud_provider_access"></a> [cloud\_provider\_access](#output\_cloud\_provider\_access)
 
-Description: Cloud provider access configuration for Atlas-Azure integration.
+Description: Cloud Provider Access summary: role\_id, service principal IDs, and authorization metadata for the Atlas Azure integration.
 
 ### <a name="output_encryption"></a> [encryption](#output\_encryption)
 
@@ -647,22 +604,34 @@ Description: PrivateLink status per user key (both module-managed and BYOE).
 
 ### <a name="output_privatelink_service_info"></a> [privatelink\_service\_info](#output\_privatelink\_service\_info)
 
-Description: Atlas PrivateLink service info per user key (for BYOE - create your Azure PE using these values)
+Description: Per-key Atlas PrivateLink service identifiers. Use with bring-your-own-endpoint to create `azurerm_private_endpoint` resources and then pass their IDs and IPs to `privatelink_byo_service`.
 
 ### <a name="output_regional_mode_enabled"></a> [regional\_mode\_enabled](#output\_regional\_mode\_enabled)
 
-Description: Whether private endpoint regional mode is enabled (auto-enabled for multi-region)
+Description: True when private endpoint regional mode is enabled in Atlas. The module enables it automatically when you use multiple distinct regions in PrivateLink inputs. See https://www.mongodb.com/docs/atlas/security-private-endpoint/#regionalized-private-endpoints
 
 ### <a name="output_resource_ids"></a> [resource\_ids](#output\_resource\_ids)
 
-Description: Azure resource IDs for data source lookups.
+Description: Convenience map of role\_id, service principal, Key Vault, keys, and storage account resource IDs for references in your root module or other stacks.
 
 ### <a name="output_role_id"></a> [role\_id](#output\_role\_id)
 
-Description: Atlas role ID for reuse with other Atlas-Azure features.
+Description: Atlas Cloud Provider Access role\_id for the Azure integration. Reuse this value for other Atlas features that need the same Azure trust relationship.
 <!-- END_TF_DOCS -->
 
 ## FAQ
+
+### When should I not use this module?
+
+- You need full control of every Azure resource and Atlas API call outside the supported variables, and you cannot accept any module defaults or lifecycle.
+- You cannot create or authorize a [service principal](https://learn.microsoft.com/entra/identity-platform/quickstart-register-app) for Atlas or grant the Azure roles the module documents for your chosen features.
+- You need a different cloud or integration pattern; consider the [Atlas AWS module](https://registry.terraform.io/modules/terraform-mongodbatlas-modules/atlas-aws/mongodbatlas/latest) or raw `mongodbatlas_*` resources for bespoke stacks.
+
+For typical Atlas-on-Azure projects, start from the [Examples](#examples) section and the [README prerequisites](#prerequisites) under Local setup.
+
+### How do I set `create_service_principal` and `service_principal_id`?
+
+Use `create_service_principal = true` (default) for a module-managed service principal, or set `create_service_principal = false` and set `service_principal_id` to your existing Microsoft Entra ID object ID. Do not set `service_principal_id` when `create_service_principal = true`. Configure `MONGODB_ATLAS_CLIENT_ID` and `MONGODB_ATLAS_CLIENT_SECRET` for the Atlas provider as in [Prerequisites](#prerequisites).
 
 ### How do I upgrade to v0.3.0 (timeouts and migration)?
 

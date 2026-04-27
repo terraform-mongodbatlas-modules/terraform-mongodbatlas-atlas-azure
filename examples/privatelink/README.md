@@ -5,6 +5,8 @@ Run 'just gen-examples' to regenerate.
 -->
 # Azure Private Endpoint (Module-Managed)
 
+The Azure Private Endpoint (Module-Managed) example creates a Private Link endpoint in your subnet and connects it to Atlas.
+
 <!-- BEGIN_GETTING_STARTED -->
 ## Prerequisites
 
@@ -16,7 +18,7 @@ To use MongoDB Atlas with Azure through Terraform, ensure you meet the following
 2. [Sign in](https://account.mongodb.com/account/login) or [create](https://account.mongodb.com/account/register) your MongoDB Atlas Account.
 3. Configure your [authentication](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs#authentication) method.
 
-   **NOTE**: Service Accounts (SA) is the preferred authentication method. See [Grant Programmatic Access to an Organization](https://www.mongodb.com/docs/atlas/configure-api-access/#grant-programmatic-access-to-an-organization) in the MongoDB Atlas documentation for detailed instructions on configuring SA access to your project.
+   **NOTE**: Service Accounts (SA) are the preferred authentication method. See [Grant Programmatic Access to an Organization](https://www.mongodb.com/docs/atlas/configure-api-access/#grant-programmatic-access-to-an-organization) in the MongoDB Atlas documentation for detailed instructions on configuring SA access to your project.
 
 4. Use an existing [MongoDB Atlas project](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/project) or [create a new Atlas project resource](#optional-create-a-new-atlas-project-resource).
 5. Authenticate your Azure CLI (`az login`) or configure your service principal credentials.
