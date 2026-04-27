@@ -1,0 +1,7 @@
+```release-note:bug
+provider/azurerm: Requires minimum version 4.42
+```
+
+```release-note:note
+provider/mongodbatlas: Aligns minimum version to 2.8 in backup export, encryption, and private link submodules
+```
