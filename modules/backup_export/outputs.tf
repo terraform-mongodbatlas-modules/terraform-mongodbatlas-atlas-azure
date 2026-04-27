@@ -17,3 +17,8 @@ output "service_url" {
   description = "Storage account primary blob endpoint URL"
   value       = mongodbatlas_cloud_backup_snapshot_export_bucket.this.service_url
 }
+
+output "expiration_days" {
+  description = "Backup export blob retention days (null if not module-managed storage)"
+  value       = local.create_storage_account ? var.create_storage_account.expiration_days : null
+}

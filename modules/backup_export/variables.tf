@@ -50,9 +50,10 @@ variable "create_storage_account" {
     replication_type    = optional(string, "LRS")
     account_tier        = optional(string, "Standard")
     min_tls_version     = optional(string, "TLS1_2")
+    expiration_days     = optional(number, 365)
   })
   default     = null
-  description = "Create module-managed Storage Account. Mutually exclusive with storage_account_id."
+  description = "Create module-managed Storage Account. Mutually exclusive with storage_account_id. expiration_days defaults to 365 (AWS parity for backup export), 0 disables the management policy."
 }
 
 variable "tags" {

@@ -3,6 +3,7 @@ locals {
   storage_account_id     = local.create_storage_account ? azurerm_storage_account.atlas[0].id : var.storage_account_id
   storage_account_name   = local.create_storage_account ? azurerm_storage_account.atlas[0].name : element(split("/", var.storage_account_id), 8)
   create_container       = local.create_storage_account || var.create_container
+  expiration_days        = local.create_storage_account ? var.create_storage_account.expiration_days : 0
 }
 
 data "azurerm_storage_account" "existing" {
@@ -22,6 +23,7 @@ resource "azurerm_storage_account" "atlas" {
   account_replication_type        = var.create_storage_account.replication_type
   min_tls_version                 = var.create_storage_account.min_tls_version
   allow_nested_items_to_be_public = false
+  public_network_access_enabled   = false
   tags                            = var.tags
 
   dynamic "timeouts" {
@@ -40,6 +42,37 @@ resource "azurerm_storage_container" "atlas" {
   name                  = var.container_name
   storage_account_id    = local.storage_account_id
   container_access_type = "private"
+
+  dynamic "timeouts" {
+    for_each = var.timeouts != null ? [1] : []
+    content {
+      create = var.timeouts.create
+      delete = var.timeouts.delete
+      update = var.timeouts.update
+    }
+  }
+}
+
+resource "azurerm_storage_management_policy" "atlas" {
+  count = local.create_storage_account && local.expiration_days > 0 ? 1 : 0
+
+  storage_account_id = azurerm_storage_account.atlas[0].id
+
+  rule {
+    name    = "atlas-backup-export-expiration"
+    enabled = true
+
+    filters {
+      prefix_match = ["${var.container_name}/"]
+      blob_types   = ["blockBlob"]
+    }
+
+    actions {
+      base_blob {
+        delete_after_days_since_modification_greater_than = local.expiration_days
+      }
+    }
+  }
 
   dynamic "timeouts" {
     for_each = var.timeouts != null ? [1] : []

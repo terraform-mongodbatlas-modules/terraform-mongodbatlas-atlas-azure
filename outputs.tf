@@ -95,6 +95,7 @@ output "backup_export" {
     storage_account_id = module.backup_export[0].storage_account_id
     container_name     = module.backup_export[0].container_name
     service_url        = module.backup_export[0].service_url
+    expiration_days    = module.backup_export[0].expiration_days
   } : null
 }
 

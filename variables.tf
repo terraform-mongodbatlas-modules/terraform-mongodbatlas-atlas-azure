@@ -249,10 +249,31 @@ variable "backup_export" {
       replication_type    = optional(string, "LRS")
       account_tier        = optional(string, "Standard")
       min_tls_version     = optional(string, "TLS1_2")
+      expiration_days     = optional(number, 365)
     }))
   })
   default     = {}
-  description = "Backup snapshot export to Azure Blob Storage. Provide EITHER `storage_account_id` (user-provided) OR `create_storage_account.enabled = true` (module-managed)."
+  description = <<-EOT
+    Backup snapshot export to Azure Blob Storage.
+
+    Provide EITHER:
+    - `storage_account_id` (user-provided Storage Account)
+    - `create_storage_account.enabled = true` (module-managed Storage Account)
+
+    **Storage account (when module-managed):**
+    - `create_storage_account.name` - Storage account name (globally unique in Azure)
+    - `create_storage_account.resource_group_name` and `azure_location` - Where the account is created
+    - Optional: `replication_type`, `account_tier`, `min_tls_version` (defaults match the type: LRS, Standard, TLS1_2)
+
+    **Security defaults (when module-managed):**
+    - `public_network_access_enabled = false` (same as `log_integration` module-managed storage)
+    - Container is private, nested blob public access is not allowed, minimum TLS 1.2
+
+    **Lifecycle:**
+    - `create_storage_account.expiration_days` - Delete blobs in the export container after N days since last modification (default 365, 0 to disable and skip `azurerm_storage_management_policy`)
+
+    The module creates a blob container for exports unless you use a user-provided `storage_account_id` with `create_container = false` and an existing container.
+  EOT
 
   validation {
     condition     = !(var.backup_export.storage_account_id != null && try(var.backup_export.create_storage_account.enabled, false))
