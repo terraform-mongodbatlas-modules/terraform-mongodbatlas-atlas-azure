@@ -316,9 +316,9 @@ Default: `[]`
 
 ### privatelink_byo_endpoint
 
-Bring-your-own-endpoint (BYOE) Atlas PrivateLink: Define Atlas endpoint services for regions where you create Azure private endpoints yourself.
-Key is a user-defined identifier; `region` accepts Atlas or Azure format. After normalizing to Azure location, values must not duplicate a region already used in `privatelink_endpoints`.
-Apply this configuration (optionally with `privatelink_byo_service` in the same workspace) so Terraform creates the Atlas endpoint services, then use `privatelink_service_info` in outputs to build user-managed `azurerm_private_endpoint` resources if you manage endpoints outside the module. If `privatelink_byo_service` is empty on the first apply, run a follow-up `terraform apply` after the Azure private endpoints exist so Terraform can link them in Atlas.
+Bring-your-own-endpoint (BYOE): defines Atlas endpoint services for regions where you manage Azure private endpoints outside the module.
+Key is a user-defined identifier; `region` accepts Atlas or Azure format and must not overlap with regions in `privatelink_endpoints`.
+Apply this to create the Atlas endpoint services, then populate `privatelink_byo_service` and re-apply once your `azurerm_private_endpoint` resources exist.
 
 Type:
 
@@ -366,7 +366,7 @@ Default: `"disabled"`
 
 ## Backup Export
 
-Backup export stores Atlas Cloud Backup snapshots in an Azure Storage container you control for retention, air-gapped recovery, and residency. Provide a `storage_account_id` and `container_name`, or set `create_storage_account.enabled = true` for module-managed storage with secure defaults (for example public network access disabled on module-managed accounts in current releases).
+Backup export stores Atlas Cloud Backup snapshots in an Azure Storage container you control for retention, air-gapped recovery, and residency. Provide a `storage_account_id` and `container_name`, or set `create_storage_account.enabled = true` for module-managed storage with secure defaults.
 
 See [export backup snapshots](https://www.mongodb.com/docs/atlas/backup/cloud-backup/export/) in the MongoDB Atlas documentation for product details.
 
