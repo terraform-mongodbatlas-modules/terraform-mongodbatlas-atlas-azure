@@ -461,6 +461,11 @@ run "privatelink_multi_region_regional_mode_default_disabled" {
     condition     = length(mongodbatlas_private_endpoint_regional_mode.this) == 0
     error_message = "Expected no private_endpoint_regional_mode when disabled (default) despite multi-region"
   }
+
+  assert {
+    condition     = length(mongodbatlas_privatelink_endpoint.this) == 2
+    error_message = "Expected two Atlas privatelink endpoints for two distinct regions"
+  }
 }
 
 run "privatelink_multi_region_regional_mode_auto" {
@@ -487,5 +492,10 @@ run "privatelink_multi_region_regional_mode_auto" {
   assert {
     condition     = length(mongodbatlas_private_endpoint_regional_mode.this) == 1
     error_message = "Expected one private_endpoint_regional_mode when auto and multi-region"
+  }
+
+  assert {
+    condition     = length(mongodbatlas_privatelink_endpoint.this) == 2
+    error_message = "Expected two Atlas privatelink endpoints for two distinct regions"
   }
 }

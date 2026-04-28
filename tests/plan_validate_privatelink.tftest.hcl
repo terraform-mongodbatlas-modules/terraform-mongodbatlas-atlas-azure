@@ -17,6 +17,40 @@ run "valid_single_region_module_managed" {
     condition     = length(module.privatelink) == 1
     error_message = "Expected one privatelink module instance"
   }
+  assert {
+    condition     = length(mongodbatlas_private_endpoint_regional_mode.this) == 0
+    error_message = "Expected no private_endpoint_regional_mode with a single module-managed region and default privatelink_regional_mode"
+  }
+  assert {
+    condition     = output.regional_mode_enabled == false
+    error_message = "Expected regional_mode_enabled false for single service region and default privatelink_regional_mode"
+  }
+}
+
+run "multi_region_regional_mode_disabled_by_default" {
+  command = plan
+  variables {
+    privatelink_endpoints = [
+      { region = "eastus2", subnet_id = "/subscriptions/sub/resourceGroups/rg-east/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" },
+      { region = "westeurope", subnet_id = "/subscriptions/sub/resourceGroups/rg-west/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" },
+    ]
+  }
+  assert {
+    condition     = length(module.privatelink) == 2
+    error_message = "Expected two privatelink module instances for two distinct regions"
+  }
+  assert {
+    condition     = length(mongodbatlas_privatelink_endpoint.this) == 2
+    error_message = "Expected two Atlas privatelink endpoints for two distinct regions"
+  }
+  assert {
+    condition     = length(mongodbatlas_private_endpoint_regional_mode.this) == 0
+    error_message = "Expected no private_endpoint_regional_mode for multi-region when default privatelink_regional_mode is used"
+  }
+  assert {
+    condition     = output.regional_mode_enabled == false
+    error_message = "Expected regional_mode_enabled false when default privatelink_regional_mode is used with two regions"
+  }
 }
 
 run "valid_multi_region_module_managed" {
@@ -36,6 +70,14 @@ run "valid_multi_region_module_managed" {
     condition     = length(mongodbatlas_private_endpoint_regional_mode.this) == 1
     error_message = "Expected regional_mode to be enabled"
   }
+  assert {
+    condition     = output.regional_mode_enabled
+    error_message = "Expected regional_mode_enabled true for privatelink_regional_mode auto and multiple service regions"
+  }
+  assert {
+    condition     = length(mongodbatlas_privatelink_endpoint.this) == 2
+    error_message = "Expected two Atlas privatelink endpoints for two distinct regions"
+  }
 }
 
 run "valid_atlas_region_format" {
@@ -48,6 +90,14 @@ run "valid_atlas_region_format" {
   assert {
     condition     = length(module.privatelink) == 1
     error_message = "Expected one privatelink module instance"
+  }
+  assert {
+    condition     = length(mongodbatlas_private_endpoint_regional_mode.this) == 0
+    error_message = "Expected no private_endpoint_regional_mode with a single module-managed region and default privatelink_regional_mode"
+  }
+  assert {
+    condition     = output.regional_mode_enabled == false
+    error_message = "Expected regional_mode_enabled false for single service region and default privatelink_regional_mode"
   }
 }
 
@@ -67,6 +117,14 @@ run "valid_custom_name_and_tags" {
     condition     = length(module.privatelink) == 1
     error_message = "Expected one privatelink module instance"
   }
+  assert {
+    condition     = length(mongodbatlas_private_endpoint_regional_mode.this) == 0
+    error_message = "Expected no private_endpoint_regional_mode with a single module-managed region and default privatelink_regional_mode"
+  }
+  assert {
+    condition     = output.regional_mode_enabled == false
+    error_message = "Expected regional_mode_enabled false for single service region and default privatelink_regional_mode"
+  }
 }
 
 run "valid_byoe" {
@@ -83,6 +141,14 @@ run "valid_byoe" {
   assert {
     condition     = length(module.privatelink) == 1
     error_message = "Expected one privatelink module instance"
+  }
+  assert {
+    condition     = length(mongodbatlas_private_endpoint_regional_mode.this) == 0
+    error_message = "Expected no private_endpoint_regional_mode for single-region BYOE and default privatelink_regional_mode"
+  }
+  assert {
+    condition     = output.regional_mode_enabled == false
+    error_message = "Expected regional_mode_enabled false for single service region and default privatelink_regional_mode"
   }
 }
 
@@ -139,6 +205,14 @@ run "valid_single_region_multi_endpoint" {
   assert {
     condition     = length(mongodbatlas_privatelink_endpoint.this) == 2
     error_message = "Expected two Atlas endpoints (one per index in same region)"
+  }
+  assert {
+    condition     = length(mongodbatlas_private_endpoint_regional_mode.this) == 0
+    error_message = "Expected no private_endpoint_regional_mode for single-region multi-endpoint and default privatelink_regional_mode"
+  }
+  assert {
+    condition     = output.regional_mode_enabled == false
+    error_message = "Expected regional_mode_enabled false for single service region and default privatelink_regional_mode"
   }
 }
 
