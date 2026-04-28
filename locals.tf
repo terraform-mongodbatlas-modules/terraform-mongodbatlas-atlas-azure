@@ -44,10 +44,11 @@ locals {
     { for k, ep in local.privatelink_module_managed : k => lookup(local._normalize_to_azure, ep.region, ep.region) }
   )
   privatelinks_module_managed_keys = toset(keys(local.privatelink_module_managed))
-  privatelink_azure_locations      = toset(values(local.privatelink_key_azure_location))
+  # Distinct Atlas private endpoint service regions (excludes future cross-region consumer-only entries)
+  privatelink_atlas_service_regions = toset(values(local.privatelink_key_azure_location))
 
-  # Enable regional mode only for multi-region pattern
-  enable_regional_mode = length(local.privatelink_azure_locations) > 1
+  # Regional mode: opt-in when multiple Atlas service regions (see var.privatelink_regional_mode)
+  enable_regional_mode = var.privatelink_regional_mode == "auto" && length(local.privatelink_atlas_service_regions) > 1
 
   # Root `container_name` or, when omitted, the first integration’s `container_name` (root validation requires one or the other)
   log_integration_default_container_name = var.log_integration.enabled ? coalesce(

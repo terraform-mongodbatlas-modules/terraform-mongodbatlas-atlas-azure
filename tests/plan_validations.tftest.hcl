@@ -436,3 +436,56 @@ run "timeouts_rejects_blank_duration" {
     var.timeouts
   ]
 }
+
+run "privatelink_multi_region_regional_mode_default_disabled" {
+  command = plan
+
+  module {
+    source = "./"
+  }
+
+  variables {
+    project_id = var.project_id
+    privatelink_endpoints = [
+      { region = "eastus2", subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" },
+      { region = "westus2", subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" },
+    ]
+  }
+
+  assert {
+    condition     = output.regional_mode_enabled == false
+    error_message = "Expected regional mode disabled with default privatelink_regional_mode and multi-region"
+  }
+
+  assert {
+    condition     = length(mongodbatlas_private_endpoint_regional_mode.this) == 0
+    error_message = "Expected no private_endpoint_regional_mode when disabled (default) despite multi-region"
+  }
+}
+
+run "privatelink_multi_region_regional_mode_auto" {
+  command = plan
+
+  module {
+    source = "./"
+  }
+
+  variables {
+    project_id                = var.project_id
+    privatelink_regional_mode = "auto"
+    privatelink_endpoints = [
+      { region = "eastus2", subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" },
+      { region = "westus2", subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" },
+    ]
+  }
+
+  assert {
+    condition     = output.regional_mode_enabled
+    error_message = "Expected regional mode enabled with auto and multiple Atlas service regions"
+  }
+
+  assert {
+    condition     = length(mongodbatlas_private_endpoint_regional_mode.this) == 1
+    error_message = "Expected one private_endpoint_regional_mode when auto and multi-region"
+  }
+}

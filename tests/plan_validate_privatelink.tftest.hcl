@@ -22,6 +22,7 @@ run "valid_single_region_module_managed" {
 run "valid_multi_region_module_managed" {
   command = plan
   variables {
+    privatelink_regional_mode = "auto"
     privatelink_endpoints = [
       { region = "eastus2", subnet_id = "/subscriptions/sub/resourceGroups/rg-east/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" },
       { region = "westeurope", subnet_id = "/subscriptions/sub/resourceGroups/rg-west/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" }

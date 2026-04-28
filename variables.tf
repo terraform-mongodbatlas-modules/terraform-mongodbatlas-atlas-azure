@@ -196,7 +196,11 @@ variable "privatelink_endpoints" {
     tags      = optional(map(string), {})
   }))
   default     = []
-  description = "Multi-region PrivateLink endpoints. `region` accepts Atlas format (US_EAST_2) or Azure format (eastus2). All regions must be UNIQUE."
+  description = <<-EOT
+    Multi-region PrivateLink endpoints. `region` accepts Atlas format (US_EAST_2) or Azure format (eastus2). All regions must be UNIQUE.
+
+    `mongodbatlas_private_endpoint_regional_mode` is only created when `privatelink_regional_mode` is `auto` and there are multiple distinct Atlas service regions. The default is `disabled`.
+  EOT
   validation {
     condition     = length(var.privatelink_endpoints) == length(distinct([for ep in var.privatelink_endpoints : ep.region]))
     error_message = "All regions in privatelink_endpoints must be unique. Use privatelink_endpoints_single_region for multiple endpoints in the same region."
@@ -230,6 +234,29 @@ variable "privatelink_endpoints_single_region" {
   validation {
     condition     = length(var.privatelink_endpoints_single_region) == 0 || length(var.privatelink_endpoints) == 0
     error_message = "Cannot use both privatelink_endpoints and privatelink_endpoints_single_region."
+  }
+}
+
+variable "privatelink_regional_mode" {
+  type        = string
+  default     = "disabled"
+  description = <<-EOT
+    Per-region SRV/connection strings for sharded and geo-sharded clusters only; not for replica
+    sets. Default is `disabled`. Use `auto` to enable when the module detects multiple distinct
+    Atlas service regions.
+
+    - **When it helps:** multi-region sharded topologies; networks that cannot be peered and need
+    local private-endpoint connection strings.
+    - **Tradeoffs:** toggling is project-wide (connection string and DNS churn, possible brief
+    downtime). A region's PE connection string is not a cross-region disaster-recovery or failover
+    path on its own.
+    - **Often skip:** a single global PE with VNet peering, or one PE per region that every app can
+    reach, is enough. See [regionalized private endpoints (multi-region sharded)](https://www.mongodb.com/docs/atlas/security-private-endpoint/?cloud-provider=azure#-optional--regionalized-private-endpoints-for-multi-region-sharded-clusters).
+  EOT
+
+  validation {
+    condition     = contains(["auto", "disabled"], var.privatelink_regional_mode)
+    error_message = "privatelink_regional_mode must be \"auto\" or \"disabled\"."
   }
 }
 
