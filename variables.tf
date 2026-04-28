@@ -246,11 +246,11 @@ variable "privatelink_regional_mode" {
   type        = string
   default     = "disabled"
   description = <<-EOT
-    Per-region SRV/connection strings for sharded and geo-sharded clusters only; not for replica
+    Per-region SRV/connection strings for sharded and geo-sharded clusters only, not for replica
     sets. Default is `disabled`. Use `auto` to enable when the module detects multiple distinct
     Atlas service regions.
 
-    - **When it helps:** multi-region sharded topologies; networks that cannot be peered and need
+    - **When it helps:** multi-region sharded topologies. Networks that cannot be peered and need
     local private-endpoint connection strings.
     - **Tradeoffs:** toggling is project-wide (connection string and DNS churn, possible brief
     downtime). A region's PE connection string is not a cross-region disaster-recovery or failover
