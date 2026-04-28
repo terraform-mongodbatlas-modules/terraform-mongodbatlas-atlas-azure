@@ -366,7 +366,7 @@ Default: `"disabled"`
 
 ## Backup Export
 
-Backup export stores Atlas Cloud Backup snapshots in an Azure Storage container you control for retention, air-gapped recovery, and residency. Provide a `storage_account_id` and `container_name`, or set `create_storage_account.enabled = true` for module-managed storage with secure defaults (for example public network access disabled on module-managed accounts in current releases).
+Backup export stores Atlas Cloud Backup snapshots in an Azure Storage container you control for retention, air-gapped recovery, and residency. Provide a `storage_account_id` and `container_name`, or set `create_storage_account.enabled = true` for module-managed storage with secure defaults (for example `public_network_access_enabled = true` on the module-managed account so MongoDB Atlas can reach the blob endpoint).
 
 See [export backup snapshots](https://www.mongodb.com/docs/atlas/backup/cloud-backup/export/) in the MongoDB Atlas documentation for product details.
 
@@ -384,7 +384,7 @@ Provide EITHER:
 - Optional: `replication_type`, `account_tier`, `min_tls_version` (defaults match the type: LRS, Standard, TLS1_2)
 
 **Security defaults (when module-managed):**
-- `public_network_access_enabled = false` (same as `log_integration` module-managed storage)
+- The module sets `public_network_access_enabled` to `true` on the Storage Account so MongoDB Atlas can reach the blob endpoint.
 - Container is private, nested blob public access is not allowed, minimum TLS 1.2
 
 **Lifecycle:**
@@ -423,7 +423,7 @@ Default: `{}`
 Log integration exports Atlas operational and audit logs to Azure Blob Storage on a one-minute schedule so your security information and event management (SIEM) platform or observability stack can ingest from storage.
 
 - **User-provided storage account**: Set `storage_account_id` to the target Storage Account resource ID. You must also name the blob container. Set `container_name` on the `log_integration` object for a single default container, or set `container_name` on each entry in `integrations` when each log stream needs its own container.
-- **Module-managed storage account**: Set `create_storage_account.enabled = true` and provide the nested `create_storage_account` fields so the module can create the account and apply the same secure defaults as other module-managed storage (for example TLS 1.2 and blocked public access where the module enforces that).
+- **Module-managed storage account**: Set `create_storage_account.enabled = true` and provide the nested `create_storage_account` fields so the module can create the account and apply the same secure defaults as module-managed `backup_export` storage (for example TLS 1.2 and `public_network_access_enabled = true` so MongoDB Atlas can reach the blob endpoint).
 - **Per-integration destination**: On an integration, optional `storage_account_name`, `container_name`, and `resource_group_name` point that integration at a different account or container (for example separate paths for audit and operational logs).
 
 See the [log export to Azure](https://www.mongodb.com/docs/atlas/export-logs-azure/) product documentation.
@@ -435,8 +435,12 @@ Log exports run at 1-minute intervals.
 
 **Storage Strategy (same pattern as `backup_export`):**
 - `storage_account_id`: User-provided Storage Account, default for all integrations.
-- `create_storage_account.enabled = true`: Module-managed Storage Account with secure defaults (TLS 1.2, public access blocked).
+- `create_storage_account.enabled = true`: Module-managed Storage Account. See **Security defaults (when module-managed)** below.
 - Per-integration `storage_account_name` and `container_name` override for BYO storage (for example audit logs to a separate account).
+
+**Security defaults (when module-managed):**
+- The module sets `public_network_access_enabled` to `true` on the Storage Account so MongoDB Atlas can reach the blob endpoint.
+- Container is private, nested blob public access is not allowed, minimum TLS 1.2
 
 **Integrations:**
 Each entry in `integrations` creates one `mongodbatlas_log_integration` resource.

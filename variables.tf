@@ -298,7 +298,7 @@ variable "backup_export" {
     - Optional: `replication_type`, `account_tier`, `min_tls_version` (defaults match the type: LRS, Standard, TLS1_2)
 
     **Security defaults (when module-managed):**
-    - `public_network_access_enabled = false` (same as `log_integration` module-managed storage)
+    - The module sets `public_network_access_enabled` to `true` on the Storage Account so MongoDB Atlas can reach the blob endpoint.
     - Container is private, nested blob public access is not allowed, minimum TLS 1.2
 
     **Lifecycle:**
@@ -376,8 +376,12 @@ variable "log_integration" {
 
     **Storage Strategy (same pattern as `backup_export`):**
     - `storage_account_id`: User-provided Storage Account, default for all integrations.
-    - `create_storage_account.enabled = true`: Module-managed Storage Account with secure defaults (TLS 1.2, public access blocked).
+    - `create_storage_account.enabled = true`: Module-managed Storage Account. See **Security defaults (when module-managed)** below.
     - Per-integration `storage_account_name` and `container_name` override for BYO storage (for example audit logs to a separate account).
+
+    **Security defaults (when module-managed):**
+    - The module sets `public_network_access_enabled` to `true` on the Storage Account so MongoDB Atlas can reach the blob endpoint.
+    - Container is private, nested blob public access is not allowed, minimum TLS 1.2
 
     **Integrations:**
     Each entry in `integrations` creates one `mongodbatlas_log_integration` resource.

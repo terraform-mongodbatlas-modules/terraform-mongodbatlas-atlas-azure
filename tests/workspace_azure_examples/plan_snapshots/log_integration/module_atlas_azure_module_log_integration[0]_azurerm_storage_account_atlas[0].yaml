@@ -18,7 +18,7 @@ location: eastus2
 min_tls_version: TLS1_2
 name: <name>
 nfsv3_enabled: false
-public_network_access_enabled: false
+public_network_access_enabled: true
 queue_encryption_key_type: Service
 sas_policy: []
 sftp_enabled: false
