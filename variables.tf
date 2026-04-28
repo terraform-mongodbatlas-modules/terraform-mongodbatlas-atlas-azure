@@ -160,9 +160,9 @@ variable "privatelink_byo_endpoint" {
   }))
   default     = {}
   description = <<-EOT
-    Bring-your-own-endpoint (BYOE) Atlas PrivateLink: Define Atlas endpoint services for regions where you create Azure private endpoints yourself.
-    Key is a user-defined identifier; `region` accepts Atlas or Azure format. After normalizing to Azure location, values must not duplicate a region already used in `privatelink_endpoints`.
-    Apply this configuration (optionally with `privatelink_byo_service` in the same workspace) so Terraform creates the Atlas endpoint services, then use `privatelink_service_info` in outputs to build user-managed `azurerm_private_endpoint` resources if you manage endpoints outside the module. If `privatelink_byo_service` is empty on the first apply, run a follow-up `terraform apply` after the Azure private endpoints exist so Terraform can link them in Atlas.
+    Bring-your-own-endpoint (BYOE): defines Atlas endpoint services for regions where you manage Azure private endpoints outside the module.
+    Key is a user-defined identifier; `region` accepts Atlas or Azure format and must not overlap with regions in `privatelink_endpoints`.
+    Apply this to create the Atlas endpoint services, then populate `privatelink_byo_service` and re-apply once your `azurerm_private_endpoint` resources exist.
   EOT
 
   validation {

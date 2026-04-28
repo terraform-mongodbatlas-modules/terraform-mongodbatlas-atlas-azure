@@ -7,7 +7,7 @@ Use this Terraform module to configure MongoDB Atlas integrations with Azure. Th
 WARNING: This section is auto-generated. Do not edit directly.
 Changes will be overwritten when documentation is regenerated.
 Run 'just gen-readme' to regenerate. -->
-- [Module status](#module-status)
+- [Module Commitment](#module-commitment)
 - [Local setup](#local-setup)
 - [Examples](#examples)
 - [Requirements](#requirements)
@@ -25,9 +25,9 @@ Run 'just gen-readme' to regenerate. -->
 - [FAQ](#faq)
 <!-- END_TOC -->
 
-## Module status
+## Module Commitment
 
-This module is in **public preview**: MongoDB publishes it to gather feedback and refine the design. Upgrades from v0 to v1 may not be seamless; plan for migration work when you adopt a v1 release. MongoDB formally supports this module from its v1 release onwards, including bug fixes and security patches for supported versions. Contributors and early adopters are welcome to open GitHub issues with feedback or defects.
+MongoDB formally supports this module, including bug fixes, security patches, and backward-compatible enhancements. The v1 release carries a two-year stability commitment: no breaking changes through September 2028 (at the earliest).
 
 ## Local setup
 
@@ -49,7 +49,7 @@ To use MongoDB Atlas with Azure through Terraform, ensure you meet the following
    **NOTE**: Service Accounts (SA) are the preferred authentication method. See [Grant Programmatic Access to an Organization](https://www.mongodb.com/docs/atlas/configure-api-access/#grant-programmatic-access-to-an-organization) in the MongoDB Atlas documentation for detailed instructions on configuring SA access to your project.
 
 4. Use an existing [MongoDB Atlas project](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs/resources/project) or [create a new Atlas project resource](#optional-create-a-new-atlas-project-resource).
-5. Authenticate your Azure CLI (`az login`) or configure your service principal credentials.
+5. Authenticate your Azure CLI (`az login`) or configure your service principal credentials. For the Azure role assignments required per feature, see [Azure Service Principal](../../README.md#azure-service-principal).
 
 ### Commands
 
@@ -672,8 +672,14 @@ User-Agent: terraform-provider-mongodbatlas/2.1.0 Terraform/1.13.1 module_name/a
 - `provider_meta "mongodbatlas"` does not send any configuration-specific data, only the module's name and version for feature adoption tracking
 - Use `export TF_LOG=debug` to see API requests with headers and responses
 
-### Why does encryption require a client secret with a two-year expiration?
+### Does encryption at rest require a client secret?
 
-Azure limits Client Secret lifetime for CMKs to two years maximum. When the secret expires, Atlas loses access to your encryption key, causing cluster unavailability. Rotate secrets before expiration.
+No. The module authenticates through `role_id` for encryption at rest automatically. Although you can still use `encryption_client_secret`, consider that secretless authentication is the recommended authentication method.
 
-**v1 Roadmap:** The mongodbatlas provider will add secretless `role_id`-based authentication for Azure encryption. Once available, the module will support both methods with secretless as the recommended approach, making `encryption_client_secret` optional.
+### What if I only need one integration (for example, only PrivateLink)?
+
+The module works for a single feature. For a single concern with maximum control, the [mongodbatlas provider](https://registry.terraform.io/providers/mongodb/mongodbatlas/latest/docs) resources might be simpler.
+
+### Does this module work with AWS or GCP?
+
+No. For AWS, use [terraform-mongodbatlas-atlas-aws](https://registry.terraform.io/modules/terraform-mongodbatlas-modules/atlas-aws/mongodbatlas/latest). For GCP, use [terraform-mongodbatlas-atlas-gcp](https://registry.terraform.io/modules/terraform-mongodbatlas-modules/atlas-gcp/mongodbatlas/latest).
