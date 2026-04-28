@@ -23,27 +23,44 @@ examples_readme:
 
 tables:
   - name: Examples
+    intro: |
+      The following examples show common configurations you can copy and adapt. Start with the [encryption](./examples/encryption) example for a minimal setup, then explore other examples for Private Link, backup export, and log integration. Examples can be combined in a single module call; see the [azure_read_only](./examples/azure_read_only) example for multiple features in one configuration.
     columns: ["feature", "name"]
     link_column: name
     example_rows:
       - folder_name: backup_export
         feature: Backup Export
         name: Azure Blob Storage Export
+        description: The Azure Blob Storage Export example configures Atlas Cloud Backup export to a module-managed storage account and blob container.
       - folder_name: encryption
         feature: Encryption at Rest
         name: Azure Key Vault Integration (User-Provided)
+        description: The Azure Key Vault Integration (User-Provided) example configures encryption at rest with a Key Vault and key you supply.
       - folder_name: encryption_create_key_vault_private_networking
         feature: Encryption at Rest
         name: Azure Key Vault (Module-Managed with Private Networking)
+        description: The Azure Key Vault (Module-Managed with Private Networking) example creates a module-managed Key Vault and optional private networking for Key Vault access from Atlas.
       - folder_name: azure_read_only
         feature: Cloud Provider Access
         name: Read-Only Azure (BYO Key Vault, Storage, and Log Export)
+        description: The Read-Only Azure example uses an existing service principal and `skip_role_assignments` for environments where the module has no Azure role assignment permissions.
       - folder_name: privatelink
         feature: Private Link
         name: Azure Private Endpoint (Module-Managed)
+        description: The Azure Private Endpoint (Module-Managed) example creates a Private Link endpoint in your subnet and connects it to Atlas.
       - folder_name: privatelink_byoe
         feature: Private Link
         name: Azure Private Endpoint (Bring Your Own Endpoint)
+        description: The Azure Private Endpoint (Bring Your Own Endpoint) example provisions Atlas Private Link services, then links user-managed Azure private endpoints in a follow-up apply or the same configuration.
       - folder_name: privatelink_multi_region
         feature: Private Link
         name: Multi-Region Private Endpoints
+        description: The Multi-Region Private Endpoints example creates Private Link in two Azure regions with Atlas private endpoint regional mode.
+      - folder_name: log_integration
+        feature: Log Integration
+        name: Azure Log Export
+        description: The Azure Log Export example exports Atlas operational and audit logs to a module-managed Azure Storage account and container.
+      - folder_name: log_integration_byo
+        feature: Log Integration
+        name: Azure Log Export (Bring Your Own Storage)
+        description: The Azure Log Export (Bring Your Own Storage) example sends logs to a storage account and resource group you supply, with one integration per container.

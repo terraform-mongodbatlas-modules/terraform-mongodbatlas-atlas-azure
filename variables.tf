@@ -160,8 +160,9 @@ variable "privatelink_byo_endpoint" {
   }))
   default     = {}
   description = <<-EOT
-    BYOE Phase 1: Atlas PrivateLink endpoint services. Key is a user-defined identifier; `region` accepts Atlas or Azure format.
-    After normalizing to Azure location, values must not duplicate a region already used in `privatelink_endpoints`.
+    Bring-your-own-endpoint (BYOE) Atlas PrivateLink: Define Atlas endpoint services for regions where you create Azure private endpoints yourself.
+    Key is a user-defined identifier; `region` accepts Atlas or Azure format. After normalizing to Azure location, values must not duplicate a region already used in `privatelink_endpoints`.
+    Apply this configuration (optionally with `privatelink_byo_service` in the same workspace) so Terraform creates the Atlas endpoint services, then use `privatelink_service_info` in outputs to build user-managed `azurerm_private_endpoint` resources if you manage endpoints outside the module. If `privatelink_byo_service` is empty on the first apply, run a follow-up `terraform apply` after the Azure private endpoints exist so Terraform can link them in Atlas.
   EOT
 
   validation {
@@ -180,7 +181,7 @@ variable "privatelink_byo_service" {
   }))
   default     = {}
   description = <<-EOT
-    BYOE Phase 2: User-managed Azure Private Endpoints linked to Atlas. Each key must exist in `privatelink_byo_endpoint`.
+    User-managed Azure private endpoints to register with Atlas for BYOE. Each key must match a key in `privatelink_byo_endpoint` and must supply the Azure private endpoint resource ID and private IP. Supply these values in the same apply as `privatelink_byo_endpoint` if Terraform manages the endpoints, or in a later apply after you create the endpoints. See the [privatelink_byoe](./examples/privatelink_byoe) example.
   EOT
   validation {
     condition     = alltrue([for k in keys(var.privatelink_byo_service) : contains(keys(var.privatelink_byo_endpoint), k)])
@@ -374,14 +375,14 @@ variable "log_integration" {
     Log exports run at 1-minute intervals.
 
     **Storage Strategy (same pattern as `backup_export`):**
-    - `storage_account_id` — user-provided Storage Account, default for all integrations
-    - `create_storage_account.enabled = true` — module-managed Storage Account with secure defaults (TLS 1.2, public access blocked)
-    - Per-integration `storage_account_name` + `container_name` override for BYO storage (e.g., audit logs to a separate account)
+    - `storage_account_id`: User-provided Storage Account, default for all integrations.
+    - `create_storage_account.enabled = true`: Module-managed Storage Account with secure defaults (TLS 1.2, public access blocked).
+    - Per-integration `storage_account_name` and `container_name` override for BYO storage (for example audit logs to a separate account).
 
     **Integrations:**
     Each entry in `integrations` creates one `mongodbatlas_log_integration` resource.
-    `prefix_path` is required by the Atlas API; use it to isolate log types within a shared container. Atlas writes objects as `{prefix}/{relative_path}`; the module trims a trailing `/` from `prefix_path` so keys do not end up with a double slash (e.g. `mongod//file`) and plans stay stable whether or not callers include `/`.
-    Valid `log_types`: MONGOD, MONGOS, MONGOD_AUDIT, MONGOS_AUDIT (not validated by the module — Atlas API is authoritative).
+    `prefix_path` is required by the Atlas API. Use it to isolate log types within a shared container. Atlas writes objects as `{prefix}/{relative_path}`. The module trims a trailing `/` from `prefix_path` so keys do not end up with a double slash (e.g. `mongod//file`) and plans stay stable whether or not callers include `/`.
+    Valid `log_types`: MONGOD, MONGOS, MONGOD_AUDIT, and MONGOS_AUDIT. The module does not validate these values. The Atlas API is authoritative.
 
     **Container name:**
     When `log_integration` is enabled, set `container_name` at the root, or set `container_name` on every integration (per-integration values override the root default for that integration only).
@@ -391,7 +392,7 @@ variable "log_integration" {
 
     **Index Stability:**
     Removing an integration from the middle of the list causes subsequent entries to be destroyed and recreated (index shift).
-    This is acceptable: log integrations are stateless config, the brief delivery gap (~1 min) causes no data loss.
+    Log integrations are stateless configuration, and the brief delivery gap (about one minute) causes no data loss.
   EOT
 
   validation {

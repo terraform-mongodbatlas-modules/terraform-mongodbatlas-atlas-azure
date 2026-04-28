@@ -1,10 +1,10 @@
 output "role_id" {
-  description = "Atlas role ID for reuse with other Atlas-Azure features."
+  description = "Atlas Cloud Provider Access role_id for the Azure integration. Reuse this value for other Atlas features that need the same Azure trust relationship."
   value       = !local.skip_cloud_provider_access ? mongodbatlas_cloud_provider_access_authorization.this[0].role_id : null
 }
 
 output "cloud_provider_access" {
-  description = "Cloud provider access configuration for Atlas-Azure integration."
+  description = "Cloud Provider Access summary: role_id, service principal IDs, and authorization metadata for the Atlas Azure integration."
   value = !local.skip_cloud_provider_access ? {
     role_id                       = mongodbatlas_cloud_provider_access_authorization.this[0].role_id
     service_principal_id          = local.service_principal_id
@@ -55,7 +55,7 @@ output "privatelink" {
 }
 
 output "privatelink_service_info" {
-  description = "Atlas PrivateLink service info per user key (for BYOE - create your Azure PE using these values)"
+  description = "Per-key Atlas PrivateLink service identifiers. Use with bring-your-own-endpoint to create `azurerm_private_endpoint` resources and then pass their IDs and IPs to `privatelink_byo_service`."
   value = {
     for key, atlas_endpoint in mongodbatlas_privatelink_endpoint.this : key => {
       region                                 = local.privatelink_key_azure_location[key]
@@ -67,7 +67,7 @@ output "privatelink_service_info" {
 }
 
 output "resource_ids" {
-  description = "Azure resource IDs for data source lookups."
+  description = "Convenience map of role_id, service principal, Key Vault, keys, and storage account resource IDs for references in your root module or other stacks."
   value = {
     role_id                = !local.skip_cloud_provider_access ? mongodbatlas_cloud_provider_access_authorization.this[0].role_id : null
     service_principal_id   = local.service_principal_id
