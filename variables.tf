@@ -202,8 +202,10 @@ variable "privatelink_endpoints" {
     `mongodbatlas_private_endpoint_regional_mode` is only created when `privatelink_regional_mode` is `auto` and there are multiple distinct Atlas service regions. The default is `disabled`.
   EOT
   validation {
-    condition     = length(var.privatelink_endpoints) == length(distinct([for ep in var.privatelink_endpoints : ep.region]))
-    error_message = "All regions in privatelink_endpoints must be unique. Use privatelink_endpoints_single_region for multiple endpoints in the same region."
+    condition = length(var.privatelink_endpoints) == length(distinct([
+      for ep in var.privatelink_endpoints : lookup(var.atlas_to_azure_region, ep.region, ep.region)
+    ]))
+    error_message = "All regions in privatelink_endpoints must be unique after normalizing to Azure location (see atlas_to_azure_region). Use privatelink_endpoints_single_region for multiple endpoints in the same region."
   }
 }
 
@@ -228,8 +230,10 @@ variable "privatelink_endpoints_single_region" {
     ```
   EOT
   validation {
-    condition     = length(var.privatelink_endpoints_single_region) <= 1 || length(distinct([for ep in var.privatelink_endpoints_single_region : ep.region])) == 1
-    error_message = "All regions in privatelink_endpoints_single_region must match (same region)."
+    condition = length(var.privatelink_endpoints_single_region) <= 1 || length(distinct([
+      for ep in var.privatelink_endpoints_single_region : lookup(var.atlas_to_azure_region, ep.region, ep.region)
+    ])) == 1
+    error_message = "All regions in privatelink_endpoints_single_region must match the same Azure location after normalization (see atlas_to_azure_region)."
   }
   validation {
     condition     = length(var.privatelink_endpoints_single_region) == 0 || length(var.privatelink_endpoints) == 0

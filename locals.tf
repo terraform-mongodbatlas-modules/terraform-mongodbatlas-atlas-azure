@@ -31,7 +31,7 @@ locals {
   _normalize_to_azure = { for r in local._all_region_keys : r => try(local.atlas_region_to_azure[r], r) }
 
   # PrivateLink: convert lists to maps for for_each with normalized regions
-  # Multi-region: use normalized Azure region as key (unique per Azure location; validated on var.privatelink_endpoints)
+  # Multi-region: use normalized azure region as key (guaranteed unique by validation)
   privatelink_endpoints_map = { for ep in var.privatelink_endpoints : lookup(local._normalize_to_azure, ep.region, ep.region) => ep }
   # Single-region: use index as key (locations are same)
   privatelink_endpoints_single_region_map = { for idx, ep in var.privatelink_endpoints_single_region : tostring(idx) => ep }
@@ -45,7 +45,7 @@ locals {
   )
   privatelinks_module_managed_keys = toset(keys(local.privatelink_module_managed))
   # Distinct Atlas private endpoint service regions (excludes future cross-region consumer-only entries)
-  privatelink_atlas_service_regions = toset(values(local.privatelink_key_azure_location))
+  privatelink_azure_locations = toset(values(local.privatelink_key_azure_location))
 
   # Regional mode: opt-in when multiple Atlas service regions (see var.privatelink_regional_mode)
   enable_regional_mode = var.privatelink_regional_mode == "auto" && length(local.privatelink_azure_locations) > 1

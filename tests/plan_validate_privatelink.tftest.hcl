@@ -188,6 +188,17 @@ run "invalid_duplicate_regions" {
   expect_failures = [var.privatelink_endpoints]
 }
 
+run "invalid_duplicate_regions_mixed_atlas_azure_format" {
+  command = plan
+  variables {
+    privatelink_endpoints = [
+      { region = "US_EAST_2", subnet_id = "/subscriptions/sub/resourceGroups/rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" },
+      { region = "eastus2", subnet_id = "/subscriptions/sub/resourceGroups/rg2/providers/Microsoft.Network/virtualNetworks/vnet/subnets/snet" }
+    ]
+  }
+  expect_failures = [var.privatelink_endpoints]
+}
+
 # Single-region multi-endpoint pattern tests
 
 run "valid_single_region_multi_endpoint" {
@@ -213,6 +224,20 @@ run "valid_single_region_multi_endpoint" {
   assert {
     condition     = output.regional_mode_enabled == false
     error_message = "Expected regional_mode_enabled false for single service region and default privatelink_regional_mode"
+  }
+}
+
+run "valid_single_region_mixed_atlas_azure_format" {
+  command = plan
+  variables {
+    privatelink_endpoints_single_region = [
+      { region = "US_EAST_2", subnet_id = "/subscriptions/sub/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/vnet1/subnets/snet" },
+      { region = "eastus2", subnet_id = "/subscriptions/sub/resourceGroups/rg2/providers/Microsoft.Network/virtualNetworks/vnet2/subnets/snet" }
+    ]
+  }
+  assert {
+    condition     = length(module.privatelink) == 2
+    error_message = "Expected two privatelink module instances"
   }
 }
 
