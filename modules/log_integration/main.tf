@@ -28,7 +28,7 @@ resource "azurerm_storage_account" "atlas" {
   account_replication_type        = var.create_storage_account.replication_type
   min_tls_version                 = var.create_storage_account.min_tls_version
   allow_nested_items_to_be_public = false
-  public_network_access_enabled   = false
+  public_network_access_enabled   = true # Atlas cannot reach the storage account if public network access is disabled
   tags                            = var.tags
 
   dynamic "timeouts" {
