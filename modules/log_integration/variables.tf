@@ -64,7 +64,7 @@ variable "create_storage_account" {
 
 variable "integrations" {
   type = list(object({
-    log_types            = list(string)
+    log_types            = set(string)
     prefix_path          = string
     storage_account_name = optional(string)
     container_name       = optional(string)

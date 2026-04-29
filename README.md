@@ -463,7 +463,7 @@ Type:
 object({
   enabled = optional(bool, false)
   integrations = optional(list(object({
-    log_types            = list(string)
+    log_types            = set(string)
     prefix_path          = string
     storage_account_name = optional(string)
     container_name       = optional(string)
