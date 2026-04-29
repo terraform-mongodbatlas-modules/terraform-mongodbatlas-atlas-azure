@@ -160,7 +160,7 @@ variable "privatelink_byo_endpoint" {
   }))
   default     = {}
   description = <<-EOT
-    Bring-your-own-endpoint (BYOE): defines Atlas endpoint services for regions where you manage Azure private endpoints outside the module.
+    Bring-your-own-endpoint (BYOE): Defines Atlas endpoint services for regions where you manage Azure private endpoints outside the module.
     Key is a user-defined identifier; `region` accepts Atlas or Azure format and must not overlap with regions in `privatelink_endpoints`.
     Apply this to create the Atlas endpoint services, then populate `privatelink_byo_service` and re-apply once your `azurerm_private_endpoint` resources exist.
   EOT
