@@ -163,7 +163,7 @@ var_groups:
       module_value: local.azure_location
     - name: storage_account_name
       expose_in_workspace: false
-      module_value: local.storage_account_name
+      module_value: local.storage_account_name_log_integration
 
   log_integration_byo:
     - name: project_id

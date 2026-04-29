@@ -168,6 +168,9 @@ locals {
   # tflint-ignore: terraform_unused_declarations
   storage_account_name = var.storage_account_name != "" ? var.storage_account_name : "saatlas${random_string.suffix.id}"
   # tflint-ignore: terraform_unused_declarations
+  # Distinct from storage_account_name so ex_backup_export and ex_log_integration do not claim the same global Azure storage account name.
+  storage_account_name_log_integration = "salogint${random_string.suffix.id}"
+  # tflint-ignore: terraform_unused_declarations
   storage_account_name_byo_log = "sabyolog${random_string.suffix.id}"
 
   # PrivateLink locals - used by generated example modules (modules.generated.tf)
@@ -248,15 +251,47 @@ resource "azurerm_storage_account" "azure_read_only_log" {
   public_network_access_enabled   = false
 }
 
+# Stand-in for organization-assigned roles when examples/azure_read_only uses skip_role_assignments (module does not create these).
+resource "azurerm_role_assignment" "azure_read_only_stand_in_atlas_kv_crypto" {
+  scope                = azurerm_key_vault.azure_read_only.id
+  role_definition_name = "Key Vault Crypto User"
+  principal_id         = local.service_principal_id
+}
+
+resource "azurerm_role_assignment" "azure_read_only_stand_in_atlas_kv_reader" {
+  scope                = azurerm_key_vault.azure_read_only.id
+  role_definition_name = "Key Vault Reader"
+  principal_id         = local.service_principal_id
+}
+
+resource "azurerm_role_assignment" "azure_read_only_stand_in_atlas_backup_blob" {
+  scope                = azurerm_storage_account.azure_read_only_backup.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = local.service_principal_id
+}
+
+resource "azurerm_role_assignment" "azure_read_only_stand_in_atlas_log_blob" {
+  scope                = azurerm_storage_account.azure_read_only_log.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = local.service_principal_id
+}
+
 locals {
+  # Child example modules use legacy empty provider blocks, so module.depends_on is invalid. Gate BYO inputs on stand-in RBAC so Atlas runs after role assignments exist.
+  _azure_read_only_rbac_gate = join("|", [
+    azurerm_role_assignment.azure_read_only_stand_in_atlas_kv_crypto.id,
+    azurerm_role_assignment.azure_read_only_stand_in_atlas_kv_reader.id,
+    azurerm_role_assignment.azure_read_only_stand_in_atlas_backup_blob.id,
+    azurerm_role_assignment.azure_read_only_stand_in_atlas_log_blob.id,
+  ])
   # tflint-ignore: terraform_unused_declarations
-  key_vault_id_azure_read_only = azurerm_key_vault.azure_read_only.id
+  key_vault_id_azure_read_only = substr("${azurerm_key_vault.azure_read_only.id}${local._azure_read_only_rbac_gate}", 0, length(azurerm_key_vault.azure_read_only.id))
   # tflint-ignore: terraform_unused_declarations
-  key_identifier_azure_read_only = azurerm_key_vault_key.azure_read_only.versionless_id
+  key_identifier_azure_read_only = substr("${azurerm_key_vault_key.azure_read_only.versionless_id}${local._azure_read_only_rbac_gate}", 0, length(azurerm_key_vault_key.azure_read_only.versionless_id))
   # tflint-ignore: terraform_unused_declarations
-  backup_storage_account_id_azure_read_only = azurerm_storage_account.azure_read_only_backup.id
+  backup_storage_account_id_azure_read_only = substr("${azurerm_storage_account.azure_read_only_backup.id}${local._azure_read_only_rbac_gate}", 0, length(azurerm_storage_account.azure_read_only_backup.id))
   # tflint-ignore: terraform_unused_declarations
-  log_storage_account_id_azure_read_only = azurerm_storage_account.azure_read_only_log.id
+  log_storage_account_id_azure_read_only = substr("${azurerm_storage_account.azure_read_only_log.id}${local._azure_read_only_rbac_gate}", 0, length(azurerm_storage_account.azure_read_only_log.id))
 }
 
 # Example module calls are generated in modules.generated.tf
