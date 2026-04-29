@@ -172,8 +172,8 @@ locals {
   # Backup/log export locals
   # tflint-ignore: terraform_unused_declarations
   storage_account_name = var.storage_account_name != "" ? var.storage_account_name : "saatlas${random_string.suffix.id}"
-  # tflint-ignore: terraform_unused_declarations
   # Distinct from storage_account_name so ex_backup_export and ex_log_integration do not claim the same global Azure storage account name.
+  # tflint-ignore: terraform_unused_declarations
   storage_account_name_log_integration = "salogint${random_string.suffix.id}"
   # tflint-ignore: terraform_unused_declarations
   storage_account_name_byo_log = "sabyolog${random_string.suffix.id}"
