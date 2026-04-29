@@ -68,6 +68,8 @@ examples:
 
   - name: azure_read_only
     var_groups: [azure_read_only]
+    module_depends_on:
+      - time_sleep.azure_read_only_atlas
     plan_regressions:
       - address: module.atlas_azure.mongodbatlas_cloud_provider_access_setup.this[0]
       - address: module.atlas_azure.mongodbatlas_cloud_provider_access_authorization.this[0]

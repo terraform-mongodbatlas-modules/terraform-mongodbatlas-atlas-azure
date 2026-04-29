@@ -16,6 +16,10 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.0"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.12"
+    }
   }
   required_version = ">= 1.9"
 }
@@ -26,6 +30,7 @@ provider "azurerm" {
   subscription_id = var.subscription_id
 }
 provider "azuread" {}
+provider "time" {}
 
 variable "org_id" {
   type    = string
@@ -237,7 +242,7 @@ resource "azurerm_storage_account" "azure_read_only_backup" {
   account_replication_type        = "LRS"
   min_tls_version                 = "TLS1_2"
   allow_nested_items_to_be_public = false
-  public_network_access_enabled   = false
+  public_network_access_enabled   = true
 }
 
 resource "azurerm_storage_account" "azure_read_only_log" {
@@ -248,7 +253,7 @@ resource "azurerm_storage_account" "azure_read_only_log" {
   account_replication_type        = "LRS"
   min_tls_version                 = "TLS1_2"
   allow_nested_items_to_be_public = false
-  public_network_access_enabled   = false
+  public_network_access_enabled   = true
 }
 
 # Stand-in for organization-assigned roles when examples/azure_read_only uses skip_role_assignments (module does not create these).
@@ -276,22 +281,26 @@ resource "azurerm_role_assignment" "azure_read_only_stand_in_atlas_log_blob" {
   principal_id         = local.service_principal_id
 }
 
+# Single depends on for the four role assignments.
+resource "time_sleep" "azure_read_only_atlas" {
+  create_duration = "1s"
+  depends_on = [
+    azurerm_role_assignment.azure_read_only_stand_in_atlas_kv_crypto,
+    azurerm_role_assignment.azure_read_only_stand_in_atlas_kv_reader,
+    azurerm_role_assignment.azure_read_only_stand_in_atlas_backup_blob,
+    azurerm_role_assignment.azure_read_only_stand_in_atlas_log_blob,
+  ]
+}
+
 locals {
-  # Child example modules use legacy empty provider blocks, so module.depends_on is invalid. Gate BYO inputs on stand-in RBAC so Atlas runs after role assignments exist.
-  _azure_read_only_rbac_gate = join("|", [
-    azurerm_role_assignment.azure_read_only_stand_in_atlas_kv_crypto.id,
-    azurerm_role_assignment.azure_read_only_stand_in_atlas_kv_reader.id,
-    azurerm_role_assignment.azure_read_only_stand_in_atlas_backup_blob.id,
-    azurerm_role_assignment.azure_read_only_stand_in_atlas_log_blob.id,
-  ])
   # tflint-ignore: terraform_unused_declarations
-  key_vault_id_azure_read_only = substr("${azurerm_key_vault.azure_read_only.id}${local._azure_read_only_rbac_gate}", 0, length(azurerm_key_vault.azure_read_only.id))
+  key_vault_id_azure_read_only = azurerm_key_vault.azure_read_only.id
   # tflint-ignore: terraform_unused_declarations
-  key_identifier_azure_read_only = substr("${azurerm_key_vault_key.azure_read_only.versionless_id}${local._azure_read_only_rbac_gate}", 0, length(azurerm_key_vault_key.azure_read_only.versionless_id))
+  key_identifier_azure_read_only = azurerm_key_vault_key.azure_read_only.versionless_id
   # tflint-ignore: terraform_unused_declarations
-  backup_storage_account_id_azure_read_only = substr("${azurerm_storage_account.azure_read_only_backup.id}${local._azure_read_only_rbac_gate}", 0, length(azurerm_storage_account.azure_read_only_backup.id))
+  backup_storage_account_id_azure_read_only = azurerm_storage_account.azure_read_only_backup.id
   # tflint-ignore: terraform_unused_declarations
-  log_storage_account_id_azure_read_only = substr("${azurerm_storage_account.azure_read_only_log.id}${local._azure_read_only_rbac_gate}", 0, length(azurerm_storage_account.azure_read_only_log.id))
+  log_storage_account_id_azure_read_only = azurerm_storage_account.azure_read_only_log.id
 }
 
 # Example module calls are generated in modules.generated.tf
