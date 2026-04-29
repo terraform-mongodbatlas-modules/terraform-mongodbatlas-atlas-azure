@@ -366,7 +366,7 @@ Default: `"disabled"`
 
 ## Backup Export
 
-Backup export stores Atlas Cloud Backup snapshots in an Azure Storage container you control for retention, air-gapped recovery, and residency. Provide a `storage_account_id` and `container_name`, or set `create_storage_account.enabled = true` for module-managed storage with secure defaults (for example `public_network_access_enabled = true` on the module-managed account so MongoDB Atlas can reach the blob endpoint).
+Backup export stores Atlas Cloud Backup snapshots in an Azure Storage container you control for retention, air-gapped recovery, and residency. Provide a `storage_account_id` and `container_name`, or set `create_storage_account.enabled = true` for module-managed storage with secure defaults.
 
 See [export backup snapshots](https://www.mongodb.com/docs/atlas/backup/cloud-backup/export/) in the MongoDB Atlas documentation for product details.
 
@@ -440,7 +440,7 @@ Log exports run at 1-minute intervals.
 
 **Security defaults (when module-managed):**
 - The module sets `public_network_access_enabled` to `true` on the Storage Account so MongoDB Atlas can reach the blob endpoint.
-- Container is private, nested blob public access is not allowed, minimum TLS 1.2
+- Container is private, nested blob public access is not allowed, minimum TLS 1.2.
 
 **Integrations:**
 Each entry in `integrations` creates one `mongodbatlas_log_integration` resource.

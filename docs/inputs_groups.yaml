@@ -54,7 +54,7 @@ sections:
     title: "Backup Export"
     level: 2
     description: |
-      Backup export stores Atlas Cloud Backup snapshots in an Azure Storage container you control for retention, air-gapped recovery, and residency. Provide a `storage_account_id` and `container_name`, or set `create_storage_account.enabled = true` for module-managed storage with secure defaults (for example `public_network_access_enabled = true` on the module-managed account so MongoDB Atlas can reach the blob endpoint).
+      Backup export stores Atlas Cloud Backup snapshots in an Azure Storage container you control for retention, air-gapped recovery, and residency. Provide a `storage_account_id` and `container_name`, or set `create_storage_account.enabled = true` for module-managed storage with secure defaults.
 
       See [export backup snapshots](https://www.mongodb.com/docs/atlas/backup/cloud-backup/export/) in the MongoDB Atlas documentation for product details.
 
