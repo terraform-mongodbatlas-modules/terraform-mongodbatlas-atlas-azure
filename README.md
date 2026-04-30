@@ -76,7 +76,7 @@ resource "mongodbatlas_project" "this" {
 }
 ```
 
-- You can use this and replace the `var.project_id` with `mongodbatlas_project.this.project_id` in the [main.tf](./main.tf) file.
+- You can use this and replace the `var.project_id` with `mongodbatlas_project.this.project_id` in the [main.tf](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/blob/v0.3.0/main.tf) file.
 
 <!-- END_GETTING_STARTED -->
 
@@ -87,20 +87,20 @@ Changes will be overwritten when documentation is regenerated.
 Run 'just gen-readme' to regenerate. -->
 ## Examples
 
-The following examples show common configurations you can copy and adapt. Start with the [encryption](./examples/encryption) example for a minimal setup, then explore other examples for Private Link, backup export, and log integration. Examples can be combined in a single module call; see the [azure_read_only](./examples/azure_read_only) example for multiple features in one configuration.
+The following examples show common configurations you can copy and adapt. Start with the [encryption](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/blob/v0.3.0/examples/encryption) example for a minimal setup, then explore other examples for Private Link, backup export, and log integration. Examples can be combined in a single module call; see the [azure_read_only](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/blob/v0.3.0/examples/azure_read_only) example for multiple features in one configuration.
 
 
 Feature | Name
 --- | ---
-Backup Export | [Azure Blob Storage Export](./examples/backup_export)
-Encryption at Rest | [Azure Key Vault Integration (User-Provided)](./examples/encryption)
-Encryption at Rest | [Azure Key Vault (Module-Managed with Private Networking)](./examples/encryption_create_key_vault_private_networking)
-Cloud Provider Access | [Read-Only Azure (BYO Key Vault, Storage, and Log Export)](./examples/azure_read_only)
-Private Link | [Azure Private Endpoint (Module-Managed)](./examples/privatelink)
-Private Link | [Azure Private Endpoint (Bring Your Own Endpoint)](./examples/privatelink_byoe)
-Private Link | [Multi-Region Private Endpoints](./examples/privatelink_multi_region)
-Log Integration | [Azure Log Export](./examples/log_integration)
-Log Integration | [Azure Log Export (Bring Your Own Storage)](./examples/log_integration_byo)
+Backup Export | [Azure Blob Storage Export](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/blob/v0.3.0/examples/backup_export)
+Encryption at Rest | [Azure Key Vault Integration (User-Provided)](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/blob/v0.3.0/examples/encryption)
+Encryption at Rest | [Azure Key Vault (Module-Managed with Private Networking)](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/blob/v0.3.0/examples/encryption_create_key_vault_private_networking)
+Cloud Provider Access | [Read-Only Azure (BYO Key Vault, Storage, and Log Export)](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/blob/v0.3.0/examples/azure_read_only)
+Private Link | [Azure Private Endpoint (Module-Managed)](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/blob/v0.3.0/examples/privatelink)
+Private Link | [Azure Private Endpoint (Bring Your Own Endpoint)](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/blob/v0.3.0/examples/privatelink_byoe)
+Private Link | [Multi-Region Private Endpoints](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/blob/v0.3.0/examples/privatelink_multi_region)
+Log Integration | [Azure Log Export](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/blob/v0.3.0/examples/log_integration)
+Log Integration | [Azure Log Export (Bring Your Own Storage)](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/blob/v0.3.0/examples/log_integration_byo)
 
 <!-- END_TABLES -->
 <!-- BEGIN_TF_DOCS -->
@@ -267,7 +267,7 @@ Default: `null`
 
 Private Link keeps application traffic to Atlas on the Azure backbone instead of the public internet, which many security policies require. Use `privatelink_endpoints` or `privatelink_endpoints_single_region` for module-managed `azurerm_private_endpoint` resources, or the bring-your-own-endpoint maps (`privatelink_byo_endpoint` and `privatelink_byo_service`) when you create and manage private endpoints in your own resources.
 
-See the [Private Link documentation](https://www.mongodb.com/docs/atlas/security-private-endpoint/?cloud-provider=azure) for product behavior. For the split between Atlas service creation and registering user endpoints, use the [privatelink_byoe example](./examples/privatelink_byoe).
+See the [Private Link documentation](https://www.mongodb.com/docs/atlas/security-private-endpoint/?cloud-provider=azure) for product behavior. For the split between Atlas service creation and registering user endpoints, use the [privatelink_byoe example](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/blob/v0.3.0/examples/privatelink_byoe).
 
 ### privatelink_endpoints
 
@@ -332,7 +332,7 @@ Default: `{}`
 
 ### privatelink_byo_service
 
-User-managed Azure private endpoints to register with Atlas for BYOE. Each key must match a key in `privatelink_byo_endpoint` and must supply the Azure private endpoint resource ID and private IP. Supply these values in the same apply as `privatelink_byo_endpoint` if Terraform manages the endpoints, or in a later apply after you create the endpoints. See the [privatelink_byoe](./examples/privatelink_byoe) example.
+User-managed Azure private endpoints to register with Atlas for BYOE. Each key must match a key in `privatelink_byo_endpoint` and must supply the Azure private endpoint resource ID and private IP. Supply these values in the same apply as `privatelink_byo_endpoint` if Terraform manages the endpoints, or in a later apply after you create the endpoints. See the [privatelink_byoe](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/blob/v0.3.0/examples/privatelink_byoe) example.
 
 Type:
 
@@ -491,7 +491,7 @@ Default: `{}`
 
 ## Timeouts
 
-Control Terraform operation timeouts for supported resources. For upgrades from v0.2.x, see [v0.3.0 upgrade guide](docs/v0.3.0-upgrade-guide.md).
+Control Terraform operation timeouts for supported resources. For upgrades from v0.2.x, see [v0.3.0 upgrade guide](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/blob/v0.3.0/docs/v0.3.0-upgrade-guide.md).
 
 ### timeouts
 
@@ -651,7 +651,7 @@ Description: Atlas Cloud Provider Access role\_id for the Azure integration. Reu
 
 ### Where can I find what changed in each release?
 
-See [CHANGELOG.md](CHANGELOG.md) in this repository. It lists user-facing changes, including breaking changes and migration notes, per release.
+See [CHANGELOG.md](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/blob/v0.3.0/CHANGELOG.md) in this repository. It lists user-facing changes, including breaking changes and migration notes, per release.
 
 ### When should I not use this module?
 
@@ -667,7 +667,7 @@ Use `create_service_principal = true` (default) for a module-managed service pri
 
 ### How do I upgrade to v0.3.0 (timeouts and migration)?
 
-See the [v0.2.x to v0.3.0 upgrade guide](docs/v0.3.0-upgrade-guide.md), including the Configurable Timeouts section for `timeouts = null` (zero-diff) versus default 30m behavior.
+See the [v0.2.x to v0.3.0 upgrade guide](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/blob/v0.3.0/docs/v0.3.0-upgrade-guide.md), including the Configurable Timeouts section for `timeouts = null` (zero-diff) versus default 30m behavior.
 
 ### What is `provider_meta "mongodbatlas"` doing?
 
