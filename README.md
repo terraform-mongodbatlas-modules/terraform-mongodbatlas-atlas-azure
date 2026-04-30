@@ -649,6 +649,10 @@ Description: Atlas Cloud Provider Access role\_id for the Azure integration. Reu
 
 ## FAQ
 
+### Where can I find what changed in each release?
+
+See [CHANGELOG.md](CHANGELOG.md) in this repository. It lists user-facing changes, including breaking changes and migration notes, per release.
+
 ### When should I not use this module?
 
 - You need full control of every Azure resource and Atlas API call outside the supported variables, and you cannot accept any module defaults or lifecycle.
