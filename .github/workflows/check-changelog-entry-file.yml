@@ -8,6 +8,9 @@ on:
 env:
   SKIP_PREFIXES: chore test doc ci refactor
 
+permissions:
+  contents: read
+
 jobs:
   should-skip:
     runs-on: ubuntu-latest
@@ -34,6 +37,9 @@ jobs:
     needs: should-skip
     if: needs.should-skip.outputs.skip != 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read # gh pr view reads the PR file list
     env:
       CHANGELOG_FILE: ".changelog/${{ github.event.pull_request.number }}.txt"
     steps:
