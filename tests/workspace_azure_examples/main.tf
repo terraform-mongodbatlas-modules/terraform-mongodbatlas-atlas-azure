@@ -2,7 +2,7 @@ terraform {
   required_providers {
     mongodbatlas = {
       source  = "mongodb/mongodbatlas"
-      version = "~> 2.8"
+      version = "~> 2.11"
     }
     azurerm = {
       source  = "hashicorp/azurerm"
