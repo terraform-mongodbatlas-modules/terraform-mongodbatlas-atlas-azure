@@ -21,7 +21,7 @@ terraform {
       version = "~> 0.12"
     }
   }
-  required_version = ">= 1.9"
+  required_version = ">= 1.10"
 }
 
 provider "mongodbatlas" {}
