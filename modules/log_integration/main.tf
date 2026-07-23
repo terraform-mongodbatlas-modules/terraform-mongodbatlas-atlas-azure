@@ -1,5 +1,5 @@
 locals {
-  create_storage_account = var.create_storage_account != null && var.create_storage_account.enabled
+  create_storage_account = try(var.create_storage_account.enabled, false)
   storage_account_id     = local.create_storage_account ? azurerm_storage_account.atlas[0].id : var.storage_account_id
   storage_account_name   = local.create_storage_account ? azurerm_storage_account.atlas[0].name : element(split("/", var.storage_account_id), 8)
   create_container       = local.create_storage_account || var.create_container
