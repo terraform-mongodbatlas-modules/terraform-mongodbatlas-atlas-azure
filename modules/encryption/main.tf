@@ -5,7 +5,7 @@ data "azuread_service_principal" "atlas" {
 }
 
 locals {
-  create_key_vault = try(var.create_key_vault.enabled, false)
+  create_key_vault = try(var.create_key_vault.enabled == true, false)
 
   key_vault_id        = local.create_key_vault ? azurerm_key_vault.atlas[0].id : var.key_vault_id
   key_vault_name      = local.create_key_vault ? azurerm_key_vault.atlas[0].name : element(split("/", var.key_vault_id), 8)
