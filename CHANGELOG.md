@@ -5,6 +5,10 @@ NOTES:
 * provider/mongodbatlas: Requires minimum version 2.11.0 for `mongodbatlas_privatelink_endpoint` update timeout support ([#70](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/pull/70))
 * terraform: Requires minimum version 1.10 to align with the MongoDB Atlas provider compatibility matrix ([#70](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/pull/70))
 
+BUG FIXES:
+
+* module: Strips double quotes from plan snapshot filenames so Windows can clone the repository ([#73](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/pull/73))
+
 ## 0.3.0 (April 30, 2026)
 
 BREAKING CHANGES:
