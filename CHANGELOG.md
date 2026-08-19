@@ -1,5 +1,7 @@
 ## (Unreleased)
 
+## 0.3.1 (August 19, 2026)
+
 NOTES:
 
 * provider/mongodbatlas: Requires minimum version 2.11.0 for `mongodbatlas_privatelink_endpoint` update timeout support ([#70](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/pull/70))
