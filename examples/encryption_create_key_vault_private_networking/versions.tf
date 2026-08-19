@@ -23,7 +23,7 @@ terraform {
   # These values are used in the User-Agent Header
   provider_meta "mongodbatlas" {
     module_name    = "atlas-azure"
-    module_version = "0.3.1"
+    module_version = "local"
   }
 }
 
