@@ -17,6 +17,7 @@ local_user_enabled: true
 location: eastus2
 min_tls_version: TLS1_2
 nfsv3_enabled: false
+public_network_access: Enabled
 public_network_access_enabled: true
 queue_encryption_key_type: Service
 sas_policy: []
