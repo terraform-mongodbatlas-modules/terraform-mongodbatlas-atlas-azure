@@ -24,3 +24,6 @@ sas_policy: []
 sftp_enabled: false
 shared_access_key_enabled: true
 table_encryption_key_type: Service
+tags:
+  mongodb-env: dev
+  mongodb-owner: owner@example.com

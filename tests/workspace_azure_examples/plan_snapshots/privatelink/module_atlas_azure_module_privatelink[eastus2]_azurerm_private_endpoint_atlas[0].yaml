@@ -5,6 +5,9 @@ private_dns_zone_group: []
 private_service_connection:
 - is_manual_connection: true
   request_message: MongoDB Atlas PrivateLink
+tags:
+  mongodb-env: dev
+  mongodb-owner: owner@example.com
 timeouts:
   create: 30m
   delete: 30m

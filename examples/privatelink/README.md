@@ -65,6 +65,8 @@ module "atlas_azure" {
   privatelink_endpoints = [
     { region = var.region, subnet_id = var.subnet_id }
   ]
+
+  azure_tags = var.azure_tags
 }
 
 output "privatelink" {

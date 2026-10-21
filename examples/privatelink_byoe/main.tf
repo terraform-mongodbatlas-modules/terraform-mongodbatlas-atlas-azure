@@ -26,6 +26,8 @@ module "atlas_azure" {
       azure_private_endpoint_ip_address = azurerm_private_endpoint.custom.private_service_connection[0].private_ip_address
     }
   }
+
+  azure_tags = var.azure_tags
 }
 
 resource "azurerm_private_endpoint" "custom" { # 2
@@ -33,6 +35,7 @@ resource "azurerm_private_endpoint" "custom" { # 2
   location            = module.atlas_azure.privatelink_service_info[local.pe1].region
   resource_group_name = var.resource_group_name
   subnet_id           = var.subnet_id
+  tags                = var.azure_tags
 
   private_service_connection {
     name                           = module.atlas_azure.privatelink_service_info[local.pe1].atlas_endpoint_service_name

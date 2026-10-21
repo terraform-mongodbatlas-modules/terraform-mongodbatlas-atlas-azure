@@ -48,3 +48,9 @@ variable "log_container_name" {
   type        = string
   description = "Blob container name for log export in the log storage account"
 }
+
+variable "azure_tags" {
+  type        = map(string)
+  description = "Tags to apply to Azure resources"
+  default     = {}
+}

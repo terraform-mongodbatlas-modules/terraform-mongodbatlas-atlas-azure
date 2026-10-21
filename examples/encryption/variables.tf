@@ -40,3 +40,9 @@ variable "soft_delete_retention_days" {
   default     = 90
   description = "Soft delete retention days (7-90). Use 7 for dev/test."
 }
+
+variable "azure_tags" {
+  type        = map(string)
+  description = "Tags to apply to Azure resources"
+  default     = {}
+}

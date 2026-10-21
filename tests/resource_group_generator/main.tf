@@ -30,6 +30,12 @@ variable "location" {
   description = "Azure region."
 }
 
+variable "tags" {
+  type        = map(string)
+  description = "Tags applied to the generated resource group"
+  default     = {}
+}
+
 resource "random_string" "suffix" {
   count   = var.name == "" ? 1 : 0
   length  = 6
@@ -44,6 +50,7 @@ locals {
 resource "azurerm_resource_group" "this" {
   name     = local.name
   location = var.location
+  tags     = var.tags
 }
 
 output "name" {

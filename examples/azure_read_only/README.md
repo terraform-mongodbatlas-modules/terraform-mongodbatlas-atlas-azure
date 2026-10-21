@@ -87,6 +87,8 @@ module "atlas_azure" {
       { log_types = ["MONGOD_AUDIT"], prefix_path = "audit" },
     ]
   }
+
+  azure_tags = var.azure_tags
 }
 
 output "role_id" {

@@ -17,6 +17,8 @@ module "atlas_azure" {
       azure_location      = var.azure_location
     }
   }
+
+  azure_tags = var.azure_tags
 }
 
 # ─────────────────────────────────────────────────────────────────────────────

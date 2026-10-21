@@ -17,3 +17,9 @@ variable "subnet_id" {
   type        = string
   description = "Azure subnet ID for private endpoint"
 }
+
+variable "azure_tags" {
+  type        = map(string)
+  description = "Tags to apply to Azure resources"
+  default     = {}
+}

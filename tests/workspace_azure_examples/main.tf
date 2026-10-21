@@ -85,6 +85,7 @@ module "rg" {
   count    = var.resource_group_name == "" ? 1 : 0
   source   = "../resource_group_generator"
   location = var.azure_location
+  tags     = var.azure_tags
 }
 
 # Shared service principal (tenant-scoped)
@@ -109,6 +110,7 @@ module "vnet_eastus2" {
   resource_group_name = local.resource_group_name
   address_space       = "10.0.0.0/16"
   subnet_prefix       = "10.0.1.0/24"
+  tags                = var.azure_tags
 }
 
 # Multi-region uses separate CIDR ranges to avoid conflicts:
@@ -120,6 +122,7 @@ module "vnet_multi_region_eastus2" {
   resource_group_name = local.resource_group_name
   address_space       = "10.2.0.0/16"
   subnet_prefix       = "10.2.1.0/24"
+  tags                = var.azure_tags
 }
 
 module "vnet_multi_region_westus2" {
@@ -128,6 +131,7 @@ module "vnet_multi_region_westus2" {
   resource_group_name = local.resource_group_name
   address_space       = "10.1.0.0/16" # Distinct from eastus2 ranges
   subnet_prefix       = "10.1.1.0/24"
+  tags                = var.azure_tags
 }
 
 # Random suffix for resource names (key vault, storage account)
@@ -204,6 +208,7 @@ resource "azurerm_key_vault" "azure_read_only" {
   purge_protection_enabled   = false
   soft_delete_retention_days = 7
   rbac_authorization_enabled = true
+  tags                       = var.azure_tags
 }
 
 resource "azurerm_role_assignment" "azure_read_only_terraform_kv_admin" {
@@ -218,6 +223,7 @@ resource "azurerm_key_vault_key" "azure_read_only" {
   key_type     = "RSA"
   key_size     = 2048
   key_opts     = ["encrypt", "decrypt", "wrapKey", "unwrapKey"]
+  tags         = var.azure_tags
 
   rotation_policy {
     automatic {
@@ -243,6 +249,7 @@ resource "azurerm_storage_account" "azure_read_only_backup" {
   min_tls_version                 = "TLS1_2"
   allow_nested_items_to_be_public = false
   public_network_access_enabled   = true
+  tags                            = var.azure_tags
 }
 
 resource "azurerm_storage_account" "azure_read_only_log" {
@@ -254,6 +261,7 @@ resource "azurerm_storage_account" "azure_read_only_log" {
   min_tls_version                 = "TLS1_2"
   allow_nested_items_to_be_public = false
   public_network_access_enabled   = true
+  tags                            = var.azure_tags
 }
 
 # Stand-in for organization-assigned roles when examples/azure_read_only uses skip_role_assignments (module does not create these).
