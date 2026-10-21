@@ -41,6 +41,11 @@ variable "subscription_id" {
   type = string
 }
 
+variable "azure_tags" {
+  type    = map(string)
+  default = {}
+}
+
 variable "resource_group_name" {
   type    = string
   default = ""

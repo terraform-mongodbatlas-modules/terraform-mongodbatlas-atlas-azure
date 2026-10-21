@@ -98,8 +98,8 @@ var_groups:
   # not leak the team email.
   tags:
     - name: azure_tags
-      expose_in_workspace: true
-      module_value: "{}"
+      expose_in_workspace: false
+      module_value: var.azure_tags
       var_type: map(string)
 
   backup_export:
