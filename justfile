@@ -43,6 +43,7 @@ validate:
 lint:
     tflint -f compact --minimum-failure-severity=warning
     tflint -f compact --recursive --minimum-failure-severity=warning --chdir=examples
+    just ws-gen # generate gitignored workspace tf files; tflint --chdir=tests needs the declared vars
     tflint -f compact --recursive --minimum-failure-severity=warning --chdir=tests
     tflint -f compact --recursive --minimum-failure-severity=warning --chdir=modules
     terraform fmt -check -recursive
