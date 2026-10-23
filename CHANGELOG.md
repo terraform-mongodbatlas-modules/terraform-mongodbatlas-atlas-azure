@@ -1,5 +1,9 @@
 ## (Unreleased)
 
+ENHANCEMENTS:
+
+* examples: Adds the `azure_tags` variable to every example and tags the Azure resources the examples create directly ([#86](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/pull/86))
+
 ## 0.3.2 (October 09, 2026)
 
 BUG FIXES:
