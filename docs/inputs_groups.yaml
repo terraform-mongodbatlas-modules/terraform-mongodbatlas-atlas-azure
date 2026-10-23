@@ -32,7 +32,6 @@ sections:
     match:
       names:
         - encryption
-        - encryption_client_secret
 
   - id: privatelink
     title: "Private Link"

@@ -52,7 +52,6 @@ Optional env vars:
 - `MONGODB_ATLAS_PROJECT_ID` - Use same project ID for all examples (plan snapshot tests)
 - `AZURE_RESOURCE_GROUP_NAME` - Use existing resource group
 - `AZURE_SERVICE_PRINCIPAL_ID` - Use existing service principal (see note below)
-- `EXISTING_ENCRYPTION_CLIENT_SECRET` - Use existing encryption client secret (skips creation)
 
 **Service Principal Note**: CI uses a shared service principal for Atlas-Azure integration. Do not delete or recreate it. If you need the client secret value for local testing, retrieve it from your team's secret manager.
 

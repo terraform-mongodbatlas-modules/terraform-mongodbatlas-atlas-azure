@@ -252,16 +252,6 @@ object({
 
 Default: `{}`
 
-### encryption_client_secret
-
-Deprecated: Azure AD application client secret for encryption. The module now uses CPA `role_id` automatically. Remove this variable from your configuration. Will be removed at v1.0.
-
-When set, the encryption submodule uses the legacy Key Vault config (tenant_id, client_id, and secret).
-
-Type: `string`
-
-Default: `null`
-
 
 ## Private Link
 
@@ -669,6 +659,10 @@ Use `create_service_principal = true` (default) for a module-managed service pri
 
 See the [v0.2.x to v0.3.0 upgrade guide](docs/v0.3.0-upgrade-guide.md), including the Configurable Timeouts section for `timeouts = null` (zero-diff) versus default 30m behavior.
 
+### How do I upgrade to v1.0.0?
+
+See the [v0.3.x to v1.0.0 upgrade guide](docs/v1.0.0-upgrade-guide.md) for migration instructions, including the removal of the deprecated `encryption_client_secret` variable in favor of Cloud Provider Access `role_id`.
+
 ### What is `provider_meta "mongodbatlas"` doing?
 
 This block tracks module usage by updating the User-Agent of requests to Atlas:
@@ -682,7 +676,7 @@ User-Agent: terraform-provider-mongodbatlas/2.1.0 Terraform/1.13.1 module_name/a
 
 ### Does encryption at rest require a client secret?
 
-No. The module authenticates through `role_id` for encryption at rest automatically. `encryption_client_secret` is deprecated and the module drops it at v1.0. Remove it from your configuration if present.
+No. The module authenticates through `role_id` for encryption at rest automatically and needs no client secret.
 
 ### What if I only need one integration (for example, only PrivateLink)?
 
