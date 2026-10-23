@@ -37,7 +37,7 @@ Runs `terraform init` and `terraform validate` across all supported Terraform ve
 
 ## Plan Snapshot Tests
 
-Plan snapshot tests verify `terraform plan` output consistency. They use workspace directories under `tests/workspace_azure_examples/`.
+Plan snapshot tests verify `terraform plan` output consistency. They use workspace directories under `tests/ws_azure/`.
 
 ### Generating dev.tfvars
 
@@ -62,10 +62,10 @@ Optional env vars:
 
 ```bash
 # Run plan snapshot tests (requires full path to var file)
-just plan-snapshot-test --var-file $(pwd)/tests/workspace_azure_examples/dev.tfvars
+just plan-snapshot-test --var-file $(pwd)/tests/ws_azure/dev.tfvars
 
 # Apply examples (creates real resources)
-just apply-examples --var-file $(pwd)/tests/workspace_azure_examples/dev.tfvars --auto-approve
+just apply-examples --var-file $(pwd)/tests/ws_azure/dev.tfvars --auto-approve
 
 # Destroy resources after testing
 just destroy-examples --auto-approve
@@ -73,7 +73,7 @@ just destroy-examples --auto-approve
 
 ### Snapshot Configuration
 
-Configure examples in `tests/workspace_azure_examples/workspace_test_config.yaml`:
+Configure examples in `tests/ws_azure/workspace_test_config.yaml`:
 
 ```yaml
 examples:

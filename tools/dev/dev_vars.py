@@ -6,7 +6,7 @@ import typer
 
 app = typer.Typer()
 
-WORKSPACE_DIR = Path(__file__).parent.parent.parent / "tests" / "workspace_azure_examples"
+WORKSPACE_DIR = Path(__file__).parent.parent.parent / "tests" / "ws_azure"
 DEV_TFVARS = WORKSPACE_DIR / "dev.tfvars"
 
 DEFAULT_ATLAS_AZURE_APP_ID = "9f2deb0d-be22-4524-a403-df531868bac0"

@@ -133,7 +133,7 @@ jobs:
         if: matrix.provider_mode == 'head'
   # === OK_EDIT: path-sync job-snapshot-tests ===
       - run: just dev-vars-azure
-      - run: just plan-snapshot-test --var-file "$(pwd)/tests/workspace_azure_examples/dev.tfvars"
+      - run: just plan-snapshot-test --var-file "$(pwd)/tests/ws_azure/dev.tfvars"
   # === DO_NOT_EDIT: path-sync job-snapshot-tests ===
   # === OK_EDIT: path-sync job-snapshot-tests ===
 
