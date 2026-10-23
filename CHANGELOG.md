@@ -1,5 +1,9 @@
 ## (Unreleased)
 
+BREAKING CHANGES:
+
+* variable/encryption_client_secret: Removes deprecated `encryption_client_secret` now that encryption authenticates through Cloud Provider Access `role_id` ([#88](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/pull/88))
+
 ENHANCEMENTS:
 
 * examples: Adds the `azure_tags` variable to every example and tags the Azure resources the examples create directly ([#86](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/pull/86))
