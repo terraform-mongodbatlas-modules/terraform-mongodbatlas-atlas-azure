@@ -7,6 +7,8 @@ module "atlas_azure" {
   privatelink_regional_mode = "auto"
 
   privatelink_endpoints = var.privatelink_endpoints
+
+  azure_tags = var.azure_tags
 }
 
 output "privatelink" {

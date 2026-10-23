@@ -1,0 +1,3 @@
+```release-note:enhancement
+examples: Adds the `azure_tags` variable to every example and tags the Azure resources the examples create directly
+```

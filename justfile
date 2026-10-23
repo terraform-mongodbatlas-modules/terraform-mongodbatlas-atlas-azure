@@ -268,5 +268,6 @@ dependabot-sdlc-triage:
 validate-regions-azure:
     just validate-regions azure --output-format variable
 
-dev-vars-azure:
-    {{py}} dev.dev_vars azure
+# Write tests/workspace_azure_examples/dev.tfvars with the CI azure_tags (mongodb-env, mongodb-owner).
+dev-vars-azure env="dev" owner="owner@example.com":
+    {{py}} dev.dev_vars azure {{quote(env)}} {{quote(owner)}}

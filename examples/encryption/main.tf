@@ -13,6 +13,7 @@ resource "azurerm_key_vault" "atlas" {
   purge_protection_enabled   = var.purge_protection_enabled
   soft_delete_retention_days = var.soft_delete_retention_days
   rbac_authorization_enabled = true
+  tags                       = var.azure_tags
 }
 
 resource "azurerm_role_assignment" "terraform_key_vault_admin" {
@@ -27,6 +28,7 @@ resource "azurerm_key_vault_key" "atlas" {
   key_type     = "RSA"
   key_size     = 2048
   key_opts     = ["encrypt", "decrypt", "wrapKey", "unwrapKey"]
+  tags         = var.azure_tags
 
   rotation_policy {
     automatic {
@@ -55,6 +57,8 @@ module "atlas_azure" {
     key_vault_id   = azurerm_key_vault.atlas.id
     key_identifier = azurerm_key_vault_key.atlas.versionless_id
   }
+
+  azure_tags = var.azure_tags
 }
 
 output "encryption" {

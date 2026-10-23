@@ -19,6 +19,8 @@ module "atlas_azure" {
       { log_types = ["MONGOD"], prefix_path = "operational" },
     ]
   }
+
+  azure_tags = var.azure_tags
 }
 
 output "log_integration" {

@@ -36,6 +36,12 @@ variable "subnet_prefix" {
   default = "10.0.1.0/24"
 }
 
+variable "tags" {
+  type        = map(string)
+  description = "Tags applied to the generated virtual network"
+  default     = {}
+}
+
 resource "random_string" "suffix" {
   length  = 6
   special = false
@@ -47,6 +53,7 @@ resource "azurerm_virtual_network" "this" {
   location            = var.location
   resource_group_name = var.resource_group_name
   address_space       = [var.address_space]
+  tags                = var.tags
 }
 
 resource "azurerm_subnet" "atlas" {

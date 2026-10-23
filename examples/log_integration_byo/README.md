@@ -65,6 +65,7 @@ resource "azurerm_storage_account" "logs" {
   account_replication_type        = "LRS"
   min_tls_version                 = "TLS1_2"
   allow_nested_items_to_be_public = false
+  tags                            = var.azure_tags
 }
 
 /*
@@ -100,6 +101,8 @@ module "atlas_azure" {
       { log_types = ["MONGOD_AUDIT"], prefix_path = "audit" },
     ]
   }
+
+  azure_tags = var.azure_tags
 }
 
 output "log_integration" {

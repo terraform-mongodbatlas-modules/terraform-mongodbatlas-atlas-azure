@@ -41,12 +41,14 @@ Plan snapshot tests verify `terraform plan` output consistency. They use workspa
 
 ### Generating dev.tfvars
 
-The `dev-vars-azure` command reads from environment variables (see Authentication Setup above):
+The `dev-vars-azure` command takes the `mongodb-env` and `mongodb-owner` tag values as arguments and reads the rest from environment variables (see Authentication Setup above):
 
 ```bash
 # Generate dev.tfvars from environment variables
-just dev-vars-azure
+just dev-vars-azure dev you@example.com
 ```
+
+The arguments populate the `azure_tags` written into `dev.tfvars`, which tags the Azure resources the workspace and examples create. The `dev` / `owner@example.com` defaults match the committed plan snapshots; use your Atlas environment and email when applying real resources.
 
 Optional env vars:
 - `MONGODB_ATLAS_PROJECT_ID` - Use same project ID for all examples (plan snapshot tests)

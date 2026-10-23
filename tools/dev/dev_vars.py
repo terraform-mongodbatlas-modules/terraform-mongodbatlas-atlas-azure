@@ -45,6 +45,8 @@ project_ids = {
 
 @app.command()
 def azure(
+    env: str,
+    owner: str,
     org_id: str = typer.Option(..., envvar="MONGODB_ATLAS_ORG_ID"),
     subscription_id: str = typer.Option(..., envvar="ARM_SUBSCRIPTION_ID"),
     resource_group_name: str = typer.Option("", envvar="AZURE_RESOURCE_GROUP_NAME"),
@@ -59,10 +61,14 @@ def azure(
     ),
 ) -> None:
     """Generate dev.tfvars from environment variables."""
+    if not env or not owner:
+        typer.secho("env and owner must not be empty (mongodb-env, mongodb-owner)", fg="red")
+        raise typer.Exit(code=1)
     WORKSPACE_DIR.mkdir(parents=True, exist_ok=True)
     lines = [
         f'org_id = "{org_id}"',
         f'subscription_id = "{subscription_id}"',
+        f'azure_tags = {{\n  "mongodb-env"   = "{env}"\n  "mongodb-owner" = "{owner}"\n}}',
     ]
     if resource_group_name:
         lines.append(f'resource_group_name = "{resource_group_name}"')

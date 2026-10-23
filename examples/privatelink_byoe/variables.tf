@@ -27,3 +27,9 @@ variable "static_ip_address" {
   type        = string
   description = "Static IP address for the private endpoint (must be within subnet range)"
 }
+
+variable "azure_tags" {
+  type        = map(string)
+  description = "Tags to apply to Azure resources"
+  default     = {}
+}

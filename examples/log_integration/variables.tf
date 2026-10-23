@@ -41,3 +41,9 @@ variable "service_principal_id" {
   default     = null
   description = "Existing service principal object ID. Required if create_service_principal = false."
 }
+
+variable "azure_tags" {
+  type        = map(string)
+  description = "Tags to apply to Azure resources"
+  default     = {}
+}

@@ -18,3 +18,9 @@ variable "privatelink_endpoints" {
   }))
   description = "PrivateLink endpoints. `region` accepts Atlas (US_EAST_2) or Azure (eastus2) format."
 }
+
+variable "azure_tags" {
+  type        = map(string)
+  description = "Tags to apply to Azure resources"
+  default     = {}
+}
