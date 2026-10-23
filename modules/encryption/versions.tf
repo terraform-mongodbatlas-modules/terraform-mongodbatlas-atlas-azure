@@ -10,10 +10,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 4.42"
     }
-    azuread = {
-      source  = "hashicorp/azuread"
-      version = ">= 2.53"
-    }
   }
 
   provider_meta "mongodbatlas" {
