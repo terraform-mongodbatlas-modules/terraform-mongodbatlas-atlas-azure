@@ -93,7 +93,9 @@ jobs:
           provider-ref: ${{ inputs.provider_ref }}
       # === OK_EDIT: path-sync job-apply-setup ===
       - name: Generate dev.tfvars
-        run: just dev-vars-azure "${{ inputs.atlas_cloud_env }}" "${{ vars.MONGODB_OWNER }}"
+        env:
+          MONGODB_TAG_OWNER: ${{ vars.MONGODB_TAG_OWNER }}
+        run: just dev-vars-azure "${{ inputs.atlas_cloud_env }}" "$MONGODB_TAG_OWNER"
       - name: Apply examples
         env:
           INCLUDE_EXAMPLES: ${{ inputs.include_examples }}
