@@ -1,9 +1,5 @@
 data "azurerm_client_config" "current" {}
 
-data "azuread_service_principal" "atlas" {
-  object_id = var.service_principal_id
-}
-
 locals {
   create_key_vault = try(var.create_key_vault.enabled == true, false)
 
@@ -146,7 +142,7 @@ resource "mongodbatlas_encryption_at_rest" "this" {
   project_id               = var.project_id
   enabled_for_search_nodes = var.enabled_for_search_nodes
 
-  /* Mutually exclusive auth: role_id (default) vs tenant_id/client_id/secret (legacy); single block, conditional attrs. */
+  # Auth is always CPA role_id; the module no longer supports tenant_id/client_id/secret.
   azure_key_vault_config {
     enabled                    = true
     azure_environment          = "AZURE"
@@ -156,10 +152,7 @@ resource "mongodbatlas_encryption_at_rest" "this" {
     key_identifier             = local.key_identifier
     require_private_networking = var.require_private_networking
 
-    role_id   = var.client_secret == null ? var.role_id : null
-    tenant_id = var.client_secret != null ? local.tenant_id : null
-    client_id = var.client_secret != null ? data.azuread_service_principal.atlas.client_id : null
-    secret    = var.client_secret
+    role_id = var.role_id
   }
 
   lifecycle {

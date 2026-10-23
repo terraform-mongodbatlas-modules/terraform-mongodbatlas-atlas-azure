@@ -143,17 +143,6 @@ variable "encryption" {
   }
 }
 
-variable "encryption_client_secret" {
-  type        = string
-  default     = null
-  sensitive   = true
-  description = <<-EOT
-    Deprecated: Azure AD application client secret for encryption. The module now uses CPA `role_id` automatically. Remove this variable from your configuration. Will be removed at v1.0.
-
-    When set, the encryption submodule uses the legacy Key Vault config (tenant_id, client_id, and secret).
-  EOT
-}
-
 variable "privatelink_byo_endpoint" {
   type = map(object({
     region = string

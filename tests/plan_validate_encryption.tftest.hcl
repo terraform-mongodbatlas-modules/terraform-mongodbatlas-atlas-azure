@@ -169,22 +169,6 @@ run "encryption_role_id_only" {
   }
 }
 
-run "encryption_with_deprecated_client_secret" {
-  command = plan
-
-  variables {
-    project_id               = var.project_id
-    encryption_client_secret = "test-secret"
-    encryption = {
-      enabled        = true
-      key_vault_id   = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.KeyVault/vaults/kv"
-      key_identifier = "https://kv.vault.azure.net/keys/my-key"
-    }
-  }
-
-  expect_failures = [check.encryption_client_secret_deprecated]
-}
-
 run "encryption_enabled_for_search_nodes_default_true" {
   command = plan
 
