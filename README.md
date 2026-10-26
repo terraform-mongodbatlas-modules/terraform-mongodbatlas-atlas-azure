@@ -29,7 +29,7 @@ Run 'just gen-readme' to regenerate. -->
 
 MongoDB formally supports this module, including bug fixes, security patches, and backward-compatible enhancements. The v1 release carries a two-year stability commitment: no breaking changes through September 2028 (at the earliest).
 
-The module tracks MongoDB Atlas provider releases and adopts each new provider major after a stabilization period following general availability. Adopting a provider major does not rename or remove module variables or change defaults, and is not considered a breaking change unless a config change is needed.
+The module tracks MongoDB Atlas provider releases and adopts each new provider major after a stabilization period following general availability. Before adopting, we test the new provider major against every supported minor version of the module. Adopting a provider major does not rename or remove module variables or change defaults. You can move to a new provider major on your current module minor version without changing your configuration. 
 
 ## Local setup
 
