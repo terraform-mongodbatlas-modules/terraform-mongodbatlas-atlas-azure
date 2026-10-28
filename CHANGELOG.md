@@ -1,5 +1,7 @@
 ## (Unreleased)
 
+## 1.0.0 (October 28, 2026)
+
 BREAKING CHANGES:
 
 * variable/encryption_client_secret: Removes deprecated `encryption_client_secret` now that encryption authenticates through Cloud Provider Access `role_id` ([#88](https://github.com/terraform-mongodbatlas-modules/terraform-mongodbatlas-atlas-azure/pull/88))
