@@ -1,4 +1,5 @@
 ip_configuration: []
+ip_version_type: IPv4
 location: eastus2
 name: pe-atlas-eastus2
 private_dns_zone_group: []
